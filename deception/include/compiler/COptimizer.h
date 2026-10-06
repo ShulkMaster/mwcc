@@ -1,0 +1,106 @@
+#ifndef COMPILER_COPTIMIZER_H
+#define COMPILER_COPTIMIZER_H
+
+#include "compiler/common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#pragma options align = mac68k
+struct COptBlockLink {
+    struct COptBlockLink *next; /* 0x00: add_succ and build_opt_blocks link successor/predecessor edges */
+    union {
+        struct COptBlock *
+            block; /* 0x04: build_opt_blocks resolution phase installs blocks; propagate_bit_to_preds reads resolved edges */
+        struct Statement *
+            statement; /* 0x04: add_succ and build_opt_blocks construction phase store statements before the final resolution loop */
+    } target; /* 0x04: build_opt_blocks changes statement targets to block targets in its final loop */
+};
+#pragma options align = reset
+#pragma options align = mac68k
+struct COptBlock {
+    struct COptBlock *next;
+    COptBlockLink *pred;
+    COptBlockLink *succ;
+    struct Statement *items;
+    SInt16 *
+        referenceBits; /* 0x10: mark_dlocal_reference_bits marks indirect reads; propagate_bit_to_preds propagates them backward */
+    SInt16 *
+        referenceBarrierBits; /* 0x14: mark_dlocal_reference_bits marks assignments/direct references before reads; propagate_bit_to_preds stops at these bits */
+    SInt32 unused;            /* 0x18: new_block and new_block2 initialize to zero; no other uses */
+    SInt16 count;
+    UInt8 flag;
+};
+#pragma options align = reset
+#pragma options align = mac68k
+struct COptCSE {
+    struct COptCSE *next;
+    struct COptCSE *left;
+    struct COptCSE *right;
+    struct COptBlock *block;
+    struct ENode *expr;
+    struct ENode *last;
+    struct ENode *replacement;
+    SInt16 uses;
+};
+#pragma options align = reset
+/* Links a common-subexpression occurrence to its candidate group. */
+struct OptimizerOccurrence {
+    struct OptimizerOccurrence *next;
+    struct COptCSE *group;
+    struct ENode *expression;
+};
+extern UInt8 data_0058851f;
+extern unsigned char data_00588513;
+extern void COptimizer_OptimizeStatementList(Object *unused, Statement *list);
+extern void mark_reachable_statements(Statement *input);
+extern void COptimizer_RecordObjectUse(Object *object, unsigned char direct_reference);
+extern void COptimizer_CountExpressionObjectUses(ENode *expression);
+extern void simplify_statement_branches(Statement *stmt);
+extern void follow_switch_labels_and_fold_constant(Statement *self);
+extern void COptimizer_004bf980(void);
+extern void mark_dlocal_reference_bits(ENode *node);
+extern void set_bit(SInt16 *p, SInt16 n);
+extern UInt16 test_bit(const SInt16 *words, short bit);
+extern void COptimizer_004c0470(ENode *node);
+extern void invalidate_expr_cse(ENode *expression);
+extern ENode *fn_004c07c0(ENode *expr);
+extern void eliminate_unreachable_statements(Statement *items);
+extern void COptimizer_004c0800(ENode *n);
+extern COptCSE *find_or_create_commutative_cse(ENode *expr, COptCSE *left, COptCSE *right);
+extern void eliminate_common_subexpressions(void);
+extern COptCSE *collect_expr_cse(ENode *expr);
+extern Boolean traverse_node_list_reverse(ENodeList *node, FuncArg *value);
+extern COptCSE *find_or_create_left_cse(ENode *expr, COptCSE *left);
+extern void fold_and_invert_conditional_branch(Statement *s);
+extern void remove_unreferenced_labels(Statement *statements);
+extern void COptimizer_CheckStmtsForNonVoidFunction(Object *func, Statement *stmt);
+extern void set_label_stmt_flag(ENode *a);
+extern void propagate_bit_to_preds(COptBlock *node, short bit);
+extern void build_opt_blocks(Statement *first);
+extern COptCSE *find_or_create_cse(ENode *expr, COptCSE *left, COptCSE *right);
+extern COptCSE *find_or_create_unary_cse(ENode *expr, COptCSE *left);
+extern void mark_and_propagate_dlocal_reference_bits(void);
+extern struct ENode *last_node;
+extern int DAT_00581308;
+extern SInt16 data_005614f0[];
+extern Boolean optimizer_changed;
+extern struct ENode *current_cse_expr;
+extern SInt16 opt_block_bits_size;
+extern struct COptCSE *cse_entries[75];
+extern struct COptCSE *cse_list;
+extern struct OptimizerOccurrence *occurrence_list;
+extern short data_005812fc;
+extern char data_005812fe;
+extern char data_005812ff;
+extern short data_00581302;
+extern struct CLabel *data_0058802c;
+extern struct COptBlock *current_opt_block;
+extern struct COptBlock *opt_blocks;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

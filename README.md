@@ -70,6 +70,8 @@ Project structure
 - `src/`: the compiler (`driver`, `frontend`, `optimizer`, `backend`) and its statically linked C library and
   runtime (`msl`, `runtime`)
 - `include/`: headers; `include/libc` is the C library as the compiler's sources see it
+- `deception/`: a functional (not matching) reconstruction of the GC 2.7 frontend, checked against the original's
+  trees (`deception/README.md`)
 - `lib/` (downloaded): the MSL C library and runtime sources of CodeWarrior Pro 5, built by `src/msl` and
   `src/runtime`
 
