@@ -70,7 +70,8 @@ def main():
     jobs = max(1, (os.cpu_count() or 4) // args.parallel)
     out_path = ROOT / "build/deception/screen.json"
     results = json.loads(out_path.read_text()) if out_path.exists() and not args.functions else {}
-    todo = [c for c in candidates if c[0] not in results]
+    # (an unlinked function is screened again: bindings may have been added since)
+    todo = [c for c in candidates if results.get(c[0], {}).get("result") in (None, "unlinked")]
     with ThreadPoolExecutor(args.parallel) as pool:
         for (name, source), result in zip(todo, pool.map(lambda c: screen(*c, game, units, jobs), todo)):
             results[name] = dict(source=source, **result)

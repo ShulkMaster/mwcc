@@ -1,10 +1,12 @@
 Deception frontend
 ==================
 
-A reconstruction of the C/C++ frontend (preprocessor, tokenizer, parser, semantic analysis) of `mwcceppc.exe` GC 2.7
-(Version 2.4.7 build 108), the compiler of Mortal Kombat: Deception. The target is functional equivalence: for the same
-input, the reconstructed frontend hands the backend the same trees as the original's. Byte-matching code is not a
-goal.
+A decompilation of the C/C++ frontend (preprocessor, tokenizer, parser, semantic analysis) of `mwcceppc.exe` GC 2.7
+(Version 2.4.7 build 108), the compiler of Mortal Kombat: Deception. Functions target the original's bytes, built with
+the compiler that builds the main project's 1.3 sources. A function that is not exact but scores at least 98% (objdiff's
+fuzzy match: register allocation and similar differences) counts as done when its behavior is verified identical: for
+the same input, the frontend hands the backend the same trees and the compiler writes the same object. Only the
+frontend is in scope.
 
 The sources started as a copy of the main project's 1.2.5 frontend (`src/frontend`, `include/compiler`) and diverge
 from it toward 2.7. The backend, optimizer and driver are the original executable's.
@@ -24,6 +26,11 @@ How equivalence is measured
 - **Corpus.** `tools/ast_check.py` runs a compiler over the units a game decompilation builds with GC/2.7 (from its
   `build.ninja`, with each unit's own flags). `record` stores the original's dumps and objects; `check` compares the
   hybrid's with them. A unit is identical when its dump and its object file are both the original's.
+- **Matching.** `tools/match.py` scores each frontend function against the original's (relocations resolved to the
+  original's addresses; objdiff's fuzzy match) and combines the score with the screen into a status: exact,
+  equivalent (at least 98% and identical behavior), near (at least 98%, behavior not verified), divergent, nonmatching.
+  `--learn` binds symbols from near matches (a relocation whose preceding bytes are the original's reads the address
+  there; kept when every site agrees).
 - **Screening.** `tools/screen.py` injects each frontend function on its own and classifies it over part of the
   corpus: identical, different (ASTs), object differs (same ASTs, different object), crash or unlinked (a referenced
   symbol has no known address).
@@ -41,6 +48,7 @@ python deception/build.py
 python deception/tools/ast_check.py record --game PATH_TO_GAME_DECOMP
 python deception/tools/ast_check.py check --game PATH_TO_GAME_DECOMP
 python deception/tools/screen.py --game PATH_TO_GAME_DECOMP [FUNCTION ...]
+python deception/tools/match.py [--learn]
 ```
 
 The game decompilation must be built (its compilers and `wibo` downloaded) for its `build.ninja` and tools.
