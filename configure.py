@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # (the index is VERSION in include/version.h)
-VERSIONS = ["GC_1_2_5", "GC_1_2_5n", "GC_1_3"]
+VERSIONS = ["GC_1_2_5", "GC_1_2_5n", "GC_1_3", "GC_2_7"]
 
 
 def pro4_arguments(args):
@@ -70,7 +70,7 @@ def main():
         "build build/tools/wibo: download",
         "  tool = wibo",
         "build build/compilers/ok build/compilers/GC/1.2.5/mwcceppc.exe build/compilers/GC/1.2.5n/mwcceppc.exe"
-        " build/compilers/GC/1.3/mwcceppc.exe: download",
+        " build/compilers/GC/1.3/mwcceppc.exe build/compilers/GC/2.7/mwcceppc.exe: download",
         "  tool = compilers",
     ]
     out += ["build lib/ok: download", "  tool = lib"]

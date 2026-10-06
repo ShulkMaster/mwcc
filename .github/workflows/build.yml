@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [GC_1_2_5, GC_1_2_5n, GC_1_3]
+        version: [GC_1_2_5, GC_1_2_5n, GC_1_3, GC_2_7]
     steps:
       - uses: actions/checkout@v4
 

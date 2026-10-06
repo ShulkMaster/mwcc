@@ -13,3 +13,5 @@ __pycache__/
 /CLAUDE.md
 /AGENTS.md
 /HANDOVER.md
+/.idea/
+/.mcp.json

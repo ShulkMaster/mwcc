@@ -2,6 +2,7 @@
 #define COMPILER_ENODE_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -227,6 +228,9 @@ struct ENode {
     Boolean ignored;
     Boolean hascall;
     Type *rtype;
+#if VERSION >= VERSION_GC_1_3
+    void *unk0A; /* 0x0A: added in 1.3; meaning unknown */
+#endif
     ENodeUnion data;
 };
 #pragma options align = reset

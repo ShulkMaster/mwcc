@@ -1,0 +1,43 @@
+{
+  "original": "build/compilers/GC/2.7/mwcceppc.exe",
+  "sha1": "100dd3a2898a1ece55462801d42ff5de8b42e29f",
+  "compilers": {
+    "pro53": "pro6"
+  },
+  "matching": [
+    "src/driver/CLProj.c",
+    "src/driver/CWParserPluginsPrivate.c",
+    "src/driver/CWPluginsPrivate.c",
+    "src/driver/DropInCompilerLinkerPrivate.c",
+    "src/msl/ansi_files.c",
+    "src/msl/ansi_files_g.c",
+    "src/msl/ansifp_x86.c",
+    "src/msl/arith.c",
+    "src/msl/buffer_io_g.c",
+    "src/msl/char_io.c",
+    "src/msl/direct_io_g.c",
+    "src/msl/fcntl_win32_g.c",
+    "src/msl/file_io_g.c",
+    "src/msl/file_io_win32_g.c",
+    "src/msl/file_pos_g.c",
+    "src/msl/mbstring.c",
+    "src/msl/mem.c",
+    "src/msl/misc_io.c",
+    "src/msl/pool_alloc_win32_g.c",
+    "src/msl/qsort_g.c",
+    "src/msl/setjmp_x86.c",
+    "src/msl/string.c",
+    "src/msl/string_g.c",
+    "src/msl/strtoul.c",
+    "src/msl/sysenv_win32.c",
+    "src/msl/time_win32.c",
+    "src/msl/unistd_win32.c",
+    "src/msl/wchar_io.c",
+    "src/msl/wcstoul.c",
+    "src/msl/wctype.c",
+    "src/runtime/NMWException.cpp",
+    "src/runtime/NewHand.cpp",
+    "src/runtime/globdest.c",
+    "src/runtime/maincrt.c"
+  ]
+}

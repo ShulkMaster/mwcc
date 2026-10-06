@@ -1,13 +1,14 @@
 MWCC
 ====
 
-[![Build Status]][actions] [![1.2.5]][progress] [![1.2.5n]][progress] [![1.3]][progress]
+[![Build Status]][actions] [![1.2.5]][progress] [![1.2.5n]][progress] [![1.3]][progress] [![2.7]][progress]
 
 [Build Status]: https://github.com/rayanht/mwcc/actions/workflows/build.yml/badge.svg
 [actions]: https://github.com/rayanht/mwcc/actions/workflows/build.yml
 [1.2.5]: https://decomp.dev/rayanht/mwcc/GC_1_2_5.svg?mode=shield&measure=code&label=1.2.5
 [1.2.5n]: https://decomp.dev/rayanht/mwcc/GC_1_2_5n.svg?mode=shield&measure=code&label=1.2.5n
 [1.3]: https://decomp.dev/rayanht/mwcc/GC_1_3.svg?mode=shield&measure=code&label=1.3
+[2.7]: https://decomp.dev/rayanht/mwcc/GC_2_7.svg?mode=shield&measure=code&label=2.7
 [progress]: https://decomp.dev/rayanht/mwcc
 
 A matching decompilation of `mwcceppc.exe`, the Windows/x86 CodeWarrior compiler for GameCube.
@@ -17,6 +18,7 @@ Supported versions:
 - `GC_1_2_5`: GameCube 1.2.5
 - `GC_1_2_5n`: GameCube 1.2.5n (1.2.5 with Ninji's patch)
 - `GC_1_3`: GameCube 1.3
+- `GC_2_7`: GameCube 2.7 (Version 2.4.7 build 108)
 
 Dependencies
 ============
@@ -37,7 +39,7 @@ python configure.py
 ninja
 ```
 
-For another version, `python configure.py --version GC_1_2_5n` (or `GC_1_3`).
+For another version, `python configure.py --version GC_1_2_5n` (or `GC_1_3`, `GC_2_7`).
 
 The build downloads what it needs but this repository does not contain:
 
@@ -60,8 +62,8 @@ Project structure
 =================
 
 - `config/sources.json`: each source's compiler, flags and status (Matching or NonMatching)
-- `config/<version>/config.json`: the original executable and its SHA-1; for 1.3, the compiler that replaces Pro 5.3
-  and the sources Matching in that version
+- `config/<version>/config.json`: the original executable and its SHA-1; for 1.3 and 2.7, the compiler that replaces
+  Pro 5.3 and the sources Matching in that version
 - `config/<version>/functions.json`: each function's address, size and source (none yet for a function not
   decompiled)
 - `config/<version>/bindings.json`: the addresses of the data and functions the sources reference
