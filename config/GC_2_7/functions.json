@@ -5701,14 +5701,16 @@
     "source": "src/driver/CLDependencies.c"
   },
   {
-    "name": "fn_004295d0",
+    "name": "get_access_path_entry",
     "address": "0x004295d0",
-    "size": 6
+    "size": 6,
+    "source": "src/driver/CLDependencies.c"
   },
   {
-    "name": "fn_004295e0",
+    "name": "set_access_path_from_include_stack",
     "address": "0x004295e0",
-    "size": 253
+    "size": 253,
+    "source": "src/driver/CLDependencies.c"
   },
   {
     "name": "contains_dependency",

@@ -13,12 +13,14 @@
 #include "driver/CLDropinCallbacks_V10.h"
 #include "driver/CLErrors.h"
 #include "driver/CLFileOps.h"
+#include "driver/CLFiles.h"
 #include "driver/CLIO.h"
 #include "driver/CLPluginRequests.h"
 #include "driver/CLProj.h"
 #include "driver/CLSegs.h"
 #include "driver/CLTarg.h"
 #include "driver/CWParserPluginsPrivate.h"
+#include "driver/MacSpecs.h"
 #include "driver/MemUtils.h"
 #include "driver/Memory.h"
 #include "driver/MsDos.h"
@@ -36,6 +38,14 @@
 /* 0x561510, file name string */
 
 #define EMPTYS ("")
+
+#if VERSION >= VERSION_GC_2_7
+#define FIND_PATH_ASSERT_LINE 0xaf
+#define SEARCH_TYPE_ERROR_LINE 0x1d4
+#else
+#define FIND_PATH_ASSERT_LINE 0x9b
+#define SEARCH_TYPE_ERROR_LINE 0x197
+#endif
 
 unsigned char CLDependencies_InitDeps(Deps *state, CLTarget *target)
 {
@@ -56,13 +66,24 @@ void CLDependencies_FreeDeps(Deps *block)
 {
     AccessPaths *paths;
     if (block->text != NULL) {
+#if VERSION >= VERSION_GC_2_7
+        xfree(block->text);
+#else
         free(block->text);
+#endif
     }
     if (block->records != NULL) {
+#if VERSION >= VERSION_GC_2_7
+        xfree(block->records);
+#else
         free(block->records);
+#endif
     }
     paths = block->scope;
     CLAccessPaths_FreeItems(paths);
+#if VERSION >= VERSION_GC_2_7
+    xfree(block->scope);
+#endif
 }
 
 unsigned char get_record_flag(Deps *table, unsigned int index)
@@ -143,6 +164,39 @@ AccessPathEntry *get_access_path_entry(void)
     return data_0054d898;
 }
 
+#if VERSION >= VERSION_GC_2_7
+void set_access_path_from_include_stack(void)
+{
+    OSSpec spec;
+    SInt16 index;
+    CWFileSpec *file;
+    char *fileName;
+
+    if (data_00541b44 == 3 && CLT_filesp != NULL && CLT_filestack != NULL) {
+        if (*CLT_filesp >= 0) {
+            index = *CLT_filesp;
+            while (index) {
+                file = (*CLT_filestack)[index];
+                if (file == NULL) {
+                    break;
+                }
+                index--;
+                MacSpecs_MakeOSSpec(file, spec.directory.path);
+                fileName = CLProj_GetFileName(MsDos_CopyStringToBuffer(spec.name, data_005880e0, 0x104));
+                if (CLFiles_FindChainRecord(default_target->fileLookup, fileName) == NULL) {
+                    if (data_0054d898 == NULL || !OS_EqualPathSpec(spec.directory.path, data_0054d898->path)) {
+                        CLDependencies_SetAccessPath(&spec, 0);
+                        return;
+                    }
+                    return;
+                }
+            }
+        }
+        CLDependencies_SetAccessPath(NULL, 0);
+    }
+}
+#endif
+
 UInt8 contains_dependency(DependencyCollection *collection, int key)
 {
     int index;
@@ -219,8 +273,8 @@ void CLDependencies_WriteDependencies(Deps *ctx, DropinFileRecord *file, MemBuff
     char line[520];
     char target[260];
     char dependency[260];
-    char escaped[324];
-    char path[324];
+    char escaped[sizeof(OSSpec)];
+    char path[sizeof(OSSpec)];
     Boolean hasSpace;
     SInt32 i;
     int *items;
@@ -272,8 +326,13 @@ void CLDependencies_WriteDependencies(Deps *ctx, DropinFileRecord *file, MemBuff
         return;
     } while (0);
 out_of_memory:
+#if VERSION >= VERSION_GC_2_7
+    fprintf(stderr, "\n*** Out of memory\n");
+    exit(-23);
+#else
     CLIO_FormatAndDispatchText("\nOut of memory\n");
     longjmp(driver_jmp_buf, 1);
+#endif
 }
 
 Boolean find_dependency_access_path_entry(AccessPaths *dependencies, char *comparison, AccessPathEntry **result,
@@ -285,7 +344,7 @@ Boolean find_dependency_access_path_entry(AccessPaths *dependencies, char *compa
     for (index = 0; index < CLAccessPaths_GetCount(dependencies); index++) {
         dependency = CLAccessPaths_GetEntry(dependencies, index);
         if (dependency == NULL)
-            CLIO_ReportAssertionFailure("path", "CLDependencies.c", 0x9b);
+            CLIO_ReportAssertionFailure("path", "CLDependencies.c", FIND_PATH_ASSERT_LINE);
         if (find_access_path_entry(dependency, comparison, result, path))
             return 1;
     }
@@ -349,11 +408,20 @@ unsigned char CLDependencies_FindFile(Deps *dependencies, char *file, char searc
     AccessPathEntry *result;
     AccessPathEntry *value;
 
-    *index = -1;
     found = 0;
+#if VERSION >= VERSION_GC_2_7
+    if (data_00541b44 == 3 && searchFirst != 0) {
+        set_access_path_from_include_stack();
+    }
+#endif
+    *index = -1;
     cached = fn_00427ad0(dependencies, searchFirst, file, context->directory.path, index, &record);
     if (cached != 0) {
+#if VERSION >= VERSION_GC_2_7
+        if (record->contextPath == data_0054d898 && record->flag != 0 && searchFirst == 0) {
+#else
         if (record->contextPath == data_0054d898) {
+#endif
             found = 1;
         } else if (record->searchPath == NULL) {
             cached = 0;
@@ -372,10 +440,14 @@ unsigned char CLDependencies_FindFile(Deps *dependencies, char *file, char searc
                 found = find_access_path_entry(result, file, &result, context->directory.path);
                 value = NULL;
             }
+#if VERSION >= VERSION_GC_2_7
+            if (found == 0 && cached != 0 && record->flag != 0 && searchFirst == 0) {
+#else
             if (found == 0 && cached != 0) {
-                lookupText = NULL;
+#endif
                 result = record->resolvedPath;
                 value = record->searchPath;
+                lookupText = NULL;
                 make_dependency_osspec(dependencies, *index, context->directory.path);
                 found = 1;
             }
@@ -414,6 +486,11 @@ SInt32 CLDependencies_SetAccessPath(OSSpec *name, Boolean flag)
     char buffer[260];
     char *path;
 
+#if VERSION >= VERSION_GC_2_7
+    if (flag && name != NULL) {
+        current_source_spec = name;
+    }
+#endif
     switch (data_00541b44) {
         case 2:
             data_0054d898 = NULL;
@@ -431,20 +508,28 @@ SInt32 CLDependencies_SetAccessPath(OSSpec *name, Boolean flag)
         case 3:
             if (name != NULL) {
                 path = name->directory.path;
+#if VERSION >= VERSION_GC_2_7
+            } else if (current_source_spec != NULL) {
+                path = current_source_spec->directory.path;
+#endif
             } else {
                 OS_GetCWD(buffer);
                 path = buffer;
             }
             break;
         default:
-            CLErrors_ReportInternalError("CLDependencies.c", 0x197, "Unhandled include file search type (%d)\n",
-                                         data_00541b44);
+            CLErrors_ReportInternalError("CLDependencies.c", SEARCH_TYPE_ERROR_LINE,
+                                         "Unhandled include file search type (%d)\n", data_00541b44);
             break;
     }
 
     data_0054d898 = find_or_create_access_path_entry(default_target->dependencyTable.scope, path);
 
+#if VERSION >= VERSION_GC_2_7
+    if (DAT_00541b28 > 2) {
+#else
     if (DAT_00541b28 > 1) {
+#endif
         CLErrors_ForwardMessage(0x69, fn_00412340(path, data_005880e0, 0x104));
     }
     return 1;

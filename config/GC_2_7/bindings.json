@@ -1,7 +1,13 @@
 {
+  "_CLT_filesp": "0x005eeca0",
+  "_CLT_filestack": "0x005eec50",
   "_ClientGlue_InitializeAndParseCommandLine": "0x00405310",
+  "_MsDos_IsAbsolutePath@4": "0x00412530",
+  "_current_source_spec": "0x005deac4",
   "_data_0053600c": "0x0058200c",
   "_data_0053601c": "0x0058201c",
+  "_data_00541b44": "0x005eecb0",
+  "_data_0054d898": "0x005deac0",
   "_fn_004052c0@4": "0x004052a0",
   "_ustrcmp@8": "0x00417490",
   "??3@YAXPAX@Z": "0x00403de0",

@@ -1,6 +1,7 @@
 #ifndef DRIVER_CLDEPENDENCIES_H
 #define DRIVER_CLDEPENDENCIES_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -75,6 +76,13 @@ extern void append_dependency_entry(DependencyCollection *v, int x, signed char 
 extern void CLDependencies_InsertDependencyIfAbsent(DependencyCollection *collection, SInt32 index, OSSpec *name,
                                                     unsigned char arg4, signed char arg5, char *result);
 extern char DAT_00541c0b;
+/* GC 2.7: the preprocessor's include stack (its entries start with the file's spec) and the main source. */
+#if VERSION >= VERSION_GC_2_7
+extern SInt16 *CLT_filesp;
+extern CWFileSpec *(*CLT_filestack)[];
+extern OSSpec *current_source_spec;
+extern void set_access_path_from_include_stack(void);
+#endif
 
 #ifdef __cplusplus
 }

@@ -71,6 +71,7 @@
     "src/driver/CLAccessPaths.c",
     "src/optimizer/IroDump.c",
     "src/frontend/CMangler.c",
-    "src/driver/MemUtils.c"
+    "src/driver/MemUtils.c",
+    "src/driver/CLDependencies.c"
   ]
 }
