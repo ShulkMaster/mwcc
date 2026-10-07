@@ -61,6 +61,7 @@
     "src/driver/CLFiles.c",
     "src/driver/StaticParserGlue.c",
     "src/driver/CLWriteObjectFile.c",
-    "src/driver/ResourceStrings.c"
+    "src/driver/ResourceStrings.c",
+    "src/driver/CLSegs.c"
   ]
 }
