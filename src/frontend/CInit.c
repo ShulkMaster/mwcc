@@ -1,5 +1,6 @@
 #define CERROR_FILE "CInit.c"
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/CInit.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -1952,7 +1953,12 @@ void init_int_or_relocation(Type *type, ENode *expression)
     Object *object;
     CInt64 value;
 
-    if (evaluate_int_or_relocation(expression, &object, &value)) {
+    if (evaluate_int_or_relocation(expression, &object, &value
+#if VERSION >= VERSION_GC_1_3
+                                   ,
+                                   0
+#endif
+                                   )) {
         if (object != NULL) {
             relocation = CompilerTools_AllocatePool(sizeof(RelocationList));
             relocation->next = cinit_state->nodes;
@@ -2850,9 +2856,14 @@ void initialize_pointer_or_intconst(InitializerData *ctx, ENode *node, Type *ns,
 
     node = oldassignmentpromotion(node, ns, qual & Q_CV, 1);
     if (node->rtype->type == TYPEPOINTER || node->type == EINTCONST) {
-        if (evaluate_int_or_relocation(node, &flag, &val)) {
+        if (evaluate_int_or_relocation(node, &flag, &val
+#if VERSION >= VERSION_GC_1_3
+                                       ,
+                                       0
+#endif
+                                       )) {
             if (flag) {
-                p = (RelocationList *)CompilerTools_AllocatePool(16);
+                p = CompilerTools_AllocatePool(sizeof(*p));
                 p->next = ctx->owner->relocations;
                 p->object = flag;
                 p->addend = val.lo;
@@ -2869,7 +2880,12 @@ void initialize_pointer_or_intconst(InitializerData *ctx, ENode *node, Type *ns,
     }
 }
 
-Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval)
+Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval
+#if VERSION >= VERSION_GC_1_3
+                                   ,
+                                   Boolean allowLocal
+#endif
+)
 {
     Object *obj;
     Object *lbase;
@@ -2887,11 +2903,19 @@ Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval)
             case EOBJREF:
                 obj = node->data.objref;
                 if (obj->datatype == DALIAS) {
+#if VERSION >= VERSION_GC_1_3
+                    CError_ASSERT(521, obj->u.alias.offset == 0);
+#else
                     CError_ASSERT(496, obj->u.alias.offset == 0);
+#endif
                     obj = obj->u.alias.object;
                 }
                 lbase = obj;
-                if (lbase->datatype == DLOCAL)
+                if (lbase->datatype == DLOCAL
+#if VERSION >= VERSION_GC_1_3
+                    && !allowLocal
+#endif
+                )
                     return 0;
                 *pobj = lbase;
                 return 1;
@@ -2900,16 +2924,33 @@ Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval)
                 break;
             case ETYPCON:
                 do {
+#if VERSION >= VERSION_GC_1_3
+                    if (node->rtype->size != node->data.monadic->rtype->size)
+                        return 0;
+#endif
                     node = node->data.monadic;
-                    if (node->rtype->size != stunsignedlong.size ||
+                    if (
+#if VERSION < VERSION_GC_1_3
+                        node->rtype->size != stunsignedlong.size ||
+#endif
                         (node->rtype->type != TYPEPOINTER && node->rtype->type != TYPEINT))
                         return 0;
                 } while (node->type == ETYPCON);
                 break;
             case EADD:
-                if (!evaluate_int_or_relocation(node->data.diadic.left, &lbase, &lval))
+                if (!evaluate_int_or_relocation(node->data.diadic.left, &lbase, &lval
+#if VERSION >= VERSION_GC_1_3
+                                                ,
+                                                allowLocal
+#endif
+                                                ))
                     return 0;
-                if (!evaluate_int_or_relocation(node->data.diadic.right, &rbase, &rval))
+                if (!evaluate_int_or_relocation(node->data.diadic.right, &rbase, &rval
+#if VERSION >= VERSION_GC_1_3
+                                                ,
+                                                allowLocal
+#endif
+                                                ))
                     return 0;
                 if (lbase != NULL && rbase != NULL)
                     return 0;
@@ -2917,9 +2958,19 @@ Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval)
                 *pval = CMach_CalcIntDiadic((Type *)&stunsignedlong, lval, '+', rval);
                 return 1;
             case ESUB:
-                if (!evaluate_int_or_relocation(node->data.diadic.left, &lbase, &lval))
+                if (!evaluate_int_or_relocation(node->data.diadic.left, &lbase, &lval
+#if VERSION >= VERSION_GC_1_3
+                                                ,
+                                                allowLocal
+#endif
+                                                ))
                     return 0;
-                if (!evaluate_int_or_relocation(node->data.diadic.right, &rbase, &rval))
+                if (!evaluate_int_or_relocation(node->data.diadic.right, &rbase, &rval
+#if VERSION >= VERSION_GC_1_3
+                                                ,
+                                                allowLocal
+#endif
+                                                ))
                     return 0;
                 if (rbase != NULL)
                     return 0;

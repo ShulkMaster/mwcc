@@ -2,6 +2,7 @@
 #define COMPILER_CINIT_H
 
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/enode.h"
 
 #ifdef __cplusplus
@@ -133,7 +134,12 @@ extern void initialize_struct_data(InitializerData *ctx, CInit *ci, Type *ts, UI
 extern void CInit_004d3620(TypeBitfield *bf, unsigned char *ptr, CInt64 value);
 extern void initialize_int(InitializerData *stage, ENode *expr, Type *type, UInt32 qual);
 extern void initialize_pointer_or_intconst(InitializerData *ctx, ENode *node, Type *ns, UInt32 qual);
-extern Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval);
+extern Boolean evaluate_int_or_relocation(ENode *node, Object **pobj, CInt64 *pval
+#if VERSION >= VERSION_GC_1_3
+                                          ,
+                                          Boolean allowLocal
+#endif
+);
 extern Boolean CInit_004d3b20(Type *type);
 extern Boolean CInit_004d3ba0(Type *type);
 extern UInt8 advance_initializer_state(CInit *ci);

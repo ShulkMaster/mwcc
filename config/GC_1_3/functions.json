@@ -15553,9 +15553,10 @@
     "size": 157
   },
   {
-    "name": "fn_0050c280",
+    "name": "init_int_or_relocation",
     "address": "0x0050c280",
-    "size": 199
+    "size": 199,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "fn_0050c350",
@@ -15615,14 +15616,16 @@
     "size": 163
   },
   {
-    "name": "fn_0050da00",
+    "name": "initialize_pointer_or_intconst",
     "address": "0x0050da00",
-    "size": 194
+    "size": 194,
+    "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050dad0",
+    "name": "evaluate_int_or_relocation",
     "address": "0x0050dad0",
-    "size": 569
+    "size": 569,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "fn_0050dd10",

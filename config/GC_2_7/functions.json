@@ -16638,10 +16638,9 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "init_int_or_relocation",
+    "name": "CInit_AutoInit",
     "address": "0x0050cc70",
-    "size": 230,
-    "source": "src/frontend/CInit.c"
+    "size": 230
   },
   {
     "name": "initialize_object_at_offset",
@@ -16685,9 +16684,10 @@
     "size": 157
   },
   {
-    "name": "fn_0050dae0",
+    "name": "init_int_or_relocation",
     "address": "0x0050dae0",
-    "size": 199
+    "size": 199,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "CInit_004d20e0",
