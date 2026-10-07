@@ -57,6 +57,7 @@ struct DropinFileRecord {
     SInt16 dependencyOption;
     UInt32 dependencyState[8];
     SInt32 fileType;
+    UInt8 reservedTail[4];
 };
 #pragma options align = reset
 #pragma pack(push, 1)

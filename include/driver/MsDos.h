@@ -1,6 +1,7 @@
 #ifndef DRIVER_MSDOS_H
 #define DRIVER_MSDOS_H
 
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/win32.h"
 #include "driver/CLTarg.h"
@@ -15,7 +16,11 @@ union MsDosCalendarData {
 };
 struct OSSpec {
     CLTargetDirectory directory;
+#if VERSION >= VERSION_GC_2_7
+    char name[0x100];
+#else
     char name[0x40];
+#endif
 };
 extern unsigned int __stdcall OS_RefToMac(unsigned int value);
 extern DWORD __stdcall OS_Create(OSSpec *spec, const unsigned int *options);

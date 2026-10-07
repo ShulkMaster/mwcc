@@ -1534,5 +1534,6 @@
   "_xrealloc@12": "0x00417330",
   "_xstrdup@4": "0x004173b0",
   "_cint64_min": "0x005b1cc8",
-  "_CMach_GetMemberAlignment": "0x004c0960"
+  "_CMach_GetMemberAlignment": "0x004c0960",
+  "_xfree@4": "0x004173e0"
 }

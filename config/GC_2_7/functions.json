@@ -4893,9 +4893,10 @@
     "source": "src/msl/scanf.c"
   },
   {
-    "name": "fn_00423c40",
+    "name": "CLFiles_AllocDropinFileRecord",
     "address": "0x00423c40",
-    "size": 38
+    "size": 38,
+    "source": "src/driver/CLFiles.c"
   },
   {
     "name": "free_allocation_record",
@@ -4904,9 +4905,10 @@
     "source": "src/driver/CLFiles.c"
   },
   {
-    "name": "fn_00423cd0",
+    "name": "CLFiles_AssertNonNullIndexedListLink",
     "address": "0x00423cd0",
-    "size": 30
+    "size": 30,
+    "source": "src/driver/CLFiles.c"
   },
   {
     "name": "CLFiles_FreeAllocationRecords",
@@ -4939,9 +4941,10 @@
     "source": "src/driver/CLFiles.c"
   },
   {
-    "name": "fn_00423e50",
+    "name": "CLFiles_GetIndex",
     "address": "0x00423e50",
-    "size": 34
+    "size": 34,
+    "source": "src/driver/CLFiles.c"
   },
   {
     "name": "CLFiles_InitChain",
@@ -4950,9 +4953,10 @@
     "source": "src/driver/CLFiles.c"
   },
   {
-    "name": "fn_00423e90",
+    "name": "CLFiles_FreeChainNodes",
     "address": "0x00423e90",
-    "size": 63
+    "size": 63,
+    "source": "src/driver/CLFiles.c"
   },
   {
     "name": "CLFiles_CreateChainRecord",
