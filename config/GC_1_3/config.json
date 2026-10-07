@@ -129,6 +129,7 @@
   ],
   "content_literal_sources": [
     "src/frontend/Unmangle.c",
-    "src/driver/MacSpecs.c"
+    "src/driver/MacSpecs.c",
+    "src/optimizer/IroDump.c"
   ]
 }

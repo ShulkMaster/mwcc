@@ -2,6 +2,7 @@
 #define COMPILER_IRODUMP_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,7 +14,11 @@ extern void IroDump_Print(const char *message, ...);
 extern void IroDump_DumpExpressions(void);
 extern void dump_flowgraph(void);
 extern void IroDump_PrintBitSet(char *prefix, BitVector *bitset);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean INT_005882b8;
+#else
 extern int INT_005882b8;
+#endif
 extern struct _FILE *iro_dump_output;
 extern Object *data_005875b8;
 extern void dump_linear_node(IROLinear *node);

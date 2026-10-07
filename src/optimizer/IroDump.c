@@ -30,6 +30,7 @@
 #include "compiler/Switch.h"
 #include "driver/Files.h"
 #include <stdio.h>
+#include <stdarg.h>
 unsigned int IroDump_IsType1NodeType50(IROLinear *linear)
 {
     if (linear->type == IROLinearOperand && linear->u.node->type == 50U)
@@ -84,14 +85,13 @@ Object *IroDump_GetObjRef(IROLinear *linear)
 void IroDump_Print(const char *message, ...)
 {
     va_list arguments;
-    int argumentSize;
 
     if (INT_005882b8 == 0)
         return;
 
-    argumentSize = (va_list)(&message + 1) - (va_list)&message;
-    arguments = (va_list)&message + (argumentSize + 3) / 4 * 4;
+    va_start(arguments, message);
     vfprintf(iro_dump_output, message, arguments);
+    va_end(arguments);
 }
 
 static inline void dump_separator(void)

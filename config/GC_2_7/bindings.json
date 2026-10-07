@@ -1553,5 +1553,7 @@
   "_data_0058757c": "0x005ea564",
   "_data_00587ffc": "0x005ea98c",
   "_next_label_number": "0x005e0bb4",
-  "_initialize_aliases": "0x00512f00"
+  "_initialize_aliases": "0x00512f00",
+  "_INT_005882b8": "0x005ef3b9",
+  "_iro_dump_output": "0x005dff14"
 }
