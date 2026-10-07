@@ -29,7 +29,7 @@ unsigned char fn_00406610(void)
     return data_00541170;
 }
 
-static UInt32 SwapRecord32(UInt32 v)
+static inline UInt32 SwapRecord32(UInt32 v)
 {
     return ((v & 0xff000000) >> 24) | ((v & 0xff0000) >> 8) | ((v & 0xff00) << 8) | ((v & 0xff) << 24);
 }
@@ -176,7 +176,7 @@ static inline void StoreBigEndian32(UInt8 *bytes, UInt32 value)
     bytes[3] = (UInt8)(value & 0xff);
 }
 
-int Resources_SetFileTimes(unsigned int fileHandle, UInt32 modificationTime, UInt32 creationTime)
+int Resources_SetFileTimes(int fileHandle, UInt32 modificationTime, UInt32 creationTime)
 {
     ResFile *file;
     UInt32 times[2];
@@ -184,9 +184,9 @@ int Resources_SetFileTimes(unsigned int fileHandle, UInt32 modificationTime, UIn
     int error;
 
     if (Resources_FindIdentifierById(fileHandle) == NULL) {
-        times[0] = SWAP32(creationTime);
-        times[1] = SWAP32(modificationTime);
         length = sizeof(times);
+        times[0] = SwapRecord32(creationTime);
+        times[1] = SwapRecord32(modificationTime);
         error = OS_Seek(fileHandle, 1, 0x52);
         if (error == 0) {
             error = OS_Write(fileHandle, times, &length);
@@ -213,7 +213,6 @@ SInt32 fn_004083b0(int handle, UInt32 *secondValue, UInt32 *firstValue)
     SInt32 byteCount;
     DWORD result;
     ResFile *record;
-    signed char *bytes;
 
     if (Resources_FindIdentifierById(handle) == NULL) {
         byteCount = 8;
@@ -222,8 +221,8 @@ SInt32 fn_004083b0(int handle, UInt32 *secondValue, UInt32 *firstValue)
             result = OS_Read(handle, values, &byteCount);
             if (result == 0 && byteCount == 8) {
                 result = 0;
-                values[0] = SWAP32(values[0]);
-                values[1] = SWAP32(values[1]);
+                values[0] = SwapRecord32(values[0]);
+                values[1] = SwapRecord32(values[1]);
                 *firstValue = values[0];
                 *secondValue = values[1];
             }
@@ -235,9 +234,10 @@ SInt32 fn_004083b0(int handle, UInt32 *secondValue, UInt32 *firstValue)
     if (record == NULL) {
         return 2;
     }
-    bytes = (signed char *)record;
-    *secondValue = (bytes[0x4e] << 24) | (bytes[0x4f] << 16) | (bytes[0x50] << 8) | bytes[0x51];
-    *firstValue = (bytes[0x4a] << 24) | (bytes[0x4b] << 16) | (bytes[0x4c] << 8) | bytes[0x4d];
+    *secondValue = ((SInt8)record->data.modificationTime[0] << 24) | ((SInt8)record->data.modificationTime[1] << 16) |
+                   ((SInt8)record->data.modificationTime[2] << 8) | (SInt8)record->data.modificationTime[3];
+    *firstValue = ((SInt8)record->data.creationTime[0] << 24) | ((SInt8)record->data.creationTime[1] << 16) |
+                  ((SInt8)record->data.creationTime[2] << 8) | (SInt8)record->data.creationTime[3];
     return 0;
 }
 
@@ -322,10 +322,10 @@ SInt16 __stdcall open_resource_file(void *param1, SInt8 param2)
 }
 
 struct ResEntry *insert_res_entry(struct ResEntry **listAddress, UInt16 key, UInt32 value, UInt8 *name, UInt8 flag,
-                                  void **extra)
+                                  StorageHandle *extra)
 {
-    struct ResEntry *previous = NULL;
     struct ResEntry **link = listAddress;
+    struct ResEntry *previous = NULL;
     struct ResEntry *entry;
     char nameBuffer[256];
 
@@ -348,7 +348,7 @@ struct ResEntry *insert_res_entry(struct ResEntry **listAddress, UInt16 key, UIn
     entry->resourceType = value;
     entry->name = name;
     entry->attrs = flag;
-    entry->hand = (struct StorageHandle *)extra;
+    entry->hand = extra;
     if (previous != NULL) {
         entry->next = previous->next;
         previous->next = entry;
@@ -596,7 +596,7 @@ void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 
                                 name = NULL;
                             }
                             if (insert_res_entry(&rt->entries, refs[j].id, types[count].type, name, refs[j].attributes,
-                                                 hand) == NULL)
+                                                 (StorageHandle *)hand) == NULL)
                                 goto fail;
                         }
                     }
@@ -883,7 +883,7 @@ void write_default_binary_record(SInt16 file)
     memset(defaults, 0, sizeof(defaults));
     memset(defaults + 70, 0, 4);
     memset(defaults + 66, 0, 4);
-    memcpy(&trailer.prefix, &prefix, sizeof(prefix));
+    trailer.prefix = prefix;
     trailer.reserved = 0;
     trailer.values[0] = 0;
     trailer.values[1] = 0;
@@ -932,7 +932,7 @@ void write_default_binary_record(SInt16 file)
     Memory_FreeHandle(buffer);
 }
 
-ResType *find_res_type(ResFile *list, int key)
+ResType *find_res_type(ResFile *list, UInt32 key)
 {
     ResType *entry;
 

@@ -105,18 +105,18 @@ struct ResourceTypeEntry {
 extern void write_resource_file(short refnum);
 extern short resource_error;
 extern struct ResEntry *insert_res_entry(struct ResEntry **listAddress, UInt16 key, UInt32 value, UInt8 *name,
-                                         UInt8 flag, void **extra);
+                                         UInt8 flag, struct StorageHandle *extra);
 extern void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 size);
 extern void write_default_binary_record(SInt16 file);
 extern ResEntry *find_res_entry_in_files(int lookupArg, short lookupKind);
-extern int Resources_SetFileTimes(unsigned int a, UInt32 b, UInt32 c);
+extern int Resources_SetFileTimes(int a, UInt32 b, UInt32 c);
 extern short __stdcall open_resource_fork(void *a1, char a2, short *a3);
 extern unsigned char fn_00406610(void);
 extern struct ResFile *find_resfile_by_refnum(short value);
 extern ResFile *find_resfile_with_previous(short value, ResFile **previous);
 extern int count_types(ResFile *chain);
 extern int count_entries(ResType *list);
-extern ResType *find_res_type(ResFile *list, int key);
+extern ResType *find_res_type(ResFile *list, UInt32 key);
 extern IdentifierListNode *Resources_FindIdentifierById(int id);
 extern void __stdcall Resources_ClearError(void *handle);
 extern unsigned int Resources_OpenResourceFile(char *path);
