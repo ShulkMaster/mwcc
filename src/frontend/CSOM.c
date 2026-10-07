@@ -165,7 +165,11 @@ ENode *CSOM_CreateMemberAccessExpr(BClassList *classList, ObjMemberVar *request,
                 break;
             }
         }
-        CClass_CheckBaseAccess(classList, request->access);
+        CClass_CheckBaseAccess(classList,
+#if VERSION >= VERSION_GC_2_7
+                               NULL,
+#endif
+                               request->access);
         if (request->has_path != 0)
             classList = MemberVarAlias_GetBases(request);
         while (classList->next != NULL)

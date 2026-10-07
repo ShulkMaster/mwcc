@@ -103,7 +103,11 @@ extern BClassList *CClass_GetBasePath(TypeClass *type, TypeClass *target, SInt16
 extern BClassList *find_target_base_path(TypeClass *cls, TypeClass *target, SInt32 offset, SInt16 level);
 extern SInt16 CClass_GetBasePathLevel(void);
 extern void CClass_Init(void);
-extern void CClass_CheckBaseAccess(BClassList *bases, char access);
+extern void CClass_CheckBaseAccess(BClassList *bases,
+#if VERSION >= VERSION_GC_2_7
+                                   Object *object,
+#endif
+                                   char access);
 extern Object *create_root_class_layout(TypeClass *type);
 extern void build_class_layout(TypeClass *type);
 extern Object *CClass_CheckPures(TypeClass *a0);

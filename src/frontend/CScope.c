@@ -232,7 +232,11 @@ void add_using_declaration(BClassList *bases, NameSpace *scope, ObjBase *def, Ha
         if (scope->theclass == NULL)
             CError_ReportError(ERR_ILLEGAL_ACCESS_USING_DECLARATION);
         else
-            CClass_CheckBaseAccess(bases, def->access);
+            CClass_CheckBaseAccess(bases,
+#if VERSION >= VERSION_GC_2_7
+                                   NULL,
+#endif
+                                   def->access);
     }
 
     if (def->otype == OT_TYPE) {

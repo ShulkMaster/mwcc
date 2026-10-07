@@ -1,6 +1,7 @@
 #ifndef COMPILER_CEXPR2_H
 #define COMPILER_CEXPR2_H
 
+#include "version.h"
 #include "compiler/common.h"
 #include "version.h"
 #include "compiler/CSOM.h"
@@ -108,7 +109,11 @@ extern void build_convertible_bases_tree(ConvNode *self);
 extern SInt32 check_standard_conversion(ENode *node, Type *ty, Boolean convert, Boolean checkAccess);
 extern ENode *CExpr_ConvertToBool(ENode *node, Boolean flag);
 extern SInt32 match_overloaded_function_pointer(NameSpaceObjectList *list, void *arg2, Type *type, UInt8 flag);
-extern ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node, UInt8 access, Boolean checkAccess);
+extern ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node,
+#if VERSION >= VERSION_GC_2_7
+                              Object *object,
+#endif
+                              UInt8 access, Boolean checkAccess);
 extern ENode *CExpr_ClassPointerCast(BClassList *path, ENode *node, Boolean checkNull);
 extern SInt32 check_member_pointer_conversion(Type *type, ENode *expr, Boolean convert);
 extern SInt16 compare_short_arrays_lexicographically(SInt16 *left, SInt16 *right, Boolean compareFifth);

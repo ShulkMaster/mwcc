@@ -14118,10 +14118,10 @@
     "source": "src/backend/PCode.c"
   },
   {
-    "name": "CClass_GetQualifiedClass",
+    "name": "PCode_NewLabel",
     "address": "0x004dd020",
     "size": 42,
-    "source": "src/frontend/CClass.c"
+    "source": "src/backend/PCode.c"
   },
   {
     "name": "fn_004dd050",
@@ -18684,9 +18684,10 @@
     "source": "src/frontend/CClass.c"
   },
   {
-    "name": "fn_0052e2c0",
+    "name": "CClass_GetQualifiedClass",
     "address": "0x0052e2c0",
-    "size": 54
+    "size": 54,
+    "source": "src/frontend/CClass.c"
   },
   {
     "name": "fn_0052e300",

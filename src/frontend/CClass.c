@@ -535,8 +535,16 @@ void CClass_CheckOverrides(TypeClass *cls)
             break;
         }
         if (object->datatype == DVFUNC) {
+#if VERSION >= VERSION_GC_2_7
+            CError_ASSERT(2175, object->type->type == TYPEFUNC);
+#else
             CError_ASSERT(1997, object->type->type == TYPEFUNC);
+#endif
+#if VERSION >= VERSION_GC_2_7
+            if (TYPE_FUNC(object->type)->flags & 0x400000) {
+#else
             if (TYPE_FUNC(object->type)->flags & 0x20000000) {
+#endif
                 linked = prepend_base_method_copies(linked, object, cls);
             }
         }
@@ -852,7 +860,11 @@ void select_member_override(ClassLayout *classRecord, ClassLayout *context, stru
                     if (classRecord == root_class_layout) {
                         TYPE_METHOD(function->object->type)->flags |= 0x20;
                         if (kind == OVERRIDE_2)
+#if VERSION >= VERSION_GC_2_7
+                            TYPE_METHOD(function->object->type)->flags |= 0x400000;
+#else
                             TYPE_METHOD(function->object->type)->flags |= 0x20000000;
+#endif
                     }
                     search->selectedClass = classRecord;
                     search->selected = function;
@@ -1302,13 +1314,22 @@ void CClass_Init(void)
     base_path_level = 0;
     return;
 }
-void CClass_CheckBaseAccess(BClassList *bases, char access)
+void CClass_CheckBaseAccess(BClassList *bases,
+#if VERSION >= VERSION_GC_2_7
+                            Object *object,
+#endif
+                            char access)
 {
     Boolean result;
 
     result = check_base_path_access(bases, access);
     if (result == '\0') {
-        CError_ReportError(ERR_ILLEGAL_ACCESS_PROTECTED_PRIVATE_MEMBER);
+#if VERSION >= VERSION_GC_2_7
+        if (bases && object)
+            CError_ReportError(381, bases->type, 0, object);
+        else
+#endif
+            CError_ReportError(ERR_ILLEGAL_ACCESS_PROTECTED_PRIVATE_MEMBER);
     }
 }
 
@@ -1453,7 +1474,11 @@ void mark_vbases_has_override(ClassLayout *root, ClassLayout *node, unsigned cha
                 continue;
             virtual_base_layout = NULL;
             if (!contains_base_layout(node, entry->selectedClass))
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(2040);
+#else
                 CError_FATAL(1880);
+#endif
             if (virtual_base_layout == NULL)
                 continue;
             for (item = root->theclass->vbases; item != NULL; item = item->next) {
@@ -1461,7 +1486,11 @@ void mark_vbases_has_override(ClassLayout *root, ClassLayout *node, unsigned cha
                     break;
             }
             if (item == NULL)
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(2047);
+#else
                 CError_FATAL(1887);
+#endif
             item->has_override = 1;
         }
     }
@@ -1506,7 +1535,11 @@ unsigned char CClass_IsMoreAccessiblePath(BClassList *path, BClassList *otherPat
         case 3:
             return 1;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(978);
+#else
             CError_FATAL(800);
+#endif
         case 2:
             switch (get_path_access(path)) {
                 case 0:
@@ -1516,7 +1549,11 @@ unsigned char CClass_IsMoreAccessiblePath(BClassList *path, BClassList *otherPat
                 case 3:
                     return 0;
                 default:
+#if VERSION >= VERSION_GC_2_7
+                    CError_FATAL(987);
+#else
                     CError_FATAL(809);
+#endif
             }
         case 1:
             switch (get_path_access(path)) {
@@ -1527,7 +1564,11 @@ unsigned char CClass_IsMoreAccessiblePath(BClassList *path, BClassList *otherPat
                 case 3:
                     return 0;
                 default:
+#if VERSION >= VERSION_GC_2_7
+                    CError_FATAL(997);
+#else
                     CError_FATAL(819);
+#endif
             }
             return 0;
     }
@@ -1540,7 +1581,11 @@ UInt8 get_path_access(BClassList *path)
     UInt8 access;
 
     if (path == NULL) {
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(930);
+#else
         CError_FATAL(752);
+#endif
     }
     access = 0;
     for (;;) {
@@ -1556,7 +1601,11 @@ UInt8 get_path_access(BClassList *path)
             base = base->next;
         }
         if (base == (ClassList *)0) {
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(939);
+#else
             CError_FATAL(761);
+#endif
         }
         switch (base->access) {
             case ACCESSPUBLIC:
@@ -1574,7 +1623,11 @@ UInt8 get_path_access(BClassList *path)
             case ACCESSNONE:
                 return 3;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(960);
+#else
                 CError_FATAL(782);
+#endif
         }
     }
     return access;

@@ -2714,7 +2714,11 @@ ENode *CExpr_CastMemberPointer(ENode *value, TypeMemberPointer *sourceType, Type
                 if (reversed != 0) {
                     offset = -offset;
                 }
-                CClass_CheckBaseAccess(path, ACCESSPUBLIC);
+                CClass_CheckBaseAccess(path,
+#if VERSION >= VERSION_GC_2_7
+                                       NULL,
+#endif
+                                       ACCESSPUBLIC);
                 sourceSize = sourceType->size;
                 if (sourceSize == targetType->size) {
                     break;
@@ -4199,7 +4203,11 @@ ENode *make_scope_parse_result_expr(CScopeParseResult *nameResult, ENode *expr, 
                 }
                 if (nameResult->isambig)
                     CError_ReportError(ERR_AMBIGUOUS_ACCESS_CLASS_STRUCT_UNION_MEMBER);
-                expr = CExpr2_004719c0(nameResult->basePath, NULL, expr, nameResult->object->access, 1);
+                expr = CExpr2_004719c0(nameResult->basePath, NULL, expr,
+#if VERSION >= VERSION_GC_2_7
+                                       OBJECT(nameResult->object),
+#endif
+                                       nameResult->object->access, 1);
                 if (!expr)
                     break;
                 tk = CPrepTokenizer_GetNextToken();
@@ -4267,7 +4275,11 @@ ENode *make_scope_parse_result_expr(CScopeParseResult *nameResult, ENode *expr, 
                         BClassList *path = NULL;
                         if (member->has_path)
                             path = ((MemberVarAlias *)member)->bases;
-                        result = CExpr2_004719c0(baseClass, path, expr, member->access, 1);
+                        result = CExpr2_004719c0(baseClass, path, expr,
+#if VERSION >= VERSION_GC_2_7
+                                                 NULL,
+#endif
+                                                 member->access, 1);
                         if (!result)
                             result = nullnode();
                         else

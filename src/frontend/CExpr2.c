@@ -2102,7 +2102,11 @@ ENode *CExpr_GenericFuncCall(BClassList *scope, ENode *instance, Boolean qualifi
         if (type->theclass->sominfo != NULL &&
             (((function->qual & Q_INLINE) == 0) || (function->datatype == DVFUNC && qualified == 0))) {
             BClassList *members = CClass_GetPathCopy(scope, 0);
-            instance = CExpr2_004719c0(scope, path, instance, access, checkAccess);
+            instance = CExpr2_004719c0(scope, path, instance,
+#if VERSION >= VERSION_GC_2_7
+                                       function,
+#endif
+                                       access, checkAccess);
             if (instance == NULL)
                 return make_slong();
             result = CSOM_MakeMethodReference(members, function, qualified);
@@ -2112,7 +2116,11 @@ ENode *CExpr_GenericFuncCall(BClassList *scope, ENode *instance, Boolean qualifi
                  (copts.f7a == 0 && instance != NULL && has_indirect_class_objref(instance, type->theclass) != 0)))
                 result->flags |= ENODE_FLAG_80;
 
-            instance = CExpr2_004719c0(scope, path, instance, access, checkAccess);
+            instance = CExpr2_004719c0(scope, path, instance,
+#if VERSION >= VERSION_GC_2_7
+                                       function,
+#endif
+                                       access, checkAccess);
             if (instance == NULL)
                 return make_slong();
         }
@@ -3487,7 +3495,11 @@ SInt32 check_standard_conversion(ENode *node, Type *ty, Boolean convert, Boolean
                         if (pointerAmbiguous != 0)
                             CError_ReportError(ERR_AMBIGUOUS_ACCESS_CLASS_STRUCT_UNION_MEMBER);
                         if (checkAccess != 0)
-                            CClass_CheckBaseAccess(base, 0);
+                            CClass_CheckBaseAccess(base,
+#if VERSION >= VERSION_GC_2_7
+                                                   NULL,
+#endif
+                                                   0);
                         converted_expr = CExpr_ClassPointerCast(base, node, 1);
                     }
                     return 3;
@@ -3513,7 +3525,11 @@ SInt32 check_standard_conversion(ENode *node, Type *ty, Boolean convert, Boolean
             if (convert != 0) {
                 if (classAmbiguous != 0)
                     CError_ReportError(ERR_AMBIGUOUS_ACCESS_CLASS_STRUCT_UNION_MEMBER);
-                CClass_CheckBaseAccess(base, 0);
+                CClass_CheckBaseAccess(base,
+#if VERSION >= VERSION_GC_2_7
+                                       NULL,
+#endif
+                                       0);
                 converted_expr = getnodeaddress(node, 0);
                 converted_expr = CExpr_ClassPointerCast(base, converted_expr, 0);
                 converted_expr = NewMonadic(converted_expr, EINDIRECT);
@@ -3728,7 +3744,11 @@ static ENode *makemonadic(ENode *inner, UInt8 ty)
     return n;
 }
 
-ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node, UInt8 access, Boolean checkAccess)
+ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node,
+#if VERSION >= VERSION_GC_2_7
+                       Object *object,
+#endif
+                       UInt8 access, Boolean checkAccess)
 {
     TypeClass *rtype;
     BClassList *classList;
@@ -3742,8 +3762,13 @@ ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node, UIn
         node = makemonadic(node, EINDIRECT);
         node->rtype = (Type *)data_00588040;
     }
+#if VERSION >= VERSION_GC_2_7
+    CError_ASSERT(1786, scope != NULL);
+    CError_ASSERT(1787, node->rtype->type == TYPECLASS);
+#else
     CError_ASSERT(1662, scope != NULL);
     CError_ASSERT(1663, node->rtype->type == TYPECLASS);
+#endif
     rtype = (TypeClass *)node->rtype;
     classList = CScope_GetClassAccessPath(scope, rtype);
     if (classList == NULL || classList->type != (Type *)rtype) {
@@ -3751,12 +3776,20 @@ ENode *CExpr2_004719c0(BClassList *scope, BClassList *baseList, ENode *node, UIn
         return NULL;
     }
     if (checkAccess > 0)
-        CClass_CheckBaseAccess(classList, access);
+        CClass_CheckBaseAccess(classList,
+#if VERSION >= VERSION_GC_2_7
+                               object,
+#endif
+                               access);
     if (TYPE_CLASS(classList->type)->sominfo == NULL) {
         if (baseList != NULL)
             classList = CClass_AppendPath(classList, baseList);
         if (node->type != EINDIRECT)
+#if VERSION >= VERSION_GC_2_7
+            node = CExpr_LValue(node, 0, 0);
+#else
             node = CExpr_LValue(node, 0, 1);
+#endif
         if (node->type == EINDIRECT) {
             node->data.monadic->flags = node->flags;
             node = node->data.monadic;

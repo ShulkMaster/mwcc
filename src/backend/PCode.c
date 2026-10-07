@@ -257,10 +257,14 @@ PCodeLabel *PCode_NewLabel(void)
 {
     PCodeLabel *node;
 
-    node = (PCodeLabel *)CompilerTools_AllocatePool(12);
+    node = (PCodeLabel *)CompilerTools_AllocatePool(sizeof(*node));
+#if VERSION >= VERSION_GC_2_7
+    memclrw(node, sizeof(*node));
+#else
     node->next = NULL;
     node->target.pendingLinks = NULL;
     node->resolved = 0;
+#endif
     node->number = next_label_number;
     ++next_label_number;
     return node;
