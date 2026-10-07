@@ -80,6 +80,7 @@
     "src/frontend/CError.c",
     "src/optimizer/GlobalOptimizer.c",
     "src/backend/CMachine.c",
-    "src/backend/RegisterInfo.c"
+    "src/backend/RegisterInfo.c",
+    "src/frontend/CException.c"
   ]
 }

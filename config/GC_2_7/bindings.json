@@ -1646,5 +1646,9 @@
   "_gUsedVirtualRegistersVR": "0x005eaa34",
   "_undefined_function_objects": "0x005e3af4",
   "_data_0058245e": "0x005e3b54",
-  "_data_00582462": "0x005e3b50"
+  "_data_00582462": "0x005e3b50",
+  "_cexcept_uniqueobjs": "0x005e308e",
+  "_data_00581c30": "0x005e308c",
+  "_data_005884fa": "0x005ef2d0",
+  "_CExcept_CanThrowException": "0x00522dd0"
 }

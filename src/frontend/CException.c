@@ -120,6 +120,7 @@ void CException_ResetPrecompiledState(UInt8 c)
     return;
 }
 
+#if VERSION < VERSION_GC_2_7
 static inline Boolean CException_HasThrow(Statement *s)
 {
     data_00581c30 = 0;
@@ -153,19 +154,93 @@ static inline Boolean CException_HasThrow(Statement *s)
     return 0;
 }
 
+#endif
+
 void CExcept_ExceptionTansform(Statement *stmt)
 {
+#if VERSION >= VERSION_GC_2_7
+    cexcept_uniqueobjs = NULL;
+#endif
     update_statement_dobjstacks(stmt);
+#if VERSION >= VERSION_GC_2_7
+    if (data_00588238 != NULL && fn_004e0ab0(data_00588238, stmt)) {
+        CError_ASSERT(2727, IS_TYPE_FUNC(data_00588238->type));
+        if (TYPE_FUNC(data_00588238->type)->exspecs != NULL && copts.fb3 != 0)
+            setup_exception_specification(stmt, TYPE_FUNC(data_00588238->type)->exspecs);
+    }
+#else
     if (data_00588238 != NULL && copts.fb3 != 0 && TYPE_FUNC(data_00588238->type)->exspecs != NULL) {
         if (CException_HasThrow(stmt)) {
             setup_exception_specification(stmt, TYPE_FUNC(data_00588238->type)->exspecs);
         }
     }
+#endif
 }
+/* TODO: [near miss] fn_004e0ab0 — GC 2.7 scan CFG differs; jump table unresolved. */
+unsigned char fn_004e0ab0(
+#if VERSION >= VERSION_GC_2_7
+    Object *func,
+#endif
+    Statement *node)
+{
+    data_00581c30 = 0;
+    while (node != NULL) {
+        switch (node->type) {
+            case ST_NOP:
+            case ST_LABEL:
+            case ST_GOTO:
+            case ST_ASM:
+                break;
+            case ST_RETURN:
+                if (node->expr.expression == NULL) {
+                    break;
+                }
+            case ST_EXPRESSION:
+            case ST_SWITCH:
+            case ST_IFGOTO:
+            case ST_IFNGOTO:
+            case ST_BEGINCATCH:
+            case ST_ENDCATCH:
+            case ST_ENDCATCHDTOR:
+            case ST_GOTOEXPR:
+                CExpr_SearchExprTree(node->expr.expression, fn_004e0b20, 2U, 54U, 55U);
+#if VERSION < VERSION_GC_2_7
+                if (data_00581c30 != 0)
+                    return 1;
+#endif
+                break;
+            default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(2698);
+#else
+                CError_FATAL(2414);
+#endif
+                break;
+        }
+        node = node->next;
+    }
+#if VERSION >= VERSION_GC_2_7
+    if (data_00581c30 != 0)
+        return 1;
+    TYPE_FUNC(data_00588238->type)->flags |= 0x400;
+#endif
+    return 0;
+}
+
 void fn_004e0b20(ENode *expr)
 {
+#if VERSION >= VERSION_GC_2_7
+    ENode *funcref = expr->data.funccall.funcref;
+    if (ENODE_IS(funcref, EOBJREF)) {
+        Object *func = funcref->data.objref;
+        if (CExcept_CanThrowException(func, func->datatype == DVFUNC && (expr->flags & ENODE_FLAG_80) == 0))
+            data_00581c30 = 1;
+    } else {
+        data_00581c30 = 1;
+    }
+#else
     data_00581c30 = 1U;
-    return;
+#endif
 }
 
 /* Label metadata used by exception statements. */
@@ -1452,7 +1527,11 @@ void CExcept_RegisterMember(Statement *statement, Object *objectptr, SInt32 offs
         node->data.member.objectptr = objectptr;
         node->data.member.offset = offset;
     } else {
+#if VERSION >= VERSION_GC_2_7
+        CError_ASSERT(632, condition->type == TYPE(&stsignedshort));
+#else
         CError_ASSERT(554, &condition->type->type == &stsignedshort.type);
+#endif
         node->kind = 8;
         node->data.member_cond.objectptr = objectptr;
         node->data.member_cond.cond = condition;
@@ -1821,47 +1900,15 @@ unsigned char CExcept_ActionNeedsDestruction(CException *entry)
         case 17:
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(363);
+#else
             CError_FATAL(302);
+#endif
             break;
     }
     result = 0;
     return result;
-}
-
-unsigned char fn_004e0ab0(Statement *node)
-{
-    data_00581c30 = 0;
-    while (node != NULL) {
-        switch (node->type) {
-            case ST_NOP:
-            case ST_LABEL:
-            case ST_GOTO:
-            case ST_ASM:
-                break;
-            case ST_RETURN:
-                if (node->expr.expression == NULL) {
-                    break;
-                }
-            case ST_EXPRESSION:
-            case ST_SWITCH:
-            case ST_IFGOTO:
-            case ST_IFNGOTO:
-            case ST_BEGINCATCH:
-            case ST_ENDCATCH:
-            case ST_ENDCATCHDTOR:
-            case ST_GOTOEXPR:
-                CExpr_SearchExprTree(node->expr.expression, fn_004e0b20, 2U, 54U, 55U);
-                if (data_00581c30 != 0) {
-                    return 1;
-                }
-                break;
-            default:
-                CError_FATAL(2414);
-                break;
-        }
-        node = node->next;
-    }
-    return 0;
 }
 
 /* Temporary list produced by exception traversal. */
@@ -2048,7 +2095,11 @@ void CException_004e35b0(CException *node)
             case 16:
                 break;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(192);
+#else
                 CError_FATAL(131);
+#endif
                 break;
         }
         node = node->next;
@@ -2058,6 +2109,9 @@ void CException_004e35b0(CException *node)
 void CExcept_Setup(void)
 {
     UINT_00587fc4 = NULL;
+#if VERSION >= VERSION_GC_2_7
+    cexcept_uniqueobjs = NULL;
+#endif
     exception_cleanup_registered = 0U;
     data_005884fa = 0U;
     return;

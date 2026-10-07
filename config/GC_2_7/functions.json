@@ -17676,9 +17676,10 @@
     "source": "src/frontend/CException.c"
   },
   {
-    "name": "fn_0051ff70",
+    "name": "fn_004e0b20",
     "address": "0x0051ff70",
-    "size": 63
+    "size": 63,
+    "source": "src/frontend/CException.c"
   },
   {
     "name": "setup_exception_specification",

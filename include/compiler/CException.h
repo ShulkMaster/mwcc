@@ -2,6 +2,7 @@
 #define COMPILER_CEXCEPTION_H
 
 #include <setjmp.h>
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -177,7 +178,16 @@ extern void CExcept_RegisterMemberArray(Statement *stmt, Object *object, SInt32 
                                         SInt32 size);
 extern void CExcept_ExceptionTansform(Statement *stmt);
 extern Statement *CExcept_ActionCleanup(CException *input, Statement *statement);
-extern unsigned char fn_004e0ab0(Statement *node);
+extern unsigned char fn_004e0ab0(
+#if VERSION >= VERSION_GC_2_7
+    Object *func,
+#endif
+    Statement *node);
+#if VERSION >= VERSION_GC_2_7
+struct UniqueObj;
+extern struct UniqueObj *cexcept_uniqueobjs;
+extern Boolean CExcept_CanThrowException(Object *object, Boolean flag);
+#endif
 extern void CExcept_Setup(void);
 extern struct Object *throw_func;
 extern struct ECacheNode *cached_objects;

@@ -132,6 +132,7 @@
     "src/driver/MacSpecs.c",
     "src/optimizer/IroDump.c",
     "src/frontend/CMangler.c",
-    "src/driver/CLDropinCallbacks_V10.cpp"
+    "src/driver/CLDropinCallbacks_V10.cpp",
+    "src/frontend/CException.c"
   ]
 }
