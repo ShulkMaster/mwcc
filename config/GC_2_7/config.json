@@ -53,6 +53,7 @@
     "src/runtime/maincrt.c"
   ],
   "content_literal_sources": [
+    "src/frontend/CScope.c",
     "src/frontend/Unmangle.c",
     "src/frontend/CPrep.c",
     "src/frontend/CPreprocess.c",

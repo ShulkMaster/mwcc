@@ -2,6 +2,7 @@
 #define COMPILER_SCOPES_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,9 @@ struct NameSpace {
     HashNameNode *name;
     NameSpaceList *usings;
     TypeClass *theclass;
+#if VERSION >= VERSION_GC_2_7
+    NameSpaceName *tparams;
+#endif
     union {
         NameSpaceName **hash;
         NameSpaceName *list;

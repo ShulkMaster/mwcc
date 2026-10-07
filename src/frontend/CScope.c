@@ -393,61 +393,58 @@ Boolean CScope_ParseMemberName(TypeClass *ctx, CScopeParseResult *node, Boolean 
 }
 #undef CERROR_FILE
 
-BClassList *CScope_GetClassAccessPath(BClassList *classes, TypeClass *base)
+static inline BClassList *CScope_GetBaseAccessPathEnd(BClassList *list)
 {
-    BClassList *current;
-    BClassList *last;
-    BClassList *start;
-    ClassList *inherited;
-    BClassList *entry;
-    BClassList *result;
-    BClassList *tail;
-    TypeClass *type;
-    BClassList *next;
-    BClassList *path;
+    BClassList *best = list;
+    ClassList *scan;
 
-    if (classes == NULL)
-        return NULL;
-    current = classes;
-    start = classes;
-    for (;;) {
-        if ((next = current->next) == NULL) {
-            last = (BClassList *)(int)start;
-            break;
-        }
-        for (inherited = TYPE_CLASS(current->type)->bases; inherited; inherited = inherited->next) {
-            if (next->type == (Type *)inherited->base)
+    do {
+        if (!list->next)
+            return best;
+        for (scan = TYPE_CLASS(list->type)->bases; scan; scan = scan->next) {
+            if (TYPE_CLASS(list->next->type) == scan->base)
                 break;
         }
-        if (inherited == NULL)
-            start = next;
-        current = next;
-    }
-    entry = start;
-    while (entry != NULL) {
-        if (entry->type == (Type *)base)
-            return entry;
-        entry = entry->next;
-    }
-    type = TYPE_CLASS(start->type);
-    class_path_base = base;
+        if (!scan)
+            best = list->next;
+        list = list->next;
+    } while (1);
+}
+
+static inline BClassList *CScope_GetAccessPath(TypeClass *src, TypeClass *dest)
+{
+    class_path_base = src;
     found_class = NULL;
-    if ((path = result = find_base_class_path(base, type, 0)) != NULL) {
-        tail = result;
-        while (tail != NULL) {
-            if (tail->type == last->type) {
-                tail->next = start->next;
-                return result;
+    return find_base_class_path(src, dest, 0);
+}
+
+BClassList *CScope_GetClassAccessPath(BClassList *list, TypeClass *tclass)
+{
+    BClassList *scan;
+    BClassList *list2;
+
+    if (!list)
+        return NULL;
+    list = CScope_GetBaseAccessPathEnd(list);
+    for (scan = list; scan; scan = scan->next) {
+        if (scan->type == (Type *)tclass)
+            return scan;
+    }
+    if ((list2 = CScope_GetAccessPath(tclass, TYPE_CLASS(list->type)))) {
+        for (scan = list2; scan; scan = scan->next) {
+            if (scan->type == list->type) {
+                scan->next = list->next;
+                return list2;
             }
-            tail = tail->next;
         }
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(3217);
+#else
         CError_FATAL(3053);
+#endif
     }
     return NULL;
 }
-
-/* NameSpace record as laid out in this build: the name table lives at 0x10
- * and the hash/list discriminator byte at 0x18. */
 
 static NameSpaceObjectList *ScopeFindName(NameSpace *nspace, HashNameNode *name)
 {
@@ -2896,7 +2893,11 @@ NameSpaceList *collect_type_namespaces(NameSpaceList *acc, Type *type)
             case TYPETEMPLDEPEXPR:
                 break;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(494);
+#else
                 CError_FATAL(476);
+#endif
                 break;
         }
         break;
@@ -2999,7 +3000,11 @@ UInt8 CScope_FindQualifiedClassMember(CScopeParseResult *holder, TypeClass *type
     success = find_and_append_class_member_path(holder, type->nspace, name, 0);
     if (success) {
         if ((objects = holder->objects) == NULL) {
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1780);
+#else
             CError_FATAL(1723);
+#endif
         }
         holder->objects = NULL;
         success = set_parse_result_from_objects(holder, objects, name);
@@ -3108,12 +3113,16 @@ NameSpaceObjectList *CScope_InsertName(NameSpace *scope, HashNameNode *name)
     NameSpaceName *tail;
     target = scope;
     if (target->is_hash != 0) {
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(387);
+#else
         CError_FATAL(369);
+#endif
     }
     if (target->is_global != 0) {
-        entry = (NameSpaceName *)galloc(16U);
+        entry = (NameSpaceName *)galloc(sizeof(NameSpaceName));
     } else {
-        entry = (NameSpaceName *)CompilerTools_AllocatePool(16U);
+        entry = (NameSpaceName *)CompilerTools_AllocatePool(sizeof(NameSpaceName));
     }
     entry->next = NULL;
     entry->name = name;
