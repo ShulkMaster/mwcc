@@ -12,20 +12,25 @@ Commands:
   the other commands compare against.
 - hybrid SELECTION: build a hybrid (tools/hybrid.py's options: --exact, --all-sourced, --source, --function,
   --exclude, --exclude-file) and compare it with the reference.
-- bisect SELECTION: find the functions whose injection changes an object or breaks a compile: repeatedly the
-  smallest prefix (in the original's address order) of the selection that fails on a sample of the failing units,
-  removed until the rest is identical on the whole corpus; then each culprit alone over the whole corpus.
-- clean: delete old runs (also done before each run): keep the newest --keep, and the total under 10 GB.
+- bisect SELECTION: heuristically remove groups from a failing selection, then replay each group alone over
+  the whole corpus. Results distinguish observed standalone failures from context-dependent removals and
+  retain the ordered selections, complete comparisons and trial hashes; minimality is not guaranteed.
+- clean: explicitly delete completed runs while preserving active runs: keep the newest --keep, and the total under 10 GB.
 
 Per unit: identical, differs (the sections, the first differing symbol), crash (no object, or a signal), error (the
-compiler reported an error the original did not), timeout. Each run writes RUN/results.json and RUN/summary.txt.
+compiler reported an error the original did not), timeout, messages_differ, or diagnostics_unverified.
+Each run writes RUN/results.json and RUN/summary.txt.
 The command runs itself in `systemd-run --user --scope -p MemoryMax=6G nice -n 10` with at most --jobs (4) compiles.
 """
 import argparse
+import copy
+import fcntl
+from contextlib import contextmanager
 import hashlib
 import json
 import os
 import resource
+import re
 import shlex
 import shutil
 import stat
@@ -129,34 +134,76 @@ def corpus(game=GAME, version="GC/2.7"):
     return sorted(units, key=lambda u: u["name"])
 
 
-def corpus_key(units, args):
+def corpus_key(units, args, original=None):
     game = Path(args.game).resolve()
     inputs = {game / u["source"] for u in units}
     directories = set()
+    local_directories = {p.parent for p in inputs}
+    for directory in local_directories:
+        inputs.update(p for p in directory.rglob("*") if p.is_file()
+                      and p.suffix.lower() in (".h", ".hpp", ".hh", ".hxx", ".inc", ".inl", ".def", ".pch"))
     for unit in units:
         flags = unit["flags"]
-        for i, flag in enumerate(flags[:-1]):
-            if flag in ("-i", "-I"):
-                directory = game / flags[i + 1]
-                if directory.is_dir():
-                    directories.add(directory)
+        i = 0
+        while i < len(flags):
+            flag = flags[i]
+            if flag.startswith("@"):
+                raise ValueError("response-file dependencies are unsupported")
+            if flag in ("-i", "-I", "-include", "-prefix"):
+                if i + 1 == len(flags):
+                    raise ValueError(f"missing dependency argument: {flag}")
+                i += 1
+                path = game / flags[i]
+                if flag in ("-i", "-I"):
+                    if not path.is_dir():
+                        raise ValueError(f"declared include directory missing: {path}")
+                    directories.add(path)
+                else:
+                    inputs.add(path)
+                    directories.add(path.parent)
+            elif flag.startswith("-I") and len(flag) > 2:
+                path = game / flag[2:]
+                if not path.is_dir():
+                    raise ValueError(f"declared include directory missing: {path}")
+                directories.add(path)
+            i += 1
     for directory in sorted(directories):
         inputs.update(f for f in directory.rglob("*") if f.is_file())
+    pending = list(inputs)
+    visited = set()
+    while pending:
+        path = pending.pop()
+        resolved = path.resolve()
+        if resolved in visited:
+            continue
+        visited.add(resolved)
+        for name in re.findall(r'^\s*#\s*include\s*"([^"\n]+)"', path.read_text(errors="replace"), re.MULTILINE):
+            candidates = [path.parent / name, *(directory / name for directory in sorted(directories))]
+            found = next((candidate for candidate in candidates if candidate.is_file()), None)
+            if found is not None and found not in inputs:
+                inputs.add(found)
+                pending.append(found)
     digest = hashlib.sha256()
     digest.update(json.dumps([units, str(game), args.sjiswrap, str(args.wibo)], sort_keys=True).encode())
     runtime = {Path(args.wibo)} if Path(args.wibo).is_file() else set()
     if args.sjiswrap and any(unit.get("sjis", False) for unit in units):
-        runtime.add(game / "build/tools/sjiswrap.exe")
-    for path in sorted(inputs | {hybrid.ORIGINAL} | runtime):
+        wrapper = Path(getattr(args, "sjiswrap_path", game / "build/tools/sjiswrap.exe"))
+        runtime.add(wrapper)
+        runtime.update(p for p in wrapper.parent.iterdir() if p.suffix.lower() == ".dll" and p.is_file())
+    for path in sorted(inputs | {Path(original or hybrid.ORIGINAL)} | runtime):
         digest.update(str(path).encode() + b"\0")
         digest.update(hashlib.sha256(path.read_bytes()).digest())
-    return digest.hexdigest()[:20]
+    return digest.hexdigest()
 
 
 # Compiling
 
 def no_core():
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+
+
+def diagnostics_digest(stdout, stderr):
+    return hashlib.sha256(struct.pack("<Q", len(stdout)) + stdout + stderr).hexdigest()
 
 
 def compile_unit(exe, unit, out_dir, args, timeout):
@@ -166,7 +213,7 @@ def compile_unit(exe, unit, out_dir, args, timeout):
     obj.unlink(missing_ok=True)
     command = [str(args.wibo)]
     if args.sjiswrap and unit["sjis"]:
-        command.append(str(Path(args.game) / "build/tools/sjiswrap.exe"))
+        command.append(str(getattr(args, "sjiswrap_path", Path(args.game) / "build/tools/sjiswrap.exe")))
     command += [str(exe), *unit["flags"], "-c", unit["source"], "-o", str(obj)]
     start = time.monotonic()
     try:
@@ -182,7 +229,10 @@ def compile_unit(exe, unit, out_dir, args, timeout):
         status = "error"
     else:
         status = "ok"
-    return dict(status=status, seconds=seconds, sha1=sha1, rc=done.returncode, output=output[-4000:])
+    return dict(status=status, seconds=seconds, sha1=sha1, rc=done.returncode, output=output[-4000:],
+                diagnostics_sha256=diagnostics_digest(done.stdout, done.stderr),
+                stdout_sha256=hashlib.sha256(done.stdout).hexdigest(),
+                stderr_sha256=hashlib.sha256(done.stderr).hexdigest())
 
 
 def compile_all(exe, units, out_dir, args, timeouts=None):
@@ -264,8 +314,16 @@ def classify(reference, result, ref_dir, out_dir, name):
     if result["status"] != reference["status"]:
         return dict(result="error" if result["status"] == "error" else "differs", detail=detail)
     if result["sha1"] == reference["sha1"]:
-        same_output = result["output"] == reference["output"]
-        return dict(result="identical") if same_output else dict(result="identical", messages_differ=True)
+        reference_digest = reference.get("diagnostics_sha256")
+        result_digest = result.get("diagnostics_sha256")
+        if reference_digest is not None and result_digest is not None:
+            same_output = result_digest == reference_digest
+        elif result["output"] != reference["output"]:
+            same_output = False
+        else:
+            return dict(result="diagnostics_unverified", objects_identical=True)
+        return dict(result="identical") if same_output else dict(
+            result="messages_differ", objects_identical=True, messages_differ=True, detail=detail)
     if result["sha1"] is None or reference["sha1"] is None:
         return dict(result="differs", sections=["(no object)"])
     sections, where = section_diff((Path(ref_dir) / name).read_bytes(), (Path(out_dir) / name).read_bytes())
@@ -273,19 +331,29 @@ def classify(reference, result, ref_dir, out_dir, name):
 
 
 def compare_runs(units, reference, results, ref_dir, out_dir):
+    expected = validate_units(units)
+    if set(results) != expected or not expected <= set(reference):
+        raise RuntimeError("comparison result keys do not match corpus")
     return {u["name"]: classify(reference[u["name"]], results[u["name"]], ref_dir, out_dir, u["name"])
             for u in units}
+
+
+def comparison_kind(comparison):
+    if comparison["result"] == "identical" and comparison.get("messages_differ"):
+        return "messages_differ"
+    return comparison["result"]
 
 
 def tally(comparison):
     counts = {}
     for c in comparison.values():
-        counts[c["result"]] = counts.get(c["result"], 0) + 1
+        kind = comparison_kind(c)
+        counts[kind] = counts.get(kind, 0) + 1
     return counts
 
 
 def failing(comparison):
-    return sorted(n for n, c in comparison.items() if c["result"] != "identical")
+    return sorted(n for n, c in comparison.items() if comparison_kind(c) != "identical")
 
 
 # Runs
@@ -309,25 +377,64 @@ def check_disk_limits(campaign=True):
         raise RuntimeError("campaign exceeds its 40 GB disk limit")
 
 
+_RUN_LEASES = {}
+
+
+@contextmanager
+def state_lock():
+    STATE.mkdir(parents=True, exist_ok=True)
+    with (STATE / ".runs.lock").open("a+b") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        yield
+
+
+def release_runs():
+    for lock in _RUN_LEASES.values():
+        lock.close()
+    _RUN_LEASES.clear()
+
+
 def clean(keep, protect=()):
-    """Delete old runs: keep the newest KEEP and the total under LIMIT; never a reference or PROTECT."""
+    """Delete completed, leased runs; leave live, reference, protected and legacy untracked runs alone."""
     if not STATE.exists():
         return
-    runs = sorted((p for p in STATE.iterdir() if p.is_dir() and not p.name.startswith("reference-")
-                   and p not in protect), key=lambda p: p.stat().st_mtime, reverse=True)
-    for old in runs[keep:]:
-        shutil.rmtree(old)
-    runs = runs[:keep]
-    while runs and disk_usage(STATE) > LIMIT:
-        shutil.rmtree(runs.pop())
+    with state_lock():
+        runs = sorted((p for p in STATE.iterdir() if p.is_dir() and not p.is_symlink() and not p.name.startswith("reference-")
+                       and p not in protect and (p / ".run.lock").is_file()),
+                      key=lambda p: p.stat().st_mtime, reverse=True)
+        eligible, locks = [], []
+        try:
+            for run in runs:
+                lock = (run / ".run.lock").open("a+b")
+                try:
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    lock.close()
+                    continue
+                locks.append(lock)
+                eligible.append(run)
+            for old in eligible[keep:]:
+                shutil.rmtree(old)
+            eligible = eligible[:keep]
+            while eligible and disk_usage(STATE) > LIMIT:
+                shutil.rmtree(eligible.pop())
+        finally:
+            for lock in locks:
+                lock.close()
 
 
 def new_run(args, kind):
-    STATE.mkdir(parents=True, exist_ok=True)
-    clean(args.keep)
-    name = args.run or time.strftime("%Y%m%d-%H%M%S") + "-" + kind
-    run = STATE / name
-    run.mkdir(parents=True, exist_ok=True)
+    if args.run is not None and (not args.run or Path(args.run).name != args.run or args.run in (".", "..") or args.run.startswith("reference-")):
+        raise ValueError("run must be a directory name, outside the reserved reference prefix")
+    with state_lock():
+        if args.run is None:
+            run = Path(tempfile.mkdtemp(prefix=time.strftime("%Y%m%d-%H%M%S") + "-" + kind + "-", dir=STATE))
+        else:
+            run = STATE / args.run
+            run.mkdir(parents=True, exist_ok=False)
+        lock = (run / ".run.lock").open("a+b")
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        _RUN_LEASES[run] = lock
     return run
 
 
@@ -339,20 +446,34 @@ def keep_failing(directory, names):
             f.unlink()
 
 
-def reference(args, units):
+def reference(args, units, original=None):
     """The original's compile of the corpus (directory, results), compiled when missing."""
-    directory = STATE / f"reference-{corpus_key(units, args)}"
+    original = Path(original or hybrid.ORIGINAL)
+    directory = STATE / f"reference-{corpus_key(units, args, original)}"
     results = directory / "results.json"
     data = json.loads(results.read_text()) if results.exists() else {}
-    valid = all(u["name"] in data and data[u["name"]]["status"] == "ok"
+    valid = set(data) == validate_units(units) and all(u["name"] in data and data[u["name"]]["status"] == "ok"
                 and data[u["name"]]["sha1"] is not None
+                and data[u["name"]].get("diagnostics_sha256") is not None
                 and (directory / "objects" / u["name"]).is_file()
                 and hashlib.sha1((directory / "objects" / u["name"]).read_bytes()).hexdigest()
                     == data[u["name"]]["sha1"] for u in units)
     if not valid:
         print(f"compiling the reference with the original: {directory}", flush=True)
-        data = compile_all(hybrid.ORIGINAL, units, directory / "objects", args)
-        results.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n")
+        data = compile_all(original, units, directory / "objects", args)
+        if set(data) != validate_units(units) or any(
+                item.get("status") != "ok" or item.get("sha1") is None
+                or item.get("diagnostics_sha256") is None
+                or not (directory / "objects" / name).is_file()
+                or hashlib.sha1((directory / "objects" / name).read_bytes()).hexdigest() != item["sha1"]
+                for name, item in data.items()):
+            raise RuntimeError("retail reference failed: inconsistent compilation artifacts")
+        with tempfile.NamedTemporaryFile(mode="w", prefix=".reference-", dir=directory, delete=False) as temporary:
+            temporary.write(json.dumps(data, indent=1, sort_keys=True) + "\n")
+            temporary_path = Path(temporary.name)
+        temporary_path.replace(results)
+    if set(data) != validate_units(units):
+        raise RuntimeError("reference result keys do not match corpus")
     failed = [name for name, item in data.items() if item["status"] != "ok" or item["sha1"] is None]
     if failed:
         raise RuntimeError(f"retail reference failed on {len(failed)} units; see {results}: {failed[:5]}")
@@ -372,17 +493,20 @@ def write_summary(run, title, units, comparison, extra=()):
         detail = " ".join(c.get("sections", [])) + (f" first {c['first']}" if c.get("first") else "")
         if c.get("detail"):
             detail += " | " + " / ".join(c["detail"])
-        lines.append(f"  {c['result']:9} {name} {detail}")
+        lines.append(f"  {comparison_kind(c):9} {name} {detail}")
     text = "\n".join(lines) + "\n"
     (run / "summary.txt").write_text(text)
     return text
 
 
 def command_retail(args, units):
+    validate_units(units)
     run = new_run(args, "retail")
-    STATE.joinpath(f"reference-{corpus_key(units, args)}").exists() and print("(reference already present)")
-    ref_dir, ref = reference(args, units)
-    again = compile_all(hybrid.ORIGINAL, units, run / "objects", args)
+    args = freeze_execution(args, units, run)
+    program = freeze_program(hybrid.Program(), run)
+    STATE.joinpath(f"reference-{corpus_key(units, args, program.frozen_original)}").exists() and print("(reference already present)")
+    ref_dir, ref = reference(args, units, program.frozen_original)
+    again = compile_all(program.frozen_original, units, run / "objects", args)
     comparison = compare_runs(units, ref, again, ref_dir, run / "objects")
     keep_failing(run / "objects", failing(comparison))
     game = sum(1 for u in units if ref[u["name"]]["sha1"] and (Path(args.game) / u["output"]).exists()
@@ -390,36 +514,216 @@ def command_retail(args, units):
     statuses = tally({n: dict(result=r["status"]) for n, r in ref.items()})
     extra = [f"original statuses: {statuses}", f"same object as the game's own build: {game}/{len(units)}",
              f"compile time: {sum(r['seconds'] for r in ref.values()):.1f} s"]
-    json.dump(dict(kind="retail", comparison=comparison, results=again), (run / "results.json").open("w"), indent=1)
+    check_execution(args, final=True)
+    (run / "results.json").write_text(json.dumps(dict(kind="retail", comparison=comparison, results=again), indent=1) + "\n")
     print(write_summary(run, f"retail vs retail ({run})", units, comparison, extra))
+    return int(bool(failing(comparison)))
+
+
+def validate_units(units):
+    names = [u["name"] for u in units]
+    if not names or any(not n for n in names) or len(names) != len(set(names)):
+        raise ValueError("corpus names must be nonempty and unique")
+    for name in names:
+        if (Path(name).is_absolute() or any(part in ("", ".", "..") for part in name.split("/"))
+                or "\\" in name or "\0" in name):
+            raise ValueError("corpus name escapes output directory")
+    return set(names)
+
+
+def freeze_program(program, run):
+    """Copy linker inputs privately; reject observed drift, without claiming an atomic source epoch."""
+    run = Path(run)
+    target = run / "inputs"
+    original = Path(hybrid.ORIGINAL)
+    sources = sorted({f["source"] for f in program.functions if "source" in f})
+    for source in sources:
+        if Path(source).is_absolute() or ".." in Path(source).parts or "\\" in source:
+            raise ValueError("configured source escapes snapshot")
+    configs = [Path(f"config/{hybrid.VERSION}/{n}.json") for n in ("functions", "bindings")]
+
+    def inventory():
+        paths = {str(p): program.root / p for p in configs}
+        missing = []
+        for source in sources:
+            rel = f"build/{hybrid.VERSION}/compiled/{source}.obj"
+            path = program.root / rel
+            if path.is_file():
+                paths[rel] = path
+            else:
+                missing.append(rel)
+        paths["build/compilers/GC/2.7/mwcceppc.exe"] = original
+        for dll in sorted(original.parent.iterdir()):
+            if dll.suffix.lower() == ".dll" and dll.is_file():
+                paths[f"build/compilers/GC/2.7/{dll.name}"] = dll
+        return paths, missing
+
+    paths, missing = inventory()
+    initial = {name: path.read_bytes() for name, path in paths.items()}
+    if json.loads(initial[str(configs[0])]) != program.functions:
+        raise RuntimeError("functions changed since selection")
+    bindings = {n: int(v, 0) for n, v in json.loads(initial[str(configs[1])]).items()}
+    # Program stores derived addresses; preserve the originally loaded bindings separately.
+    if bindings != program.input_bindings:
+        raise RuntimeError("bindings changed since selection")
+    records = {name: dict(size=len(data), sha256=hashlib.sha256(data).hexdigest())
+               for name, data in initial.items()}
+    with tempfile.TemporaryDirectory(prefix=".inputs-", dir=run) as staging:
+        staging = Path(staging)
+        for name, data in initial.items():
+            path = staging / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+        after_paths, after_missing = inventory()
+        if set(paths) != set(after_paths) or missing != after_missing:
+            raise RuntimeError("linker input file set changed during freeze")
+        for name, path in after_paths.items():
+            if hashlib.sha256(path.read_bytes()).hexdigest() != records[name]["sha256"]:
+                raise RuntimeError(f"linker input changed during freeze: {name}")
+        metadata = dict(schema=1, consistency="observed-drift-check; producer-stability-required",
+                        files=records, missing_objects=missing)
+        canonical = json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode()
+        metadata["sha256"] = hashlib.sha256(canonical).hexdigest()
+        (staging / "inputs.json").write_text(json.dumps(metadata, indent=1, sort_keys=True) + "\n")
+        for name in records:
+            if hashlib.sha256((staging / name).read_bytes()).hexdigest() != records[name]["sha256"]:
+                raise RuntimeError(f"private input copy differs: {name}")
+        staging.rename(target)
+    (run / "inputs.json").write_bytes((target / "inputs.json").read_bytes())
+    frozen = hybrid.Program(target)
+    frozen.frozen_original = target / "build/compilers/GC/2.7/mwcceppc.exe"
+    frozen.input_manifest = metadata
+    frozen.run = run
+    return frozen
+
+
+def static_elf(data):
+    """Inspect ELF64 little-endian headers only; never execute a candidate loader."""
+    if len(data) < 64 or data[:6] != b"\x7fELF\x02\x01":
+        raise ValueError("runtime freeze requires a static ELF64 little-endian wibo")
+    offset = struct.unpack_from("<Q", data, 32)[0]
+    size, count = struct.unpack_from("<HH", data, 54)
+    if size < 56 or offset + size * count > len(data):
+        raise ValueError("invalid wibo program header table")
+    for index in range(count):
+        kind = struct.unpack_from("<I", data, offset + size * index)[0]
+        if kind in (2, 3):  # PT_DYNAMIC / PT_INTERP
+            raise ValueError("dynamic wibo runtime is unsupported by this private-copy slice")
+
+
+def freeze_execution(args, units, run):
+    """Freeze runtime bytes, retaining the original game cwd and logical source arguments."""
+    live = copy.copy(args)
+    original = Path(hybrid.ORIGINAL)
+    start = corpus_key(units, live, original)
+    paths = {"wibo": Path(args.wibo)}
+    if args.sjiswrap and any(u.get("sjis", False) for u in units):
+        wrapper = Path(args.game) / "build/tools/sjiswrap.exe"
+        paths["wrapper/sjiswrap.exe"] = wrapper
+        paths.update({"wrapper/" + p.name: p for p in wrapper.parent.iterdir()
+                      if p.suffix.lower() == ".dll" and p.is_file()})
+    before = {name: p.read_bytes() for name, p in paths.items()}
+    static_elf(before["wibo"])
+    target = Path(run) / "runtime"
+    with tempfile.TemporaryDirectory(prefix=".runtime-", dir=run) as stage:
+        stage = Path(stage)
+        for name, data in before.items():
+            path = stage / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+            path.chmod(0o755 if name == "wibo" else 0o644)
+        if corpus_key(units, live, original) != start:
+            raise RuntimeError("corpus/runtime changed during execution freeze")
+        for name, path in paths.items():
+            if path.read_bytes() != before[name] or (stage / name).read_bytes() != before[name]:
+                raise RuntimeError(f"runtime input changed during freeze: {name}")
+        stage.rename(target)
+    frozen = copy.copy(args)
+    frozen.wibo = target / "wibo"
+    if "wrapper/sjiswrap.exe" in paths:
+        frozen.sjiswrap_path = target / "wrapper/sjiswrap.exe"
+    metadata = dict(schema=1, corpus_sha256_start=start, corpus_fully_frozen=False,
+                    consistency="observed-start/end-check; producer-stability-required",
+                    scope="local header trees/literal quoted includes, declared -i/-I/attached-I, -prefix/-include; macro/implicit search/env unverified",
+                    runtime={name: dict(source=str(paths[name]), size=len(data), sha256=hashlib.sha256(data).hexdigest())
+                             for name, data in before.items()})
+    frozen.execution_guard = (live, units, original, Path(run), metadata)
+    (Path(run) / "execution.json").write_text(json.dumps(metadata, indent=1, sort_keys=True) + "\n")
+    return frozen
+
+
+def check_execution(args, final=False):
+    guard = getattr(args, "execution_guard", None)
+    if guard is None:
+        return
+    live, units, original, run, metadata = guard
+    current = corpus_key(units, live, original)
+    metadata["corpus_sha256_end"] = current
+    metadata["observed_unchanged"] = current == metadata["corpus_sha256_start"]
+    if final or not metadata["observed_unchanged"]:
+        (run / "execution.json").write_text(json.dumps(metadata, indent=1, sort_keys=True) + "\n")
+    if not metadata["observed_unchanged"]:
+        raise RuntimeError("live corpus/runtime drift invalidates differential provenance")
+    # Private runtime copies must also still equal recorded input bytes.
+    for name, record in metadata["runtime"].items():
+        if hashlib.sha256((run / "runtime" / name).read_bytes()).hexdigest() != record["sha256"]:
+            metadata["private_runtime_unchanged"] = False
+            (run / "execution.json").write_text(json.dumps(metadata, indent=1, sort_keys=True) + "\n")
+            raise RuntimeError("private runtime bytes changed during execution")
 
 
 def build_hybrid(keys, path, program):
-    image, manifest = hybrid.build(keys, program)
-    hybrid.write(path, image, manifest)
+    original = getattr(program, "frozen_original", hybrid.ORIGINAL)
+    image, manifest = hybrid.build(keys, program, original=original)
+    manifest["sha256"] = hashlib.sha256(image).hexdigest()
+    manifest["requested"] = list(keys)
+    if hasattr(program, "input_manifest"):
+        manifest["inputs_sha256"] = program.input_manifest["sha256"]
+        manifest["inputs_manifest"] = str(program.run / "inputs.json")
+        if hasattr(program, "execution_inputs"):
+            manifest["execution_manifest"] = str(program.run / "execution.json")
+            manifest["corpus_sha256_start"] = program.execution_inputs["corpus_sha256_start"]
+            manifest["runtime"] = program.execution_inputs["runtime"]
+        durable = program.run / "images"
+        durable.mkdir(exist_ok=True)
+        (durable / (manifest["sha256"] + ".json")).write_text(
+            json.dumps(manifest, indent=1, sort_keys=True) + "\n")
+    hybrid.write(path, image, manifest, original=original)
     return manifest
 
 
 def command_hybrid(args, units):
     program = hybrid.Program()
     keys = hybrid.select(program, args)
+    if not keys:
+        raise SystemExit("nothing selected")
+    validate_units(units)
     run = new_run(args, "hybrid")
+    args = freeze_execution(args, units, run)
+    program = freeze_program(program, run)
+    if hasattr(args, "execution_guard"):
+        program.execution_inputs = args.execution_guard[-1]
     manifest = build_hybrid(keys, run / "hybrid/mwcceppc.exe", program)
-    ref_dir, ref = reference(args, units)
+    if not manifest["injected"]:
+        raise SystemExit("no selected function could be injected")
+    ref_dir, ref = reference(args, units, program.frozen_original)
     results = compile_all(run / "hybrid/mwcceppc.exe", units, run / "objects", args, timeouts(ref))
     comparison = compare_runs(units, ref, results, ref_dir, run / "objects")
     keep_failing(run / "objects", failing(comparison))
-    json.dump(dict(kind="hybrid", argv=sys.argv[1:], comparison=comparison, results=results),
-              (run / "results.json").open("w"), indent=1)
+    check_execution(args, final=True)
+    (run / "results.json").write_text(json.dumps(dict(
+        kind="hybrid", argv=sys.argv[1:], comparison=comparison, results=results,
+        partial_coverage=bool(manifest["skipped"]), manifest=manifest), indent=1) + "\n")
     extra = [f"hybrid: {len(manifest['injected'])} functions injected, {len(manifest['skipped'])} skipped "
              f"(see hybrid/mwcceppc.exe.json), sha1 {manifest['sha1']}"]
     print(write_summary(run, f"original vs hybrid {' '.join(sys.argv[2:])} ({run})", units, comparison, extra))
+    return int(bool(failing(comparison)) or bool(manifest["skipped"]))
 
 
 class Bisector:
     def __init__(self, args, units, run, program):
         self.args, self.units, self.run, self.program = args, {u["name"]: u for u in units}, run, program
-        self.ref_dir, self.ref = reference(args, units)
+        self.ref_dir, self.ref = reference(args, units, program.frozen_original)
         self.timeouts = timeouts(self.ref)
         self.cache = {}
         self.tests = 0
@@ -432,23 +736,50 @@ class Bisector:
 
     def compare(self, keys, names):
         """{unit: comparison} of a hybrid of KEYS over NAMES."""
+        check_execution(self.args)
         cache_key = (hashlib.sha1("\n".join(keys).encode()).hexdigest(), tuple(names))
         if cache_key not in self.cache:
             self.tests += 1
             with tempfile.TemporaryDirectory(dir=self.run) as work:
                 exe = Path(work) / "mwcceppc.exe"
-                build_hybrid(keys, exe, self.program)
+                manifest = build_hybrid(keys, exe, self.program)
+                if set(keys) != {item["key"] for item in manifest["injected"]}:
+                    raise RuntimeError("bisect trial did not inject every requested key")
                 units = [self.units[n] for n in names]
                 results = compile_all(exe, units, Path(work) / "objects", self.args, self.timeouts)
-                self.cache[cache_key] = compare_runs(units, self.ref, results, self.ref_dir, Path(work) / "objects")
+                comparison = compare_runs(units, self.ref, results, self.ref_dir, Path(work) / "objects")
+                trials = self.run / "trials"
+                trials.mkdir(exist_ok=True)
+                identity = hashlib.sha256(json.dumps(cache_key).encode()).hexdigest()
+                (trials / (identity + ".json")).write_text(json.dumps(dict(
+                    requested=list(keys), units=list(names), manifest=manifest,
+                    comparison=comparison, results=results), indent=1, sort_keys=True) + "\n")
+                self.cache[cache_key] = comparison
+        check_execution(self.args)
         return self.cache[cache_key]
+
+    def trial_reference(self, keys, names):
+        """Reference existing durable evidence; never compile a new trial here."""
+        cache_key = (hashlib.sha1("\n".join(keys).encode()).hexdigest(), tuple(names))
+        identity = hashlib.sha256(json.dumps(cache_key).encode()).hexdigest()
+        path = self.run / "trials" / (identity + ".json")
+        raw = path.read_bytes()
+        data = json.loads(raw)
+        if (data["requested"] != list(keys) or data["units"] != list(names)
+                or data["comparison"] != self.cache[cache_key]):
+            raise RuntimeError("durable trial does not match cached comparison")
+        manifest = data["manifest"]
+        return dict(path=str(path), sha256=hashlib.sha256(raw).hexdigest(),
+                    image_sha256=manifest["sha256"], inputs_sha256=manifest["inputs_sha256"],
+                    comparison_sha256=hashlib.sha256(json.dumps(
+                        data["comparison"], sort_keys=True, separators=(",", ":")).encode()).hexdigest())
 
     def fails(self, keys, names):
         return bool(keys) and bool(failing(self.compare(keys, names)))
 
     def minimal(self, keys, names):
-        """A small group of KEYS that fails on NAMES: the last function of the shortest failing prefix, then
-        within the functions before it, with it fixed, until the group fails on its own."""
+        """Heuristic prefix search; healing interactions and key order can defeat minimality.
+        Returned groups must be replayed alone before assigning standalone failure evidence."""
         fixed, candidates = [], list(keys)
         while True:
             low, high = 1, len(candidates)
@@ -470,45 +801,73 @@ class Bisector:
 
 def command_bisect(args, units):
     program = hybrid.Program()
-    run = new_run(args, "bisect")
-    bisector = Bisector(args, units, run, program)
     selected = hybrid.select(program, args)
-    # (only what links: a skipped function changes nothing)
-    _, manifest = hybrid.build(selected, program)
+    if not selected:
+        raise SystemExit("nothing selected")
+    validate_units(units)
+    run = new_run(args, "bisect")
+    args = freeze_execution(args, units, run)
+    program = freeze_program(program, run)
+    if hasattr(args, "execution_guard"):
+        program.execution_inputs = args.execution_guard[-1]
+    manifest = build_hybrid(selected, run / "initial/mwcceppc.exe", program)
+    if not manifest["injected"]:
+        raise SystemExit("no selected function could be injected")
+    bisector = Bisector(args, units, run, program)
     remaining = [i["key"] for i in manifest["injected"]]
     bisector.note(f"bisecting {len(remaining)} functions over {len(units)} units ({run})")
     every = [u["name"] for u in units]
     culprits = []
+    contexts = []
+    initial_keys = list(remaining)
     full = bisector.compare(remaining, every)
+    full_initial = full
+    initial_trial = bisector.trial_reference(initial_keys, every)
     names = bisector.sample(failing(full))
     bisector.note(f"all: {tally(full)}")
     while names:
         if bisector.fails(remaining, names):
+            context = dict(selection=list(remaining), sample=list(names),
+                           trial=bisector.trial_reference(remaining, names))
             group = bisector.minimal(remaining, names)
+            context["removed"] = list(group)
+            contexts.append(context)
             culprits.append(group)
             remaining = [k for k in remaining if k not in group]
-            bisector.note(f"culprit: {' + '.join(group)} ({bisector.tests} hybrids so far)")
+            bisector.note(f"removed group (standalone replay pending): {' + '.join(group)} ({bisector.tests} hybrids so far)")
             continue
         full = bisector.compare(remaining, every)
-        bisector.note(f"without {len(culprits)} culprits: {tally(full)}")
+        bisector.note(f"after removing {len(culprits)} groups: {tally(full)}")
         names = bisector.sample(failing(full))
-    # (each culprit alone over the whole corpus: its impact)
+    # Replay removed groups alone to distinguish standalone from context-dependent observations.
     ranked = []
-    for group in culprits:
+    for group, context in zip(culprits, contexts):
         alone = bisector.compare(group, every)
-        bad = {n: c for n, c in alone.items() if c["result"] != "identical"}
+        bad = {n: alone[n] for n in failing(alone)}
         ranked.append(dict(functions=group, counts=tally(alone), failing=len(bad),
+                           evidence="standalone_failure" if bad else "interaction_or_context_dependent",
+                           standalone_failure_observed=bool(bad), context=context,
+                           comparison=alone, trial=bisector.trial_reference(group, every),
                            examples={n: bad[n] for n in sorted(bad)[:5]}))
     ranked.sort(key=lambda r: (-r["failing"], r["functions"]))
     clean_full = bisector.compare(remaining, every)
-    result = dict(kind="bisect", argv=sys.argv[1:], injected=len(manifest["injected"]), culprits=ranked,
-                  remaining=remaining, remaining_counts=tally(clean_full), hybrids=bisector.tests)
+    check_execution(args, final=True)
+    remaining_role = "source_selection" if remaining else "retail_control"
+    result = dict(schema=2, kind="bisect", argv=sys.argv[1:], injected=len(manifest["injected"]),
+                  removed_groups=ranked,
+                  culprits=[r for r in ranked if r["standalone_failure_observed"]],
+                  initial_comparison=full_initial, initial_trial=initial_trial,
+                  remaining=remaining, remaining_role=remaining_role,
+                  source_selection_pass=bool(remaining) and not failing(clean_full),
+                  remaining_counts=tally(clean_full), comparison=clean_full,
+                  remaining_trial=bisector.trial_reference(remaining, every),
+                  initial_manifest=manifest, hybrids=bisector.tests)
     (run / "results.json").write_text(json.dumps(result, indent=1) + "\n")
     (run / "exclude.txt").write_text("".join(f"{k}\n" for r in ranked for k in r["functions"]))
     lines = [f"bisect {' '.join(sys.argv[2:])} ({run}): {len(manifest['injected'])} functions, "
              f"{bisector.tests} hybrids",
-             f"without the culprits ({len(remaining)} functions): {tally(clean_full)}",
-             "culprits by impact (units failing when injected alone):"]
+             f"remaining {remaining_role} ({len(remaining)} functions): {tally(clean_full)}",
+             "removed groups by observed standalone impact:"]
     for r in ranked:
         example = next(iter(r["examples"].items()), None)
         where = ""
@@ -517,7 +876,7 @@ def command_bisect(args, units):
             where = f"e.g. {example[0]}: {c['result']} " + " ".join(c.get("sections", [])) + (
                 f" first {c['first']}" if c.get("first") else "") + (
                 " | " + " / ".join(c["detail"]) if c.get("detail") else "")
-        lines.append(f"  {r['failing']:4} {' + '.join(r['functions'])} {r['counts']} {where}")
+        lines.append(f"  {r['failing']:4} {r['evidence']} {' + '.join(r['functions'])} {r['counts']} {where}")
     text = "\n".join(lines) + "\n"
     (run / "summary.txt").write_text(text)
     print(text)
@@ -559,8 +918,11 @@ def main():
     elif args.command == "clean":
         clean(args.keep)
     else:
-        {"retail": command_retail, "hybrid": command_hybrid, "bisect": command_bisect}[args.command](args, units)
+        try:
+            return {"retail": command_retail, "hybrid": command_hybrid, "bisect": command_bisect}[args.command](args, units)
+        finally:
+            release_runs()
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

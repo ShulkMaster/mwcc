@@ -203,6 +203,7 @@ class Program:
         self.functions = json.loads((self.root / f"config/{VERSION}/functions.json").read_text())
         self.addresses = {name: int(value, 0) for name, value in
                           json.loads((self.root / f"config/{VERSION}/bindings.json").read_text()).items()}
+        self.input_bindings = dict(self.addresses)
         self.own = {}  # (source, symbol) -> address
         for f in self.functions:
             symbol = function_symbol(f["name"])
@@ -456,16 +457,16 @@ def build(keys, program=None, original=ORIGINAL):
     return image, manifest
 
 
-def write(output, image, manifest):
+def write(output, image, manifest, original=ORIGINAL):
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(image)
     output.chmod(0o755)
     Path(str(output) + ".json").write_text(json.dumps(manifest, indent=1) + "\n")
     # (the compiler loads its license manager DLL from its own directory)
-    for sibling in ORIGINAL.parent.iterdir():
+    for sibling in Path(original).parent.iterdir():
         if sibling.suffix.lower() == ".dll" and not (output.parent / sibling.name).exists():
-            (output.parent / sibling.name).symlink_to(sibling.resolve())
+            (output.parent / sibling.name).write_bytes(sibling.read_bytes())
 
 
 def parser():
@@ -492,6 +493,8 @@ def main():
     if not keys:
         raise SystemExit("nothing selected")
     image, manifest = build(keys, program)
+    if not manifest["injected"]:
+        raise SystemExit("no selected function could be injected")
     write(args.output, image, manifest)
     for name, source in manifest["copied"].items():
         print(f"copied: {name} ({source})", file=sys.stderr)
