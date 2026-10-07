@@ -8886,9 +8886,10 @@
     "source": "src/frontend/CError.c"
   },
   {
-    "name": "fn_00463b30",
+    "name": "CError_IllegalUseAbstractClass",
     "address": "0x00463b30",
-    "size": 49
+    "size": 49,
+    "source": "src/frontend/CError.c"
   },
   {
     "name": "CError_OverloadedFunctionError",
@@ -9026,7 +9027,7 @@
     "source": "src/frontend/CError.c"
   },
   {
-    "name": "CError_IllegalUseAbstractClass",
+    "name": "append_ctstate_argument",
     "address": "0x00467b20",
     "size": 172,
     "source": "src/frontend/CError.c"
@@ -13026,10 +13027,9 @@
     "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "CBrowse_ForwardObjectFileRange",
+    "name": "fn_004d1040",
     "address": "0x004d1040",
-    "size": 69,
-    "source": "src/frontend/CBrowse.c"
+    "size": 69
   },
   {
     "name": "fn_004d1090",
@@ -17075,9 +17075,10 @@
     "source": "src/frontend/CBrowse.c"
   },
   {
-    "name": "fn_00513800",
+    "name": "CBrowse_ForwardObjectFileRange",
     "address": "0x00513800",
-    "size": 103
+    "size": 103,
+    "source": "src/frontend/CBrowse.c"
   },
   {
     "name": "fn_00513870",
@@ -19545,14 +19546,16 @@
     "size": 78
   },
   {
-    "name": "fn_0053bf80",
+    "name": "CDecl_NewConvFuncType",
     "address": "0x0053bf80",
-    "size": 183
+    "size": 183,
+    "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_0053c040",
+    "name": "CDecl_ParseFuncQualifiers",
     "address": "0x0053c040",
-    "size": 136
+    "size": 136,
+    "source": "src/frontend/CDecl.c"
   },
   {
     "name": "fn_0053c0d0",
@@ -19671,7 +19674,7 @@
     "source": "src/frontend/CExpr.c"
   },
   {
-    "name": "fn_0053ccc0",
+    "name": "s_expression",
     "address": "0x0053ccc0",
     "size": 202
   },
@@ -20183,10 +20186,9 @@
     "source": "src/backend/DWARF.c"
   },
   {
-    "name": "CDecl_NewConvFuncType",
+    "name": "fn_00547c80",
     "address": "0x00547c80",
-    "size": 65,
-    "source": "src/frontend/CDecl.c"
+    "size": 65
   },
   {
     "name": "fn_00547cd0",

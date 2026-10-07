@@ -768,6 +768,9 @@ void parse_explicit_template_instantiation(void)
         CError_ReportError(ERR_LPAREN_EXPECTED);
         return;
     }
+#if VERSION >= VERSION_GC_1_3
+    tk = CPrepTokenizer_GetNextToken();
+#endif
     CDecl_ParseDirectFuncDecl(&declaration);
     if (declaration.dtype->type != TYPEFUNC) {
         CError_ReportError(ERR_ILLEGAL_EXPLICIT_TEMPLATE_INSTANTIATION);
@@ -842,6 +845,9 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
             CError_ReportIllegalFlags(di.qual & ~(Q_INLINE | Q_EXPLICIT));
             di.dtype = (Type *)&void_ptr;
             di.isConstructor = 1;
+#if VERSION >= VERSION_GC_1_3
+            tk = CPrepTokenizer_GetNextToken();
+#endif
             CDecl_ParseDirectFuncDecl(&di);
             if (di.dtype->type == TYPEFUNC) {
                 FuncArg *args;
@@ -868,6 +874,9 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                 di.dtype = (Type *)&void_ptr;
                 di.isConstructor = 1;
                 CTempl_PushScope(stack, &templclass->base);
+#if VERSION >= VERSION_GC_1_3
+                tk = CPrepTokenizer_GetNextToken();
+#endif
                 CDecl_ParseDirectFuncDecl(&di);
                 if (di.dtype->type == TYPEFUNC) {
                     di.name = constructor_name;
@@ -908,6 +917,9 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                     }
                     di.dtype = (Type *)&void_ptr;
                     CTempl_PushScope(stack, &templclass->base);
+#if VERSION >= VERSION_GC_1_3
+                    tk = CPrepTokenizer_GetNextToken();
+#endif
                     CDecl_ParseDirectFuncDecl(&di);
                     if (di.dtype->type == TYPEFUNC) {
                         if (templclass->base.sominfo)
@@ -931,6 +943,7 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                     }
                     CError_ReportIllegalFlags(di.qual & ~(Q_INLINE | Q_VIRTUAL));
                     conversion_type_name(&di);
+#if VERSION < VERSION_GC_1_3
                     if (tk != '(')
                         CError_ReportError(ERR_LPAREN_EXPECTED);
                     else
@@ -941,6 +954,7 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                         CError_ReportError(ERR_RPAREN_EXPECTED);
                     else
                         tk = CPrepTokenizer_GetNextToken();
+#endif
                     conversionType = di.dtype;
                     conversionQual = di.qual;
                     CDecl_NewConvFuncType(&di);

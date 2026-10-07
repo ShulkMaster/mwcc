@@ -1181,7 +1181,9 @@ void parse_class_members(ClassLayoutInput *decle, TypeClass *tclass, SInt16 mode
     Boolean special;
     NameSpace *scope;
     Type *type;
+#if VERSION < VERSION_GC_1_3
     TypeFunc *tfunc;
+#endif
     TypeBitfield *copy, *source;
     ObjMemberVar *unionMember;
     ObjMemberVar *memberVar;
@@ -1406,6 +1408,11 @@ void parse_class_members(ClassLayoutInput *decle, TypeClass *tclass, SInt16 mode
                 md.declarator.extraQualifiers = dsx3c;
                 md.declarator.qual = qual;
                 conversion_type_name(&md.declarator);
+#if VERSION >= VERSION_GC_1_3
+                md.declarator.qual |= dsqual;
+                type = md.declarator.dtype;
+                CDecl_NewConvFuncType(&md.declarator);
+#else
                 if (tk != '(')
                     CError_ReportError(ERR_LPAREN_EXPECTED);
                 else
@@ -1426,6 +1433,7 @@ void parse_class_members(ClassLayoutInput *decle, TypeClass *tclass, SInt16 mode
                 md.declarator.isType = 0;
                 md.declarator.dtype = (Type *)tfunc;
                 md.declarator.storage = 0;
+#endif
                 if ((tclass->flags & CLASS_IS_TEMPL) && CTemplateTools_IsDependentType(type))
                     md.declarator.name = CParser_GetUniqueName();
                 declare_member_function(decle, tclass, &md.declarator, access, 1, 1, 1, 0);
@@ -3359,6 +3367,13 @@ void parse_resolved_member_function_decl(DeclInfo *di, Boolean define)
             if (TYPE_FUNC(obj->type)->flags & FUNC_IS_CTOR)
                 di->isConstructor = 1;
             tk = CPrepTokenizer_GetNextToken();
+#if VERSION >= VERSION_GC_1_3
+            if (tk != '(') {
+                CError_ReportError(ERR_LPAREN_EXPECTED);
+                return;
+            }
+            tk = CPrepTokenizer_GetNextToken();
+#endif
             save = currentNameSpace;
             currentNameSpace = obj->nspace;
             CDecl_ParseDirectFuncDecl(di);
@@ -3382,6 +3397,13 @@ void parse_resolved_member_function_decl(DeclInfo *di, Boolean define)
             di->nspace = obj->nspace;
             di->name = obj->name;
             tk = CPrepTokenizer_GetNextToken();
+#if VERSION >= VERSION_GC_1_3
+            if (tk != '(') {
+                CError_ReportError(ERR_LPAREN_EXPECTED);
+                return;
+            }
+            tk = CPrepTokenizer_GetNextToken();
+#endif
             CDecl_ParseDirectFuncDecl(di);
             if (di->dtype->type == TYPEFUNC) {
                 if (define)
@@ -3394,6 +3416,14 @@ void parse_resolved_member_function_decl(DeclInfo *di, Boolean define)
             di->dtype = (Type *)&stsignedint;
             di->nspace = obj->nspace;
             di->name = obj->name;
+#if VERSION >= VERSION_GC_1_3
+            if (tk != '(') {
+                CError_ReportError(ERR_LPAREN_EXPECTED);
+                CError_ReportError(ERR_DECLARATION_SYNTAX_ERROR);
+                return;
+            }
+            tk = CPrepTokenizer_GetNextToken();
+#endif
             save = currentNameSpace;
             currentNameSpace = obj->nspace;
             CDecl_ParseDirectFuncDecl(di);
@@ -3415,11 +3445,20 @@ Boolean CDecl_FunctionDeclarator(DeclInfo *decl, NameSpace *mode, Boolean allow_
     Boolean needsPrototype;
     Object *object;
 
+#if VERSION >= VERSION_GC_1_3
+    object = CDecl_GetFunctionObject(decl, mode, &needsPrototype, 0);
+#else
     object = CDecl_GetFunctionObject(decl, mode, &needsPrototype, 1);
+#endif
     if (object != NULL && (decl->hasParameterNames || tk == '{' || tk == TK_TRY || (decl->isConstructor && tk == ':') ||
                            (!copts.cplusplus && isdeclaration(0, 0, 0, 0)))) {
-        if (!allow_definition || data_00588238)
+        if (!allow_definition || data_00588238) {
             CError_ReportError(ERR_ILLEGAL_FUNCTION_DEFINITION);
+#if VERSION >= VERSION_GC_1_3
+            if (data_00588238)
+                return 0;
+#endif
+        }
 
         if (object->nspace == registration_context && memcmp(object->name->name, "main", 5) == 0) {
             if (object->sclass == TK_STATIC ||
@@ -5147,6 +5186,19 @@ void scandeclarator(DeclInfo *decl)
         scandeclarator(decl);
         if (!unsized && !checkType(decl->dtype))
             decl->dtype = (Type *)&stsignedchar;
+#if VERSION >= VERSION_GC_1_3
+        if (decl->dtype->size == 0 && CTemplateTools_IsDependentType(decl->dtype)) {
+            TypeTemplDep *boundType = (TypeTemplDep *)galloc(sizeof(TypeTemplDep));
+            memclrw(boundType, sizeof(TypeTemplDep));
+            boundType->type = TYPETEMPLATE;
+            boundType->size = 1;
+            boundType->kind = 3;
+            boundType->u.array.type = decl->dtype;
+            boundType->u.array.index = fn_00513040(intconstnode((Type *)&stsignedint, count.lo), 1);
+            decl->dtype = (Type *)boundType;
+            return;
+        }
+#endif
         elementType = decl->dtype;
         size = elementType->size * count.lo;
         array = (Type *)galloc(sizeof(TypePointer));
@@ -5157,10 +5209,47 @@ void scandeclarator(DeclInfo *decl)
         array->array[0].qual = 0;
         decl->dtype = array;
     } else if (tk == '(') {
+#if VERSION >= VERSION_GC_1_3
+        if (copts.cplusplus == 0 || decl->name == NULL || decl->dtype->type == TYPEVOID ||
+            CParser_TryParamList(decl->dtype->type != TYPECLASS)) {
+            tk = CPrepTokenizer_GetNextToken();
+            CDecl_ParseDirectFuncDecl(decl);
+        }
+#else
         CDecl_ParseDirectFuncDecl(decl);
+#endif
     }
 }
 
+#if VERSION >= VERSION_GC_1_3
+/* What follows a function declarator's parameter list: const and volatile (a repeat is warned about) and an exception
+   specification. */
+static void CDecl_ParseFuncQualifiers(TypeFunc *ft)
+{
+    SInt32 token;
+
+    for (;;) {
+        token = tk;
+        if (token == TK_CONST) {
+            if (ft->flags & FUNC_CONST)
+                CError_Warning(ERR_ILLEGAL_USE, "const");
+            ft->flags |= FUNC_CONST;
+            tk = CPrepTokenizer_GetNextToken();
+        } else if (token == TK_VOLATILE) {
+            if (ft->flags & FUNC_VOLATILE)
+                CError_Warning(ERR_ILLEGAL_USE, "volatile");
+            ft->flags |= FUNC_VOLATILE;
+            tk = CPrepTokenizer_GetNextToken();
+        } else {
+            if (token == TK_THROW)
+                CExcept_ScanExceptionSpecification(ft);
+            return;
+        }
+    }
+}
+#endif
+
+/* The caller has consumed the '(' (GC 1.3 and later); before, the function stepped over it itself. */
 void CDecl_ParseDirectFuncDecl(DeclInfo *d)
 {
     TypeFunc *ft;
@@ -5168,6 +5257,21 @@ void CDecl_ParseDirectFuncDecl(DeclInfo *d)
     FuncArg *args;
     Boolean ok;
 
+#if VERSION >= VERSION_GC_1_3
+    if (tk == ')') {
+        if (copts.cplusplus == 0)
+            args = &data_00584748;
+        else
+            args = NULL;
+        tk = CPrepTokenizer_GetNextToken();
+    } else {
+        args = parameter_type_list(d);
+        if (tk != ')')
+            CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);
+        else
+            tk = CPrepTokenizer_GetNextToken();
+    }
+#else
     if (copts.cplusplus != 0 && d->name != NULL && d->dtype->type != TYPEVOID &&
         !CParser_TryParamList(d->dtype->type != TYPECLASS))
         return;
@@ -5186,6 +5290,7 @@ void CDecl_ParseDirectFuncDecl(DeclInfo *d)
         CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);
     else
         tk = CPrepTokenizer_GetNextToken();
+#endif
 
     ft = (TypeFunc *)galloc(sizeof(TypeFunc));
     memclrw(ft, sizeof(TypeFunc));
@@ -5197,6 +5302,13 @@ void CDecl_ParseDirectFuncDecl(DeclInfo *d)
         ft->flags = FUNC_PASCAL;
     }
 
+#if VERSION >= VERSION_GC_1_3
+    if (copts.cplusplus != 0) {
+        CDecl_ParseFuncQualifiers(ft);
+        if (d->storage == TK_TYPEDEF && ft->exspecs != NULL)
+            CError_ReportError(ERR_ILLEGAL_EXCEPTION_SPECIFICATION);
+    }
+#else
     if (tk == TK_THROW) {
         if (d->storage == TK_TYPEDEF)
             CError_ReportError(ERR_ILLEGAL_EXCEPTION_SPECIFICATION);
@@ -5204,6 +5316,7 @@ void CDecl_ParseDirectFuncDecl(DeclInfo *d)
         if ((SInt32)tk == TK_CONST || (SInt32)tk == TK_VOLATILE)
             CError_ReportError(ERR_ILLEGAL_TYPE_QUALIFIERS);
     }
+#endif
 
     scandeclarator(d);
 
@@ -5217,6 +5330,9 @@ void CDecl_ParseDirectFuncDecl(DeclInfo *d)
     ft->functype = d->dtype;
     ft->qual = d->qual & Q_CV;
     d->dtype = (Type *)ft;
+#if VERSION >= VERSION_GC_1_3
+    d->qual &= ~Q_CV;
+#endif
     d->isType = 0;
 }
 
@@ -5585,6 +5701,18 @@ void CDecl_NewConvFuncType(DeclInfo *state)
     HashNameNode *name;
     Type *returnType;
     unsigned int returnQualifiers;
+#if VERSION >= VERSION_GC_1_3
+    if (tk != '(')
+        CError_ReportError(ERR_LPAREN_EXPECTED);
+    else
+        tk = CPrepTokenizer_GetNextToken();
+    if (tk == TK_VOID)
+        tk = CPrepTokenizer_GetNextToken();
+    if (tk != ')')
+        CError_ReportError(ERR_RPAREN_EXPECTED);
+    else
+        tk = CPrepTokenizer_GetNextToken();
+#endif
     functionType = (TypeFunc *)galloc(26U);
     memclrw(functionType, 26U);
     originalType = state->dtype;
@@ -5596,8 +5724,17 @@ void CDecl_NewConvFuncType(DeclInfo *state)
     functionType->functype = returnType;
     returnQualifiers = state->qual;
     functionType->qual = (returnQualifiers & Q_CV);
+#if VERSION >= VERSION_GC_1_3
+    functionType->flags = FUNC_CONVERSION;
+#endif
     state->isType = 0U;
+#if VERSION >= VERSION_GC_1_3
+    CDecl_ParseFuncQualifiers(functionType);
+#endif
     state->dtype = (Type *)functionType;
+#if VERSION >= VERSION_GC_1_3
+    state->qual &= ~Q_CV;
+#endif
     state->storage = 0U;
 }
 
