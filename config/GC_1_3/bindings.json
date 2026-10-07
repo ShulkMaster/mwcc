@@ -1636,5 +1636,6 @@
   "_data_0058851a": "0x005e73e0",
   "_InlineAsm_gccmode": "0x005e7403",
   "_CompilerTools_IsByteInDBCSCharacter": "0x004422b0",
-  "_CPrep_IncrementCountersAndUpdateTextOffset": "0x0043d350"
+  "_CPrep_IncrementCountersAndUpdateTextOffset": "0x0043d350",
+  "_CParser_SetUniqueID": "0x004e7d60"
 }

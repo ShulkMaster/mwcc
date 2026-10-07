@@ -13986,9 +13986,10 @@
     "size": 130
   },
   {
-    "name": "fn_004e7d60",
+    "name": "CParser_SetUniqueID",
     "address": "0x004e7d60",
-    "size": 10
+    "size": 10,
+    "source": "src/frontend/CParser.c"
   },
   {
     "name": "fn_004e7d70",

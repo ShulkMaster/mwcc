@@ -233,7 +233,7 @@ extern Object *CParser_NewLocalDataObject(DeclInfo *declaration, unsigned int ad
 extern HashNameNode *CParser_AppendUniqueNameFile(char *prefix);
 extern HashNameNode *CParser_AppendUniqueName(char *name);
 extern HashNameNode *CParser_GetUniqueName(void);
-extern unsigned int fn_004905c0(unsigned int a0);
+extern void CParser_SetUniqueID(SInt32 value);
 extern void CParser_PrintUniqueID(char *p);
 extern SInt32 CParser_GetUniqueID(void);
 extern Type *CParser_GetWCharType(void);

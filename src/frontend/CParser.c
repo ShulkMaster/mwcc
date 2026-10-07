@@ -2512,10 +2512,9 @@ HashNameNode *CParser_GetUniqueName(void)
     return GetHashNameNode(buf);
 }
 
-unsigned int fn_004905c0(unsigned int value)
+void CParser_SetUniqueID(SInt32 value)
 {
     data_00580dc0 = value;
-    return value;
 }
 
 void CParser_PrintUniqueID(char *p)

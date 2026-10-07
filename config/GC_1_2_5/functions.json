@@ -11748,7 +11748,7 @@
     "source": "src/frontend/CParser.c"
   },
   {
-    "name": "fn_004905c0",
+    "name": "CParser_SetUniqueID",
     "address": "0x004905c0",
     "size": 10,
     "source": "src/frontend/CParser.c"

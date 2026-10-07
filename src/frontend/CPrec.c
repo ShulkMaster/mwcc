@@ -226,7 +226,7 @@ void CPrec_LoadPrecompiledHeader(short file, UInt8 *buffer)
     else
         pendingInlineWork = (CPrecNode *)(precompiled_header_base + prec_header->pendingInlineWorkOffset);
 
-    fn_004905c0(prec_header->uniqueID);
+    CParser_SetUniqueID(prec_header->uniqueID);
     selector_reference_count = prec_header->selectorReferenceCount;
     data_00587f6c = prec_header->objcState;
     objc_string_constant_count = prec_header->objcStringConstantCount;
