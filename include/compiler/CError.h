@@ -403,7 +403,7 @@ extern char declspec_illegal_use_string[];
 extern char illegal_flags_attribute_text[];
 extern void CError_Longjmp(void);
 extern void CError_LongJump(void);
-extern void fn_00449d60(void);
+extern void CError_ResetErrorSkip(void);
 extern void CError_SetWrittenEntry(int *a0);
 extern void CError_SaveAndSetWrittenEntry(CPrecWrittenEntry *entry, int *savedEntry);
 extern void CError_SetBufferedToken(BufferedToken *entry);

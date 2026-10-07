@@ -9056,9 +9056,10 @@
     "source": "src/frontend/CError.c"
   },
   {
-    "name": "fn_004680a0",
+    "name": "CError_ResetErrorSkip",
     "address": "0x004680a0",
-    "size": 8
+    "size": 8,
+    "source": "src/frontend/CError.c"
   },
   {
     "name": "CError_SetWrittenEntry",

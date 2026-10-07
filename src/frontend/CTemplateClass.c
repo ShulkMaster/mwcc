@@ -155,17 +155,17 @@ unsigned char CTemplateClass_InstantiateClass(TypeClass *theclass)
     for (declaration = resolvedTemplate->declarations; declaration != NULL; declaration = declaration->next) {
         switch (declaration->kind) {
             case 0:
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SaveAndSetWrittenEntry(&declaration->source, &sourceSave);
                 CTemplateClass_0051cec0(&instantiation, (TypeClassTemplate *)declaration->target.type);
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SetWrittenEntry(&sourceSave);
                 break;
             case 1:
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SaveAndSetWrittenEntry(&declaration->source, &sourceSave);
                 instantiate_enum(&instantiation, declaration);
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SetWrittenEntry(&sourceSave);
                 break;
             default:
@@ -190,27 +190,27 @@ unsigned char CTemplateClass_InstantiateClass(TypeClass *theclass)
             case 1:
                 for (typeMapping = instantiation.mappings; typeMapping != NULL; typeMapping = typeMapping->next) {
                     if (typeMapping->declaration == memberDeclaration) {
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SaveAndSetWrittenEntry(&memberDeclaration->source, &sourceSave);
                         initialize_enum_constants(&instantiation, memberDeclaration, typeMapping->replacement);
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SetWrittenEntry(&sourceSave);
                         break;
                     }
                 }
                 break;
             case 2:
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SaveAndSetWrittenEntry(&memberDeclaration->source, &sourceSave);
                 instantiate_friend_declaration(&instantiation, memberDeclaration->target.friendDeclaration);
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SetWrittenEntry(&sourceSave);
                 break;
             case 5:
                 for (objectMapping = instantiation.mappings;; objectMapping = objectMapping->next) {
                     CE_ASSERT(objectMapping == 0, CError_FATAL(2047));
                     if (objectMapping->declaration == memberDeclaration) {
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SaveAndSetWrittenEntry(&memberDeclaration->source, &sourceSave);
                         object = (Object *)objectMapping->object;
                         initializer = CTemplTool_DeduceExpr(&instantiation, memberDeclaration->value.initializer);
@@ -221,14 +221,14 @@ unsigned char CTemplateClass_InstantiateClass(TypeClass *theclass)
                         } else {
                             CError_ReportError(ERR_ILLEGAL_STATIC_CONST_MEMBER_INITIALIZATION, object->name->name);
                         }
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SetWrittenEntry(&sourceSave);
                         break;
                     }
                 }
                 break;
             case 6:
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SaveAndSetWrittenEntry(&memberDeclaration->source, &sourceSave);
                 templateType = (TypeTemplDep *)memberDeclaration->target.type;
                 access = memberDeclaration->value.access;
@@ -244,17 +244,17 @@ unsigned char CTemplateClass_InstantiateClass(TypeClass *theclass)
                     CScope_AddClassUsingDeclaration(instantiation.instance, (TypeClass *)instantiatedType,
                                                     templateType->u.qual.name, access);
                 }
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SetWrittenEntry(&sourceSave);
                 break;
             case 7:
                 for (baseMapping = instantiation.mappings;; baseMapping = baseMapping->next) {
                     CE_ASSERT(baseMapping == 0, CError_FATAL(2067));
                     if (baseMapping->declaration == memberDeclaration) {
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SaveAndSetWrittenEntry(&memberDeclaration->source, &sourceSave);
                         instantiate_object_type(&instantiation, memberDeclaration, baseMapping->object);
-                        fn_00449d60();
+                        CError_ResetErrorSkip();
                         CError_SetWrittenEntry(&sourceSave);
                         break;
                     }
@@ -719,7 +719,7 @@ void initialize_enum_constants(TemplateContext *context, struct TemplateClassDec
             continue;
         if ((item = (ObjEnumConst *)parameter->target.object)->type != enumType)
             continue;
-        fn_00449d60();
+        CError_ResetErrorSkip();
         CError_SaveAndSetWrittenEntry(&parameter->source, &savedContext);
         for (binding = scope->enumlist; binding != NULL; binding = binding->next)
             if (binding->name == item->name)
@@ -730,7 +730,7 @@ void initialize_enum_constants(TemplateContext *context, struct TemplateClassDec
             expression = CTemplTool_DeduceExpr(context, parameter->value.initializer);
             if (expression->type != EINTCONST) {
                 CError_ReportError(ERR_ILLEGAL_CONSTANT_EXPRESSION);
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 CError_SetWrittenEntry(&savedContext);
                 break;
             }
@@ -741,7 +741,7 @@ void initialize_enum_constants(TemplateContext *context, struct TemplateClassDec
         }
         binding->val = expression->data.intval;
         binding->type = expression->rtype;
-        fn_00449d60();
+        CError_ResetErrorSkip();
         CError_SetWrittenEntry(&savedContext);
     }
     CDecl_ComputeUnderlyingEnumType(scope);
@@ -841,7 +841,7 @@ void instantiate_bases(TemplateContext *context, TypeClass *instance, TypeClassT
     for (declaration = ((TypeClassTemplate *)context->templateClass)->declarations; declaration;
          declaration = declaration->next) {
         if (declaration->kind == 4) {
-            fn_00449d60();
+            CError_ResetErrorSkip();
             CError_SaveAndSetWrittenEntry(&declaration->source, &savedEntry);
             newBase = galloc(sizeof(ClassList));
             memclrw(newBase, sizeof(ClassList));
@@ -878,7 +878,7 @@ void instantiate_bases(TemplateContext *context, TypeClass *instance, TypeClassT
             } else {
                 CError_ReportError(ERR_ILLEGAL_STRUCT_UNION_ENUM_CLASS_DEFINITION);
             }
-            fn_00449d60();
+            CError_ResetErrorSkip();
             CError_SetWrittenEntry(&savedEntry);
         }
     }

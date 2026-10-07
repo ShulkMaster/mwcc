@@ -311,9 +311,9 @@ static void CError_BufferGrow(StrBuf *eb, UInt32 amount)
     eb->avail += amount;
 }
 
-void fn_00449d60(void)
+void CError_ResetErrorSkip(void)
 {
-    data_005805ee = 4294967295U;
+    data_005805ee = -1;
     return;
 }
 

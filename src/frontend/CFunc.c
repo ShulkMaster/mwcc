@@ -1062,7 +1062,7 @@ void parse_statement(StatementContext *context)
                 }
                 stmt = AppendStmt(8);
                 stmt->expr.expression = NULL;
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 tk = CPrepTokenizer_GetNextToken();
                 return;
             }
@@ -1071,7 +1071,7 @@ void parse_statement(StatementContext *context)
                     CError_Warning(ERR_RETURN_VALUE_EXPECTED);
                 stmt = AppendStmt(8);
                 stmt->expr.expression = NULL;
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 tk = CPrepTokenizer_GetNextToken();
                 return;
             }
@@ -1240,9 +1240,9 @@ void parse_statement(StatementContext *context)
                 if (tk != ';')
                     CError_ReportError(ERR_SEMICOLON_EXPECTED);
                 else
-                    fn_00449d60();
+                    CError_ResetErrorSkip();
             } else
-                fn_00449d60();
+                CError_ResetErrorSkip();
             tk = CPrepTokenizer_GetNextToken();
             if (tk != ';') {
                 if (copts.cplusplus && !use_legacy_condition_scope() && isdeclaration(1, 0, 0, 0x3d)) {
@@ -1266,11 +1266,11 @@ void parse_statement(StatementContext *context)
                     CError_ReportError(ERR_ILLEGAL_OPERAND);
 #endif
                 if (tk == ';')
-                    fn_00449d60();
+                    CError_ResetErrorSkip();
                 else
                     CError_ReportError(ERR_SEMICOLON_EXPECTED);
             } else {
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 testExpr = NULL;
             }
             tk = CPrepTokenizer_GetNextToken();
@@ -1278,11 +1278,11 @@ void parse_statement(StatementContext *context)
                 stepExpr = s_expression();
                 CExpr_CheckUnusedExpression(stepExpr);
                 if (tk == ')')
-                    fn_00449d60();
+                    CError_ResetErrorSkip();
                 else
                     CError_ReportError(ERR_RPAREN_EXPECTED);
             } else {
-                fn_00449d60();
+                CError_ResetErrorSkip();
                 stepExpr = NULL;
             }
             if (warn_empty_control_statement()) {
@@ -1560,7 +1560,7 @@ void parse_statement(StatementContext *context)
                     tk = CPrepTokenizer_GetNextToken();
                     if (tk == ';')
                         tk = CPrepTokenizer_GetNextToken();
-                    fn_00449d60();
+                    CError_ResetErrorSkip();
                     return;
                 }
                 CError_ReportError(ERR_LPAREN_EXPECTED);
@@ -1628,7 +1628,7 @@ void parse_statement(StatementContext *context)
     if (tk == ';') {
         CPrep_ResetBufferedTokenPosition();
         tk = CPrepTokenizer_GetNextToken();
-        fn_00449d60();
+        CError_ResetErrorSkip();
     } else
         CError_ReportErrorAndUpdateToken(ERR_SEMICOLON_EXPECTED);
 }

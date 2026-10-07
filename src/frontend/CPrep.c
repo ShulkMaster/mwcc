@@ -213,7 +213,7 @@ void CPrep_ParseDirective(void)
         DAT_0057f9dc = 1;
         CError_ReportError(ERR_PREPROCESSOR_ERROR_DIRECTIVE);
         data_005884fd = save;
-        fn_00449d60();
+        CError_ResetErrorSkip();
         CPrepTokenizer_SkipToEndOfLine();
         data_00588531 = 1;
         return;

@@ -8304,7 +8304,7 @@
     "source": "src/frontend/CError.c"
   },
   {
-    "name": "fn_00449d60",
+    "name": "CError_ResetErrorSkip",
     "address": "0x00449d60",
     "size": 11,
     "source": "src/frontend/CError.c"
