@@ -812,11 +812,19 @@ ENode *make_class_member_or_global_call(Type *classType, ENodeList *arguments, c
         if (CScope_FindClassMemberObject(TYPE_CLASS(classType), &lookup, operatorName->name)) {
             overloads = lookup.objects;
             function = (Object *)lookup.object;
+#if VERSION >= VERSION_GC_2_7
+            CError_ASSERT(4968, overloads != NULL || function != NULL);
+#else
             CError_ASSERT(4635, overloads != NULL || function != NULL);
+#endif
             found = 1;
         } else if (TYPE_CLASS(classType)->flags & CLASS_HANDLEOBJECT) {
             if (isArray)
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(4975);
+#else
                 CError_FATAL(4642);
+#endif
             function = newh_func;
             found = 1;
         }
@@ -2393,7 +2401,11 @@ Boolean CExpr_GetFuncMatchArgs(Object *obj, ENodeList *arguments, ENode *instanc
         result->parameters = ((TypeMemberFunc *)obj->type)->args;
         return 1;
     }
+#if VERSION >= VERSION_GC_1_3
+    if (((TypeMemberFunc *)obj->type)->flags & FUNC_IS_CTOR) {
+#else
     if (((TypeMemberFunc *)obj->type)->flags & FUNC_IS_DTOR) {
+#endif
         result->arguments = arguments;
         result->parameters = ((TypeMemberFunc *)obj->type)->args->next;
         return 1;
@@ -2423,7 +2435,12 @@ Boolean CExpr_GetFuncMatchArgs(Object *obj, ENodeList *arguments, ENode *instanc
 void match_function_arguments(Object *signature, FuncArg *argument, ENodeList *objects, ArgMatch *value)
 {
     ArgMatch conversions;
-    if (signature->type->type == TYPEFUNC && (((TypeFunc *)signature->type)->flags & 1024U) == 0U) {
+    if (signature->type->type == TYPEFUNC &&
+#if VERSION >= VERSION_GC_1_3
+        (((TypeFunc *)signature->type)->flags & 0x100000U) == 0U) {
+#else
+        (((TypeFunc *)signature->type)->flags & 1024U) == 0U) {
+#endif
         memclrw(&conversions, 30U);
         for (;;) {
             if (argument == NULL || argument->type == &stvoid) {
@@ -3916,7 +3933,11 @@ void init_comparison_values(unsigned int kind, ComparisonValues *counts, Type *s
             counts->kind3Weight += conversion_score;
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1504);
+#else
             CError_FATAL(1381);
+#endif
             break;
     }
     do {
