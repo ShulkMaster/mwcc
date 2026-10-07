@@ -1618,6 +1618,7 @@
   "_DAT_00587630": "0x005e7374",
   "_DAT_005880a4": "0x005e73ee",
   "_IRO_IsIntConstant": "0x00469640",
+  "_IroBitVect_AreEqual": "0x0052a2b0",
   "_is_bitvector_empty": "0x0052a1a0",
   "_IRO_GetTemp": "0x00467850",
   "_create_temp_object": "0x004f4200",

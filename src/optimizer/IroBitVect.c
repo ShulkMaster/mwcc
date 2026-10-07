@@ -64,7 +64,11 @@ void IroBitVect_Subtract(BitVector *source, BitVector *destination)
     }
 }
 
+#if VERSION >= VERSION_GC_1_3
+Boolean IroBitVect_AreEqual(BitVector *a, BitVector *b)
+#else
 int IroBitVect_AreEqual(BitVector *a, BitVector *b)
+#endif
 {
     unsigned int i;
 

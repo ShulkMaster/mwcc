@@ -17079,9 +17079,10 @@
     "source": "src/optimizer/IroBitVect.c"
   },
   {
-    "name": "fn_0052a2b0",
+    "name": "IroBitVect_AreEqual",
     "address": "0x0052a2b0",
-    "size": 46
+    "size": 46,
+    "source": "src/optimizer/IroBitVect.c"
   },
   {
     "name": "fn_0052a2e0",
