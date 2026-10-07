@@ -66,6 +66,7 @@
     "src/driver/ResourceStrings.c",
     "src/driver/CLSegs.c",
     "src/frontend/CInit.c",
-    "src/frontend/CObjCModern.c"
+    "src/frontend/CObjCModern.c",
+    "src/driver/CLAccessPaths.c"
   ]
 }

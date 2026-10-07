@@ -251,10 +251,9 @@
     "size": 97
   },
   {
-    "name": "free_access_path_entry",
+    "name": "fn_00402260",
     "address": "0x00402260",
-    "size": 58,
-    "source": "src/driver/CLAccessPaths.c"
+    "size": 58
   },
   {
     "name": "fn_004022a0",
@@ -5468,19 +5467,22 @@
     "size": 6
   },
   {
-    "name": "fn_004284d0",
+    "name": "init_access_path_entry",
     "address": "0x004284d0",
-    "size": 67
+    "size": 67,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428520",
+    "name": "CLAccessPaths_CreateAccessPathEntry",
     "address": "0x00428520",
-    "size": 23
+    "size": 23,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428540",
+    "name": "free_access_path_entry",
     "address": "0x00428540",
-    "size": 52
+    "size": 52,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
     "name": "CLAccessPaths_Init",
@@ -5513,29 +5515,34 @@
     "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428730",
+    "name": "remove_access_path",
     "address": "0x00428730",
-    "size": 84
+    "size": 84,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428790",
+    "name": "delete_access_path",
     "address": "0x00428790",
-    "size": 50
+    "size": 50,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_004287d0",
+    "name": "CLAccessPaths_GetEntry",
     "address": "0x004287d0",
-    "size": 59
+    "size": 59,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428810",
+    "name": "CLAccessPaths_GetCount",
     "address": "0x00428810",
-    "size": 38
+    "size": 38,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428840",
+    "name": "CLAccessPaths_FindPath",
     "address": "0x00428840",
-    "size": 94
+    "size": 94,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
     "name": "add_subdirectory_access_paths",
@@ -5550,9 +5557,10 @@
     "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_00428a50",
+    "name": "count_access_paths_recursive",
     "address": "0x00428a50",
-    "size": 93
+    "size": 93,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
     "name": "copy_access_paths_to_file_specs",

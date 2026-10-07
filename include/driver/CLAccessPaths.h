@@ -1,6 +1,7 @@
 #ifndef DRIVER_CLACCESSPATHS_H
 #define DRIVER_CLACCESSPATHS_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -32,6 +33,9 @@ extern AccessPathEntry *CLAccessPaths_FindPath(AccessPaths *table, void *value);
 extern Boolean CLAccessPaths_InsertItem(AccessPaths *paths, UInt16 index, void *value);
 extern Boolean add_subdirectory_access_paths(AccessPaths *ctx, AccessPathEntry *param2);
 extern unsigned char remove_access_path(AccessPaths *list, UInt16 index);
+#if VERSION >= VERSION_GC_2_7
+extern unsigned char delete_access_path(AccessPaths *list, UInt16 index);
+#endif
 extern AccessPathEntry *init_access_path_entry(OSPathBuffer *src, AccessPathEntry *result);
 extern AccessPathEntry *CLAccessPaths_CreateAccessPathEntry(char *source);
 extern void free_access_path_entry(AccessPathEntry *blocks);

@@ -11,6 +11,7 @@ struct AccessPathEntry {
     char *path;
     struct AccessPaths *children;
     unsigned int auxiliary2;
+    UInt16 flags;
 };
 #pragma options align = mac68k
 struct DepRecord {
