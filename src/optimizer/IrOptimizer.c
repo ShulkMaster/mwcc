@@ -1525,7 +1525,7 @@ struct IROLinear *linearize_expression(ENode *expression)
             ENodeList *cursor;
             SInt32 argumentCount;
 
-            node = new_linear(10);
+            node = new_linear(IROLinearFunccall);
             result = node;
             node->nodeflags = expression->flags;
             node->u.funccall.ispure = (expression->type == EFUNCCALLP);
@@ -2361,8 +2361,8 @@ void mark_node_and_operand_flags(IROLinear *node, int flag)
         case IROLinearEntry:
         case IROLinearExit:
         case IROLinearAsm:
-        case 17:
-        case 18:
+        case IROLinearUnknown1:
+        case IROLinearUnknown2:
         case IROLinearEnd:
             break;
     }

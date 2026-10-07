@@ -2,6 +2,7 @@
 #define COMPILER_IROLOOP_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +24,6 @@ struct IROAddrRecord {
     SInt32 x18;
 };
 #pragma options align = reset
-/* The kinds of IR node (IROLinear.type), as the optimizer's dump prints them (IroDump: "Operand", "Goto", "If %d %s",
- * "Funccall %d(", "BeginCatch %d", ...) and as the statements they are built from give them (ST_ENTRY 11, ST_EXIT 12,
- * ST_ASM 16); 17 and 18 stay unnamed. */
 enum {
     IROLinearNop,
     IROLinearOperand,
@@ -37,6 +35,9 @@ enum {
     IROLinearReturn,
     IROLinearLabel,
     IROLinearSwitch,
+#if VERSION >= VERSION_GC_1_3
+    IROLinearOp3Arg,
+#endif
     IROLinearFunccall,
     IROLinearEntry,
     IROLinearExit,
@@ -44,7 +45,9 @@ enum {
     IROLinearEndCatch,
     IROLinearEndCatchDtor,
     IROLinearAsm,
-    IROLinearEnd = 19
+    IROLinearUnknown1,
+    IROLinearUnknown2,
+    IROLinearEnd
 };
 /* An IR node's flags (IROLinear.flags), as the optimizer's dump prints them (<reffed>, <assigned>, <used>, ...); its other
  * bits are not named. */
@@ -73,35 +76,42 @@ struct IROLinear {
     Type *rtype;
     struct IROExpr *expr;
     struct ERange *range;
+#if VERSION >= VERSION_GC_1_3
+    struct PointsToFunction *pointsToFunction;
+    Boolean x1E;
+#endif
     union {
-        struct IROLinear *monadic;  /* 0x1a: ClearReferences Op1Arg, Return and catch kinds */
-        ENode *node;                /* 0x1a: IrOptimizer_0042eb40 Operand */
-        struct CLabel *label;       /* 0x1a: NewLabelLinear IROLinearLabel; convert_linear_to_statements label kinds */
-        struct Statement *asm_stmt; /* 0x1a: build_linear_from_statements kind 16 preserves the asm statement */
+        struct IROLinear *monadic;
+        ENode *node;
+        struct CLabel *label;
+        struct Statement *asm_stmt;
         struct {
-            struct CLabel *label; /* 0x1a: convert_linear_to_statements If/IfNot use target.label */
+            struct CLabel *label;
             struct IROLinear *cond;
         } branch;
         struct {
             struct SwitchInfo *info;
             struct IROLinear *cond;
-        } swtch; /* 0x1a: ClearReferences Switch */
+        } swtch;
         struct {
             struct IROLinear *left;
             struct IROLinear *right;
-        } diadic; /* 0x1a: ClearReferences Op2Arg */
+        } diadic;
         struct {
             struct IROLinear *a;
             struct IROLinear *b;
             struct IROLinear *c;
-        } args3; /* 0x1a: build_linear_from_statements BeginCatch (13) initializes three operands */
+        } args3;
         struct {
             char ispure;
             SInt16 argCount;
             struct IROLinear **args;
             struct IROLinear *callee;
             struct TypeFunc *functype;
-        } funccall; /* 0x1a: ClearReferences Funccall */
+#if VERSION >= VERSION_GC_1_3
+            struct LocationSetSet *returnedLocs;
+#endif
+        } funccall;
     } u;
     struct IROLinear *next;
 };

@@ -462,8 +462,8 @@ int initialize_linear_range(IROLinear *nd)
         case IROLinearEndCatch:
         case IROLinearEndCatchDtor:
         case IROLinearAsm:
-        case 17:
-        case 18:
+        case IROLinearUnknown1:
+        case IROLinearUnknown2:
         case IROLinearEnd:
             break;
     }

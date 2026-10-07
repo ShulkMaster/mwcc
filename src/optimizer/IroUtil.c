@@ -367,8 +367,8 @@ void visit_linear_range_trees(IROLinear *node, IROLinear *last, void *ctx)
         switch (n->type) {
             case IROLinearNop:
             case IROLinearAsm:
-            case 17:
-            case 18:
+            case IROLinearUnknown1:
+            case IROLinearUnknown2:
             case IROLinearEnd:
                 break;
             case IROLinearBeginCatch:
