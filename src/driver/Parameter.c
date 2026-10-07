@@ -1,5 +1,6 @@
 #define CERROR_FILE "unknown.c"
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/Parameter.h"
 #include "compiler/objects.h"
 #include "compiler/scopes.h"
@@ -620,9 +621,17 @@ int const_matches_dest(ConstRec *constant)
 int set_on_off(OnOff *opt, char *arg, int flags)
 {
     unsigned char on = (flags & 8) == 0;
+#if VERSION >= VERSION_GC_2_7
+    if (!ustrcmp(arg, "off"))
+#else
     if (!ClientGlue_CompareLowercaseStrings(arg, "off"))
+#endif
         *opt->var = on;
+#if VERSION >= VERSION_GC_2_7
+    else if (!ustrcmp(arg, "on"))
+#else
     else if (!ClientGlue_CompareLowercaseStrings(arg, "on"))
+#endif
         *opt->var = !on;
     else {
         Parameter_ForwardVarArgs(12, arg);
@@ -704,9 +713,17 @@ void format_string_name_help_value(STRING_T *parm, char **name, char **help, cha
 int parse_on_off(OnOff *opt, char *arg, int flags)
 {
     unsigned char on = (flags & 8) == 0;
+#if VERSION >= VERSION_GC_2_7
+    if (!ustrcmp(arg, "on"))
+#else
     if (!ClientGlue_CompareLowercaseStrings(arg, "on"))
+#endif
         *opt->var = on;
+#if VERSION >= VERSION_GC_2_7
+    else if (!ustrcmp(arg, "off"))
+#else
     else if (!ClientGlue_CompareLowercaseStrings(arg, "off"))
+#endif
         *opt->var = !on;
     else {
         Parameter_ForwardVarArgs(12, arg);

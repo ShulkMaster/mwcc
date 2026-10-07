@@ -1,4 +1,5 @@
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/Targets.h"
 #include "compiler/objects.h"
 #include "compiler/scopes.h"
@@ -762,7 +763,11 @@ Boolean Targets_MatchCommandLineOptions(int argc, char **argv)
 
     for (i = 0; i < argc; i++) {
         for (j = 0; j < driverTool[4]; j++) {
+#if VERSION >= VERSION_GC_2_7
+            if (ustrcmp(((char **)driverTool[5])[j], argv[i]) == 0)
+#else
             if (ClientGlue_CompareLowercaseStrings(((char **)driverTool[5])[j], argv[i]) == 0)
+#endif
                 break;
         }
         if (j >= driverTool[4])

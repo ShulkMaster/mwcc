@@ -3,6 +3,7 @@
 
 #include <setjmp.h>
 #include "compiler/common.h"
+#include "version.h"
 #include "driver/MsDos.h"
 
 #ifdef __cplusplus
@@ -126,7 +127,9 @@ extern char specs_equal;
 extern char data_0057edfb;
 extern char data_0057edfc;
 extern char *program_name;
+#if VERSION < VERSION_GC_2_7
 extern int CLIO_CompareStringsIgnoreCase(char *left, char *right);
+#endif
 extern NameTableEntry *create_data_block(char *name, const void *source, unsigned int size);
 extern OSSpec cachedRecordSpec;
 extern OSSpec data_0057ecb6;

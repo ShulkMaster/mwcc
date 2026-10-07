@@ -1,5 +1,6 @@
 #define CERROR_FILE "unknown.c"
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLMain.h"
 #include "compiler/objects.h"
 #include "compiler/scopes.h"
@@ -192,7 +193,11 @@ int CLMain_Initialize(int argc, char **argv)
 
     CLProj_CopyStringBounded(buf, *argv, strlen(*argv), sizeof(buf));
     buf[sizeof(buf) - 1] = 0;
+#if VERSION >= VERSION_GC_2_7
+    if (strlen(buf) < 4 || ustrcmp(buf + strlen(buf) - 4, ".exe") != 0)
+#else
     if (strlen(buf) < 4 || CLIO_CompareStringsIgnoreCase(buf + strlen(buf) - 4, ".exe") != 0)
+#endif
         CLProj_AppendString(buf, ".exe", sizeof(buf));
 
     CLIO_InitializeStreamBuffering();
@@ -451,7 +456,11 @@ unsigned int check_cmdline_entries(char *context)
 {
     NameTableEntry *entry;
     StorageHandle *handle;
+#if VERSION >= VERSION_GC_2_7
+    if (!context || !ustrcmp(context, "CmdLine Panel")) {
+#else
     if (!context || !ClientGlue_CompareLowercaseStrings(context, "CmdLine Panel")) {
+#endif
         entry = CLPrefs_FindNameTableEntry("CmdLine Panel");
         if (entry && (handle = CLPrefs_CopyDestinationToTemporary(entry)) != NULL) {
             if (context &&
@@ -462,7 +471,11 @@ unsigned int check_cmdline_entries(char *context)
             return 0;
         }
     }
+#if VERSION >= VERSION_GC_2_7
+    if (!context || !ustrcmp(context, "CmdLine Environment")) {
+#else
     if (!context || !ClientGlue_CompareLowercaseStrings(context, "CmdLine Environment")) {
+#endif
         entry = CLPrefs_FindNameTableEntry("CmdLine Environment");
         if (entry && (handle = CLPrefs_CopyDestinationToTemporary(entry)) != NULL) {
             if (context && !((int (*)(void *, void *))copy_environment_code_record)((struct CodeRecord *)handle->data,
@@ -473,7 +486,11 @@ unsigned int check_cmdline_entries(char *context)
             return 0;
         }
     }
+#if VERSION >= VERSION_GC_2_7
+    if (!context || !ustrcmp(context, "CmdLine Compiler Panel")) {
+#else
     if (!context || !ClientGlue_CompareLowercaseStrings(context, "CmdLine Compiler Panel")) {
+#endif
         entry = CLPrefs_FindNameTableEntry("CmdLine Compiler Panel");
         if (entry && (handle = CLPrefs_CopyDestinationToTemporary(entry)) != NULL) {
             if (context && !((int (*)(void *, void *))convert_command_line_panel_settings)(
@@ -484,7 +501,11 @@ unsigned int check_cmdline_entries(char *context)
             return 0;
         }
     }
+#if VERSION >= VERSION_GC_2_7
+    if (!context || !ustrcmp(context, "CmdLine Linker Panel")) {
+#else
     if (!context || !ClientGlue_CompareLowercaseStrings(context, "CmdLine Linker Panel")) {
+#endif
         entry = CLPrefs_FindNameTableEntry("CmdLine Linker Panel");
         if (entry && (handle = CLPrefs_CopyDestinationToTemporary(entry)) != NULL) {
             if (context && !((int (*)(void *, void *))convert_linker_panel_settings)(

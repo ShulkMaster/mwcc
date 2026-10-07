@@ -1,4 +1,5 @@
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/ToolHelpers.h"
 #include "compiler/CPrep.h"
 #include "compiler/InlineAsmPPC.h"
@@ -131,7 +132,11 @@ void **copy_resource_by_name(char *name)
     struct StorageHandle *handle;
     Resource *resources;
     for (index = 0; index < driverTool[10]; index++) {
+#if VERSION >= VERSION_GC_2_7
+        if (!ustrcmp(name, (resources = (Resource *)driverTool[11])[index].name)) {
+#else
         if (!ClientGlue_CompareLowercaseStrings(name, (resources = (Resource *)driverTool[11])[index].name)) {
+#endif
             handle = (struct StorageHandle *)Memory_NewHandle((resources = (Resource *)driverTool[11])[index].size);
             if (!handle)
                 return NULL;

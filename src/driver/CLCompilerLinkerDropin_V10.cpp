@@ -2,6 +2,7 @@
 #pragma bool off
 
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLCompilerLinkerDropin_V10.h"
 #include "compiler/scopes.h"
 #include "compiler/types.h"
@@ -603,7 +604,11 @@ unsigned int __stdcall copy_name_with_p_extension(unsigned int unused, const cha
         CLIO_FormatAndDispatchText("Callback: %s\n", data_0054d684);
     }
     strcpy(output, name);
+#if VERSION >= VERSION_GC_2_7
+    if (ustrcmp(output + strlen(output) - 2, ".p") != 0) {
+#else
     if (ClientGlue_CompareLowercaseStrings(output + strlen(output) - 2, ".p") != 0) {
+#endif
         strcat(output, ".p");
     }
     return 0;

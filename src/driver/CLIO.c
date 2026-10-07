@@ -1004,6 +1004,7 @@ short CLIO_ReportDiagnostic(Plugin *type, DiagnosticSourcePosition *record, int 
     return severity;
 }
 
+#if VERSION < VERSION_GC_2_7
 int CLIO_CompareStringsIgnoreCase(char *left, char *right)
 {
     do {
@@ -1013,6 +1014,8 @@ int CLIO_CompareStringsIgnoreCase(char *left, char *right)
     } while (*left++ != '\0');
     return 0;
 }
+
+#endif
 
 NameTableEntry *create_data_block(char *name, const void *source, unsigned int size)
 {

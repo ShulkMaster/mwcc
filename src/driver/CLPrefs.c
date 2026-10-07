@@ -1,5 +1,6 @@
 #define CERROR_FILE "unknown.c"
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLPrefs.h"
 #include "compiler/CPrep.h"
 #include "driver/CLCompilerLinkerDropin_V10.h"
@@ -98,7 +99,11 @@ NameTableEntry *CLPrefs_FindNameTableEntry(char *name)
 {
     NameTableEntry *entry = name_table_entries;
     while (entry != NULL) {
+#if VERSION >= VERSION_GC_2_7
+        if (ustrcmp(entry->name, name) == 0) {
+#else
         if (CLIO_CompareStringsIgnoreCase(entry->name, name) == 0) {
+#endif
             break;
         }
         entry = entry->next;

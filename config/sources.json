@@ -1182,6 +1182,20 @@
       "src/driver"
     ]
   },
+  "src/driver/StringExtras.c": {
+    "compiler": "pro53",
+    "flags": [
+      "-O4,p",
+      "-sym",
+      "off",
+      "-Cpp_exceptions",
+      "off"
+    ],
+    "include_dirs": [
+      "src/driver"
+    ],
+    "status": "NonMatching"
+  },
   "src/driver/StringUtils.c": {
     "compiler": "pro53",
     "flags": [

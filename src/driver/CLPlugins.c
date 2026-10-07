@@ -1,5 +1,6 @@
 #define CERROR_FILE "CLPlugins.c"
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLPlugins.h"
 #include "compiler/CPrep.h"
 #include "driver/CLCompilerLinkerDropin_V10.h"
@@ -241,8 +242,16 @@ char file_map_matches(FileMap *reference, int value, char *name, char flag)
     if (!(((reference->ext[0] != '\0' || flag != '\0') && (name[0] != '\0' || flag != '\0')) ||
           reference->type != value) ||
         (((reference->type == 0 && flag == '\0') || (value == 0 && flag == '\0')) &&
+#if VERSION >= VERSION_GC_2_7
+         ustrcmp(reference->ext, name) == 0) ||
+#else
          CLIO_CompareStringsIgnoreCase(reference->ext, name) == 0) ||
+#endif
+#if VERSION >= VERSION_GC_2_7
+        (ustrcmp(reference->ext, name) == 0 && reference->type == value))
+#else
         (CLIO_CompareStringsIgnoreCase(reference->ext, name) == 0 && reference->type == value))
+#endif
         return 1;
     else
         return 0;
@@ -994,7 +1003,11 @@ int CLPlugins_GetUniquePluginNames(Plugin *nameList, SInt32 *nameCount, char ***
             existingIndex = 0;
             if (0 < count) {
                 do {
+#if VERSION >= VERSION_GC_2_7
+                    if (ustrcmp(array[existingIndex], resolvedList->panels[nameIndex]) == 0)
+#else
                     if (CLIO_CompareStringsIgnoreCase(array[existingIndex], resolvedList->panels[nameIndex]) == 0)
+#endif
                         break;
                     existingIndex++;
                 } while (existingIndex < count);

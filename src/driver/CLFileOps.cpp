@@ -1,6 +1,7 @@
 #pragma bool off
 
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLFileOps.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -70,7 +71,11 @@ int __stdcall CLFileOps_FindExecutable(char *name, void *param2)
 
     strncpy(buf, name, 0x104);
     buf[0x103] = 0;
+#if VERSION >= VERSION_GC_2_7
+    if ((UInt32)strlen(buf) < 4 || ustrcmp(buf + strlen(buf) - 4, ".exe") != 0)
+#else
     if ((UInt32)strlen(buf) < 4 || ClientGlue_CompareLowercaseStrings(buf + strlen(buf) - 4, ".exe") != 0)
+#endif
         CLProj_AppendString(buf, ".exe", 0x104);
 
     if (strchr(buf, '\\') == 0) {

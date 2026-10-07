@@ -12,7 +12,9 @@ struct PluginRequiredInputRecord {
     unsigned char bytes[36];
 };
 extern int fn_004050e0(char *left, char *right, int count);
+#if VERSION < VERSION_GC_2_7
 extern int ClientGlue_CompareLowercaseStrings(const char *left, const char *right);
+#endif
 #if VERSION < VERSION_GC_2_7
 extern char *ClientGlue_DuplicateString(const char *a0);
 #endif

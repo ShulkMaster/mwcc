@@ -1,5 +1,6 @@
 #define CERROR_FILE "CLBrowser.c"
 #include "compiler/common.h"
+#include "driver/StringExtras.h"
 #include "driver/CLBrowser.h"
 #include "compiler/win32.h"
 #include "compiler/CPrep.h"
@@ -117,7 +118,11 @@ int CLBrowser_LookupValue(void *table, char *name, short *value)
     index = 0;
     if (0 < count) {
         do {
+#if VERSION >= VERSION_GC_2_7
+            comparison = ustrcmp(name, entry->name);
+#else
             comparison = CLIO_CompareStringsIgnoreCase(name, entry->name);
+#endif
             if (comparison == 0) {
                 found = 1;
                 break;

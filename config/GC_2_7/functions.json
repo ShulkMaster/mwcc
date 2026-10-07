@@ -3520,9 +3520,10 @@
     "size": 60
   },
   {
-    "name": "fn_00417490",
+    "name": "ustrcmp",
     "address": "0x00417490",
-    "size": 69
+    "size": 69,
+    "source": "src/driver/StringExtras.c"
   },
   {
     "name": "fn_004174e0",

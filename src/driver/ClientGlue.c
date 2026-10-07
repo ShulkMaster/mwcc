@@ -32,6 +32,7 @@ int fn_004050e0(char *left, char *right, int count)
     return 0;
 }
 
+#if VERSION < VERSION_GC_2_7
 int ClientGlue_CompareLowercaseStrings(const char *left, const char *right)
 {
     unsigned int rightValue;
@@ -46,6 +47,8 @@ int ClientGlue_CompareLowercaseStrings(const char *left, const char *right)
     } while (*left++ != '\0');
     return 0;
 }
+
+#endif
 
 #if VERSION < VERSION_GC_2_7
 char *ClientGlue_DuplicateString(const char *a0)
