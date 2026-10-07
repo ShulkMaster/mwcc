@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/cc-eabi-ppc.h"
 #include "compiler/CPrep.h"
@@ -51,7 +52,7 @@ int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input)
             data_00588258 = 0;
             break;
         case 0:
-            initialize_compiler_plugin_cu((unsigned int)input);
+            initialize_compiler_plugin_cu(input);
             if (data_00588258 == 0) {
                 CWPluginsPrivate_InvokeCallback40(compiler_plugin_cu.context, "Win32_Plugins_PPC_Nintendo", "1", 0, 0,
                                                   &data_00588258);
@@ -195,58 +196,52 @@ void initialize_copts(CPrepCU *source)
     copts.precompiledHeaderFileTypes[1] = 0x54455854;
 }
 
-signed char initialize_compiler_plugin_cu(unsigned int input)
+signed char initialize_compiler_plugin_cu(CWPluginPrivateContext *context)
 {
     TgtRec readBuffer;
-    CWPluginPrivateContext *context;
 
     memset(&compiler_plugin_cu, 0, sizeof(compiler_plugin_cu));
-    compiler_plugin_cu.context = (CWPluginPrivateContext *)input;
+    compiler_plugin_cu.context = context;
 
-    context = (CWPluginPrivateContext *)input;
     if (CWPluginsPrivate_GetRequest(context, &compiler_plugin_cu.pluginRequest))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CWPluginsPrivate_GetAPIVersion(context, &compiler_plugin_cu.apiVersion))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CWPluginsPrivate_GetSourceFile(context, &compiler_plugin_cu.projectFile))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CWPluginsPrivate_GetNumFiles(context, &compiler_plugin_cu.projectFileCount))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetFileIndex(context, (unsigned int *)&compiler_plugin_cu.mainFileNumber))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetContextPayload(context, &compiler_plugin_cu.mainFile))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetResultValues(context, &compiler_plugin_cu.mainFileOffset, &compiler_plugin_cu.mainFileLength))
         return 0;
-    if (CPrep_GetEnabled(input, &compiler_plugin_cu.precompiling))
+    if (CPrep_GetEnabled(context, &compiler_plugin_cu.precompiling))
         return 0;
-    if (CPrep_GetActive(input, &compiler_plugin_cu.active))
+    if (CPrep_GetActive(context, &compiler_plugin_cu.active))
         return 0;
-    if (CPrep_GetOperation(input, &compiler_plugin_cu.preprocessOnly))
+    if (CPrep_GetOperation(context, &compiler_plugin_cu.preprocessOnly))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetSetting(context, &compiler_plugin_cu.filesyminfo))
         return 0;
-    if (CPrep_GetReserved15d(input, &compiler_plugin_cu.useMappedPrecompiledHeaders))
+    if (CPrep_GetReserved15d(context, &compiler_plugin_cu.useMappedPrecompiledHeaders))
         return 0;
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetDependencyState(context, &compiler_plugin_cu.browseOptions))
         return 0;
 
     compiler_plugin_cu.compiling = !compiler_plugin_cu.preprocessOnly;
-    if (CPrep_GetDependencyOption(input, &compiler_plugin_cu.mainFileAttributes))
+    if (CPrep_GetDependencyOption(context, &compiler_plugin_cu.mainFileAttributes))
         return 0;
 
-    context = (CWPluginPrivateContext *)input;
     if (CPrep_GetTargetSettings(context, &readBuffer))
         return 0;
     compiler_plugin_cu.platformCode1 = readBuffer.head.platformCodes[1];
     compiler_plugin_cu.platformCode0 = readBuffer.head.platformCodes[0];
+#if VERSION >= VERSION_GC_2_7
+    compiler_plugin_cu.targetName = compiler_plugin_target_name;
+    if (CWPluginsPrivate_GetTargetName(context, compiler_plugin_cu.targetName, 128))
+        return 0;
+#endif
     return 1;
 }

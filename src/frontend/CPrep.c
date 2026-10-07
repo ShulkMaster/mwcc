@@ -5008,14 +5008,14 @@ CWPluginPrivateContext *validate_context_signature(CWPluginPrivateContext *recor
 }
 #pragma auto_inline reset
 
-int __stdcall CPrep_GetEnabled(int key, unsigned char *value)
+int __stdcall CPrep_GetEnabled(CWPluginPrivateContext *context, unsigned char *value)
 {
     CWPluginPrivateContext *record;
 
     if (value == NULL) {
         return 3;
     }
-    record = validate_context_signature((CWPluginPrivateContext *)key);
+    record = validate_context_signature(context);
     if (record == NULL) {
         return 4;
     }
@@ -5023,14 +5023,14 @@ int __stdcall CPrep_GetEnabled(int key, unsigned char *value)
     return 0;
 }
 
-unsigned int __stdcall CPrep_GetActive(int selector, unsigned char *value)
+unsigned int __stdcall CPrep_GetActive(CWPluginPrivateContext *context, unsigned char *value)
 {
     CWPluginPrivateContext *state;
 
     if (value == NULL) {
         return 3;
     }
-    state = validate_context_signature((CWPluginPrivateContext *)selector);
+    state = validate_context_signature(context);
     if (state == NULL) {
         return 4;
     }
@@ -5038,14 +5038,14 @@ unsigned int __stdcall CPrep_GetActive(int selector, unsigned char *value)
     return 0;
 }
 
-unsigned int __stdcall CPrep_GetOperation(int key, unsigned char *value)
+unsigned int __stdcall CPrep_GetOperation(CWPluginPrivateContext *context, unsigned char *value)
 {
     CWPluginPrivateContext *result;
 
     if (value == NULL) {
         return 3;
     }
-    result = validate_context_signature((CWPluginPrivateContext *)key);
+    result = validate_context_signature(context);
     if (result == NULL) {
         return 4;
     }
@@ -5068,14 +5068,14 @@ unsigned int __stdcall CPrep_GetSetting(CWPluginPrivateContext *key, unsigned ch
     return 0;
 }
 
-unsigned int __stdcall CPrep_GetReserved15d(int handle, unsigned char *value)
+unsigned int __stdcall CPrep_GetReserved15d(CWPluginPrivateContext *context, unsigned char *value)
 {
     CWPluginPrivateContext *record;
 
     if (value == NULL) {
         return 3;
     }
-    record = validate_context_signature((CWPluginPrivateContext *)handle);
+    record = validate_context_signature(context);
     if (record == NULL) {
         return 4;
     }
@@ -5233,14 +5233,14 @@ SInt32 __stdcall CPrep_CallCompilerCallback(void *objectId, SInt32 argument)
     return object->compilerCallbacks->callback(object, argument);
 }
 
-unsigned int __stdcall CPrep_GetDependencyOption(int lookupKey, unsigned short *value)
+unsigned int __stdcall CPrep_GetDependencyOption(CWPluginPrivateContext *context, unsigned short *value)
 {
     CWPluginPrivateContext *record;
 
     if (value == NULL) {
         return 3;
     }
-    record = validate_context_signature((CWPluginPrivateContext *)lookupKey);
+    record = validate_context_signature(context);
     if (record == NULL) {
         return 4;
     }

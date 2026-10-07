@@ -486,6 +486,9 @@ struct CPrepCU {
     UInt16 mainFileAttributes;
     SInt32 platformCode1; /* 0xfa: initialize_compiler_plugin_cu copies head.platformCodes[1]. */
     SInt32 platformCode0; /* 0xfe: initialize_compiler_plugin_cu copies head.platformCodes[0]. */
+#if VERSION >= VERSION_GC_2_7
+    char *targetName;
+#endif
 };
 #pragma options align = reset
 #pragma options align = mac68k
@@ -750,14 +753,14 @@ extern unsigned int *CPrep_RemoveFlaggedMacros(void);
 extern CWPluginPrivateContext *validate_context_signature(CWPluginPrivateContext *record);
 extern int CPrep_AppendStringBounded(char *dst, char *src, int size);
 extern void __stdcall CPrep_RegisterPredefinedMacros(void);
-extern int __stdcall CPrep_GetEnabled(int key, unsigned char *value);
-extern unsigned int __stdcall CPrep_GetActive(int selector, unsigned char *value);
-extern unsigned int __stdcall CPrep_GetOperation(int key, unsigned char *value);
+extern int __stdcall CPrep_GetEnabled(CWPluginPrivateContext *key, unsigned char *value);
+extern unsigned int __stdcall CPrep_GetActive(CWPluginPrivateContext *selector, unsigned char *value);
+extern unsigned int __stdcall CPrep_GetOperation(CWPluginPrivateContext *key, unsigned char *value);
 extern unsigned int __stdcall CPrep_GetSetting(CWPluginPrivateContext *key, unsigned char *value);
-extern unsigned int __stdcall CPrep_GetReserved15d(int handle, unsigned char *value);
+extern unsigned int __stdcall CPrep_GetReserved15d(CWPluginPrivateContext *handle, unsigned char *value);
 extern unsigned int __stdcall CPrep_GetDependencyState(CWPluginPrivateContext *a0, BrowseOptions *a1);
 extern unsigned int __stdcall CPrep_GetFileIndex(CWPluginPrivateContext *key, unsigned int *value);
-extern unsigned int __stdcall CPrep_GetDependencyOption(int lookupKey, unsigned short *value);
+extern unsigned int __stdcall CPrep_GetDependencyOption(CWPluginPrivateContext *lookupKey, unsigned short *value);
 extern int __stdcall CPrep_GetContextPayload(CWPluginPrivateContext *handle, CWFileSpec *destination);
 extern unsigned int __stdcall CPrep_GetResultValues(CWPluginPrivateContext *handle, UInt32 *first_value,
                                                     UInt32 *second_value);

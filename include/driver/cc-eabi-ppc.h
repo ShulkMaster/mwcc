@@ -21,7 +21,7 @@ struct SymbolSettings {
 extern void cc_eabi_ppc_ReportCompilingFunction(char *name);
 extern int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input);
 extern void initialize_copts(CPrepCU *source);
-extern signed char initialize_compiler_plugin_cu(unsigned int input);
+extern signed char initialize_compiler_plugin_cu(CWPluginPrivateContext *context);
 extern unsigned char data_0054c408[];
 extern struct DriverSettings {
     unsigned char b[9];
@@ -33,6 +33,7 @@ extern struct DriverSettings {
 extern char data_0057f486;
 extern int data_00588258;
 extern struct CPrepCU compiler_plugin_cu;
+extern char compiler_plugin_target_name[128];
 extern char mm_extension[], c_extension[], uppercase_m_extension[];
 extern char data_0054c464[];
 extern char data_0054c474[], data_0054c464[];

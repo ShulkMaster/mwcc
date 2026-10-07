@@ -1,8 +1,13 @@
 {
   "_CLT_filesp": "0x005eeca0",
   "_CLT_filestack": "0x005eec50",
+  "_CPrep_GetDependencyState@8": "0x00440150",
+  "_CPrep_GetTargetSettings@8": "0x004401e0",
+  "_CWPluginsPrivate_GetSourceFile@8": "0x0041ea00",
+  "_CWPluginsPrivate_GetTargetName@12": "0x0041ea60",
   "_ClientGlue_InitializeAndParseCommandLine": "0x00405310",
   "_MsDos_IsAbsolutePath@4": "0x00412530",
+  "_compiler_plugin_target_name": "0x005de920",
   "_current_source_spec": "0x005deac4",
   "_data_0053600c": "0x0058200c",
   "_data_0053601c": "0x0058201c",
