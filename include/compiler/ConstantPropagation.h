@@ -47,6 +47,7 @@ extern int gConstantPropagationChanged;
 extern struct PCodeInstruction **virtual_register_definitions;
 extern struct PCodeInstruction **unique_definitions;
 #if VERSION >= VERSION_GC_2_7
+extern struct PCodeInstruction **float_register_definitions;
 extern void COpt_LoadDeletion(Object *function);
 #else
 extern void COpt_LoadDeletion(void);

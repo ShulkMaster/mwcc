@@ -2,6 +2,7 @@
 #define COMPILER_INTRINSICS_H
 
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/InlineAsmPPC.h"
 
 #ifdef __cplusplus
@@ -90,7 +91,11 @@ extern struct MangleEntry *DAT_0055542c[];
 extern short intrinsic_opcodes[];
 extern Type data_0055fb94;
 extern struct Object *data_00587fc0;
+#if VERSION >= VERSION_GC_2_7
+extern int gUsedVirtualRegistersVR;
+#else
 extern SInt16 gUsedVirtualRegistersVR;
+#endif
 extern Type initializer_data_0055bb90;
 extern char initializer_data_0055c9a4[];
 extern char initializer_data_0055c9b0[];

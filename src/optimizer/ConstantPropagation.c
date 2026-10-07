@@ -487,11 +487,15 @@ void ConstantPropagation_FindUniqueDefinitions(struct PCodeBlock *state)
     SInt32 reg;
     struct PCodeInstruction *result;
 
+#if VERSION >= VERSION_GC_2_7
+    for (i = 0; i < used_virtual_registers[UsedVirtualRegistersGPR]; i++) {
+#else
     for (i = 0; i < gUsedVirtualRegistersGPR; i++) {
+#endif
         result = NULL;
         for (def = code_motion_register_definition_heads[i]; def != NULL; def = def->next) {
             reg = def->entry_index;
-            if (data_00587fe4[state->index].definition_sets[2][reg >> 5] & (1 << reg)) {
+            if (data_00587fe4[state->index].definition_sets[2][reg >> 5] & (1U << (reg & 31))) {
                 if (result == NULL) {
                     result = code_motion_entries[reg].instruction;
                 } else {
@@ -503,14 +507,36 @@ void ConstantPropagation_FindUniqueDefinitions(struct PCodeBlock *state)
         unique_definitions[i] = result;
     }
 
+#if VERSION >= VERSION_GC_2_7
+    for (i = 0; i < used_virtual_registers[UsedVirtualRegistersFPR]; i++) {
+        result = NULL;
+        for (def = data_00587f04[i]; def != NULL; def = def->next) {
+            reg = def->entry_index;
+            if (data_00587fe4[state->index].definition_sets[2][reg >> 5] & (1U << (reg & 31))) {
+                if (result == NULL) {
+                    result = code_motion_entries[reg].instruction;
+                } else {
+                    result = NULL;
+                    break;
+                }
+            }
+        }
+        float_register_definitions[i] = result;
+    }
+#endif
+
+#if VERSION >= VERSION_GC_2_7
+    for (j = 0; j < used_virtual_registers[UsedVirtualRegistersVR]; j++) {
+#else
     for (j = 0; j < gUsedVirtualRegistersVR; j++) {
+#endif
         struct PCodeInstruction *vresult;
         SInt32 vreg;
         struct CodeMotionEntryLink *vdef;
         vresult = NULL;
         for (vdef = register_definition_heads[j]; vdef != NULL; vdef = vdef->next) {
             vreg = vdef->entry_index;
-            if (data_00587fe4[state->index].definition_sets[2][vreg >> 5] & (1 << vreg)) {
+            if (data_00587fe4[state->index].definition_sets[2][vreg >> 5] & (1U << (vreg & 31))) {
                 if (vresult == NULL) {
                     vresult = code_motion_entries[vreg].instruction;
                 } else {

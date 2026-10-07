@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,8 +141,22 @@ extern void (*data_00560648[])(void *, short, short, void *);
 extern Float float_one;
 extern char instrSelectionFileName[];
 extern struct FunctionCallFrame *function_call_frames;
+#if VERSION >= VERSION_GC_2_7
+enum UsedVirtualRegisterIndex {
+    UsedVirtualRegistersSPR = 0,
+    UsedVirtualRegistersCRField = 1,
+    UsedVirtualRegistersVR = 2,
+    UsedVirtualRegistersFPR = 3,
+    UsedVirtualRegistersGPR = 4,
+    UsedVirtualRegisterClassCount = 5
+};
+extern int used_virtual_registers[UsedVirtualRegisterClassCount];
+extern int gUsedVirtualRegistersFPR;
+extern int gUsedVirtualRegistersGPR;
+#else
 extern short gUsedVirtualRegistersFPR;
 extern SInt16 gUsedVirtualRegistersGPR;
+#endif
 extern void get_dispatch_result(struct DeferredDispatch *dispatch, unsigned int argument2, unsigned int argument3,
                                 struct DispatchResult *output);
 extern void InstrSelection_EmitSwitchTables(Object *a0);

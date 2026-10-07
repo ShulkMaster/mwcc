@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,10 +68,17 @@ extern void propagate_use_sets(void);
 extern void solve_definition_sets(void);
 extern void compute_block_definition_and_use_sets(void);
 extern void move_instruction_to_preheader(PCodeInstruction *instruction, Loop *region);
-extern struct CodeMotionDataflowState {
+struct CodeMotionDataflowState {
+#if VERSION >= VERSION_GC_2_7
+    int use_start;
+    int use_count;
+    int definition_start;
+    int definition_count;
+#endif
     UInt32 *definition_sets[4];
     UInt32 *use_sets[4];
-} *data_00587fe4;
+};
+extern struct CodeMotionDataflowState *data_00587fe4;
 extern int has_use_outside_loop_in_preheader_set(PCodeOperand *ref, Loop *info);
 extern int fn_00526950(int itemIndex, int targetIndex);
 extern int is_loop_invariant(PCodeInstruction *info, Loop *ctx, UInt32 *defs, SInt32 p4, SInt32 p5);

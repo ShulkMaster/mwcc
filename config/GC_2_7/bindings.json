@@ -1603,5 +1603,15 @@
   "_CExpr_ConvertToCondition": "0x004bb220",
   "_integralpromote": "0x004be460",
   "_forceintegral": "0x004beaa0",
-  "_CExpr_Convert": "0x0054f7a0"
+  "_CExpr_Convert": "0x0054f7a0",
+  "_used_virtual_registers": "0x005eaa2c",
+  "_data_00587fe4": "0x005ea960",
+  "_data_00587f04": "0x005ea980",
+  "_register_definition_heads": "0x005ea97c",
+  "_unique_definitions": "0x005e3bb8",
+  "_float_register_definitions": "0x005e3bb4",
+  "_virtual_register_definitions": "0x005e3bb0",
+  "_gUsedVirtualRegistersGPR": "0x005eaa3c",
+  "_gUsedVirtualRegistersFPR": "0x005eaa38",
+  "_gUsedVirtualRegistersVR": "0x005eaa34"
 }

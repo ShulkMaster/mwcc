@@ -1550,8 +1550,11 @@ void COpt_ConstantPropagation(void)
 
     gConstantPropagationChanged = 0;
     COpt_SetLoopCodeMotionMode(0);
-    unique_definitions = galloc(gUsedVirtualRegistersGPR * 4);
-    virtual_register_definitions = galloc(gUsedVirtualRegistersVR * 4);
+    unique_definitions = galloc(gUsedVirtualRegistersGPR * sizeof(*unique_definitions));
+#if VERSION >= VERSION_GC_2_7
+    float_register_definitions = galloc(gUsedVirtualRegistersFPR * sizeof(*float_register_definitions));
+#endif
+    virtual_register_definitions = galloc(gUsedVirtualRegistersVR * sizeof(*virtual_register_definitions));
     do {
         constantPropagationChanged = 0;
         for (i = 0; i < gPCodeBlockCount; i++) {
