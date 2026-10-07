@@ -112,7 +112,7 @@ int IroRangePropagation_PropagateRangeInLinear(struct IROLinear *nd)
             break;
         case EAND:
         case EANDASS:
-            if (IroDump_IsType1NodeType50(nd->u.diadic.right)) {
+            if (IRO_IsIntConstant(nd->u.diadic.right)) {
                 val = nd->u.diadic.right->u.node->data.intval;
                 nd->range = NewRange(1);
                 nd->range->upper = val;

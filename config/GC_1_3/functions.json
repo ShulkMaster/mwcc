@@ -8849,9 +8849,10 @@
     "size": 23
   },
   {
-    "name": "fn_00469640",
+    "name": "IRO_IsIntConstant",
     "address": "0x00469640",
-    "size": 23
+    "size": 23,
+    "source": "src/optimizer/IroUtil.c"
   },
   {
     "name": "fn_00469660",

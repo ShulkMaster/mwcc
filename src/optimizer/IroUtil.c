@@ -986,3 +986,14 @@ int IroUtil_IsTypeOneNodeTypeFiftyOne(IROLinear *record)
         return 1;
     return 0;
 }
+
+#if VERSION >= VERSION_GC_1_3
+Boolean IRO_IsIntConstant(IROLinear *linear)
+#else
+unsigned int IRO_IsIntConstant(IROLinear *linear)
+#endif
+{
+    if (linear->type == IROLinearOperand && linear->u.node->type == EINTCONST)
+        return 1U;
+    return 0U;
+}

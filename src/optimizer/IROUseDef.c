@@ -470,7 +470,7 @@ static Boolean IRO_NodeKind(IROLinear *n)
                 return 0;
             return 1;
         case IROLinearOp2Arg:
-            if ((n->nodetype == EADDASS || n->nodetype == ESUBASS) && IroDump_IsType1NodeType50(n->u.diadic.right) &&
+            if ((n->nodetype == EADDASS || n->nodetype == ESUBASS) && IRO_IsIntConstant(n->u.diadic.right) &&
                 !(n->u.diadic.left->flags & 0x80000))
                 return 1;
             return 0;
@@ -575,7 +575,7 @@ void add_constant_to_next_use(IROLinear *expression, CInt64 value, Type *type)
                 }
                 break;
             case IROLinearOp2Arg:
-                if (IroDump_IsType1NodeType50(node->u.diadic.right) != 0) {
+                if (IRO_IsIntConstant(node->u.diadic.right) != 0) {
                     switch (node->nodetype) {
                         case EADD:
                         case EADDASS: {

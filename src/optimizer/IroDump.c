@@ -31,13 +31,6 @@
 #include "driver/Files.h"
 #include <stdio.h>
 #include <stdarg.h>
-unsigned int IroDump_IsType1NodeType50(IROLinear *linear)
-{
-    if (linear->type == IROLinearOperand && linear->u.node->type == 50U)
-        return 1U;
-    return 0U;
-}
-
 SInt32 IroDump_IsPowerOfTwo(IROLinear *node, SInt32 *bit)
 {
     SInt32 value;

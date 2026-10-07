@@ -4340,7 +4340,7 @@
   "_equal_enode_values": "0x0044d380",
   "_fn_0044d460": "0x0044d460",
   "_IroUtil_IsTypeOneNodeTypeFiftyOne": "0x0044d490",
-  "_IroDump_IsType1NodeType50": "0x0044d4b0",
+  "_IRO_IsIntConstant": "0x0044d4b0",
   "_IroDump_IsPowerOfTwo": "0x0044d4d0",
   "_fn_0044d520": "0x0044d520",
   "_IroDump_GetObjRef": "0x0044d550",

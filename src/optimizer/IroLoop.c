@@ -98,7 +98,7 @@ IROLinear *reorder_sequence_by_flags_and_type50(IROLinear *tree, IROList *contex
     if (entry != NULL) {
         do {
             node = entry->element;
-            if (IroDump_IsType1NodeType50(node) == 0 && (node->flags & IROLF_LoopInvariant) != 0) {
+            if (IRO_IsIntConstant(node) == 0 && (node->flags & IROLF_LoopInvariant) != 0) {
                 if (result != NULL) {
                     combinedNode = MakeSequenceNode(result, node, context, 0);
                     combinedNode->flags |= IROLF_LoopInvariant;
@@ -123,7 +123,7 @@ IROLinear *reorder_sequence_by_flags_and_type50(IROLinear *tree, IROList *contex
     if (entry != NULL) {
         do {
             node = entry->element;
-            if (IroDump_IsType1NodeType50(node) == 0) {
+            if (IRO_IsIntConstant(node) == 0) {
                 if (result != NULL) {
                     IROLinear *sequenceNode;
                     sequenceNode = MakeSequenceNode(result, node, context, 0);
@@ -327,7 +327,7 @@ void add_const_to_induction_var_references(IROLinear *first, IROLinear *last, SI
             adjustedAfterScale = 0;
             if (canScale && scaledUse != NULL && scaledUse->type == IROLinearOp2Arg &&
                 (scaledUse->nodetype == ESHL || scaledUse->nodetype == EMUL) &&
-                IroDump_IsType1NodeType50(scaledUse->u.diadic.right)) {
+                IRO_IsIntConstant(scaledUse->u.diadic.right)) {
                 addressUse = IroUtil_FindNextUse(scaledUse);
                 if (addressUse != NULL && addressUse->type == IROLinearOp2Arg && addressUse->nodetype == EADD &&
                     addressUse->u.diadic.right == scaledUse) {
@@ -876,7 +876,7 @@ struct IROLinear *create_loop_iteration_count(struct IROList *context, struct IR
 
     unitBound = 0;
     bound = statement->init->u.diadic.right;
-    if (IroDump_IsType1NodeType50(bound) && CInt64_Equal(bound->u.node->data.intval, qval_zero))
+    if (IRO_IsIntConstant(bound) && CInt64_Equal(bound->u.node->data.intval, qval_zero))
         unitBound = 1;
     if (!unitBound)
         bound = IroUtil_CopyLinearToList((bound), (context));
@@ -1116,7 +1116,7 @@ int compute_loop_count(IROLoop *loop, CInt64 *count)
         integralType->integral == IT_UINT || integralType->integral == IT_ULONG ||
         integralType->integral == IT_ULONGLONG)
         isUnsigned = 1;
-    if (IroDump_IsType1NodeType50(start) != 0 && IroDump_IsType1NodeType50(limit) != 0) {
+    if (IRO_IsIntConstant(start) != 0 && IRO_IsIntConstant(limit) != 0) {
         startValue = start->u.node->data.intval;
         limitValue = limit->u.node->data.intval;
         if (isUnsigned != 0) {
@@ -1150,7 +1150,7 @@ int compute_loop_count(IROLoop *loop, CInt64 *count)
     limitTerms = IroVars_CreateAddrRecord(limit);
     if (start->type == IROLinearOp2Arg && start->nodetype == EADD) {
         IroVars_CollectAddrRecordElements(start, startTerms);
-    } else if (IroDump_IsType1NodeType50(start) != 0) {
+    } else if (IRO_IsIntConstant(start) != 0) {
         startTerms->numInts += 1;
         IroVars_PrependElmList(start, &startTerms->ints);
         startTerms->numObjRefs = 0;
@@ -1163,7 +1163,7 @@ int compute_loop_count(IROLoop *loop, CInt64 *count)
     }
     if (limit->type == IROLinearOp2Arg && limit->nodetype == EADD) {
         IroVars_CollectAddrRecordElements(limit, limitTerms);
-    } else if (IroDump_IsType1NodeType50(limit) != 0) {
+    } else if (IRO_IsIntConstant(limit) != 0) {
         limitTerms->numInts += 1;
         IroVars_PrependElmList(limit, &limitTerms->ints);
         limitTerms->numObjRefs = 0;
@@ -1220,7 +1220,7 @@ int is_loop_unrollable(IROLoop *loop)
 
     if (!(loop->flags & 0x10000)) {
         operand = loop->cond->u.diadic.right;
-        if (IroDump_IsType1NodeType50(loop->cond->u.diadic.right) == 0 && (operand->flags & IROLF_LoopInvariant) == 0) {
+        if (IRO_IsIntConstant(loop->cond->u.diadic.right) == 0 && (operand->flags & IROLF_LoopInvariant) == 0) {
             IroDump_Print("IsLoopUnrollable:No because Loop Upper Bound is Variant in the loop\n");
             return 0;
         }
@@ -1236,7 +1236,7 @@ int is_loop_unrollable(IROLoop *loop)
         if (initializationType->integral == IT_CHAR || initializationType->integral == IT_SHORT ||
             initializationType->integral == IT_INT || initializationType->integral == IT_LONG ||
             initializationType->integral == IT_LONGLONG) {
-            if (IroDump_IsType1NodeType50(loop->init->u.diadic.right) != 0) {
+            if (IRO_IsIntConstant(loop->init->u.diadic.right) != 0) {
                 ENode *literal = loop->init->u.diadic.right->u.node;
                 if (!CInt64_GreaterEqual(literal->data.intval, qval_zero)) {
                     IroDump_Print("IsLoopUnrollable:No because initial value of induction is signed but > 0\n");
@@ -2604,7 +2604,7 @@ IROLoop *fn_0045faa0(IRONode *loop)
                             }
                             if (linear->type == IROLinearOp2Arg && linear->nodetype == ESHR &&
                                 (assignmentObject = IroDump_GetObjRef(linear->u.diadic.left)) != NULL &&
-                                IroDump_IsType1NodeType50(linear->u.diadic.right) != 0) {
+                                IRO_IsIntConstant(linear->u.diadic.right) != 0) {
                                 for (assignmentInduction = induction_variables; assignmentInduction != NULL;
                                      assignmentInduction = assignmentInduction->next) {
                                     if (assignmentInduction->var->object == assignmentObject) {
@@ -2618,7 +2618,7 @@ IROLoop *fn_0045faa0(IRONode *loop)
                                 IROLoopInd *comparisonInduction;
                                 if (linear->type == IROLinearOp2Arg && linear->nodetype == EAND &&
                                     (comparisonObject = IroDump_GetObjRef(linear->u.diadic.left)) != NULL &&
-                                    IroDump_IsType1NodeType50(linear->u.diadic.right) != 0) {
+                                    IRO_IsIntConstant(linear->u.diadic.right) != 0) {
                                     comparisonInduction = induction_variables;
                                     while (comparisonInduction != NULL && comparisonObject != NULL) {
                                         if (comparisonInduction->var->object == comparisonObject) {

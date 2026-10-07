@@ -2,12 +2,18 @@
 #define COMPILER_IROUTIL_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern VarRecord *IRO_GetTemp(IROExpr *expr);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean IRO_IsIntConstant(IROLinear *linear);
+#else
+extern unsigned int IRO_IsIntConstant(IROLinear *linear);
+#endif
 extern IROLinear *IroUtil_GetFirstLinear(IROLinear *p);
 extern IROLinear *IroUtil_AppendObjectRefAndUse(Object *obj, IROList *list);
 extern void IroUtil_InitList(IROList *state);

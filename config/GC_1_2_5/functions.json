@@ -8700,10 +8700,10 @@
     "source": "src/optimizer/IroUtil.c"
   },
   {
-    "name": "IroDump_IsType1NodeType50",
+    "name": "IRO_IsIntConstant",
     "address": "0x0044d4b0",
     "size": 26,
-    "source": "src/optimizer/IroDump.c"
+    "source": "src/optimizer/IroUtil.c"
   },
   {
     "name": "IroDump_IsPowerOfTwo",

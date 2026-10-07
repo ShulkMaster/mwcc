@@ -1461,7 +1461,7 @@ void simplify_diadic_constants(IROLinear *node)
         }
         changed = FALSE;
         if (fn_0044be00(left) == NULL && fn_0044be00(right) == NULL) {
-            if (IroDump_IsType1NodeType50(right) != 0 || IroUtil_IsTypeOneNodeTypeFiftyOne(right) != 0) {
+            if (IRO_IsIntConstant(right) != 0 || IroUtil_IsTypeOneNodeTypeFiftyOne(right) != 0) {
                 if (IroUtil_IsZeroConstant(right) != 0) {
                     switch (node->nodetype) {
                         case EADDV:
@@ -1612,7 +1612,7 @@ void simplify_diadic_constants(IROLinear *node)
                     }
                 }
             }
-            if (!changed && (IroDump_IsType1NodeType50(left) != 0 || IroUtil_IsTypeOneNodeTypeFiftyOne(left) != 0)) {
+            if (!changed && (IRO_IsIntConstant(left) != 0 || IroUtil_IsTypeOneNodeTypeFiftyOne(left) != 0)) {
                 if (IroUtil_IsZeroConstant(left) != 0) {
                     switch (node->nodetype) {
                         case EADDV:

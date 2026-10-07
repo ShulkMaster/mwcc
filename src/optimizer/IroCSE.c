@@ -848,7 +848,7 @@ void collect_expression_var_refs_and_flags(IROLinear *e, SInt32 flag)
             if (data_00551d6c[e->nodetype] != 0)
                 DAT_00587630 = 1;
             if (e->nodetype == EDIV || e->nodetype == EMODULO) {
-                if (IroDump_IsType1NodeType50(e->u.diadic.right) == 0 ||
+                if (IRO_IsIntConstant(e->u.diadic.right) == 0 ||
                     CInt64_Equal(e->u.diadic.right->u.node->data.intval, qval_zero) != 0) {
                     DAT_00587e58 = 1;
                 }
@@ -952,7 +952,7 @@ void IroCSE_0044f6a0(IROLinear *e, SInt32 flag)
                 return;
             }
             if ((UInt8)(e->nodetype - 0x0B) <= 1) {
-                if (IroDump_IsType1NodeType50(e->u.diadic.right) == 0 ||
+                if (IRO_IsIntConstant(e->u.diadic.right) == 0 ||
                     CInt64_Equal(e->u.diadic.right->u.node->data.intval, qval_zero) != 0) {
                     DAT_00587e58 = 1;
                 }
