@@ -540,6 +540,7 @@
   "_OS_Execute@24": "0x00412070",
   "_OS_FreeHandle@4": "0x004132f0",
   "_OS_GetCWD@4": "0x00411fb0",
+  "_OS_GetDirPtr@4": "0x00412320",
   "_OS_GetErrText@4": "0x004118f0",
   "_OS_GetFileTime@12": "0x00411a60",
   "_OS_GetHandleSize@8": "0x00413330",

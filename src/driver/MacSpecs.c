@@ -126,10 +126,16 @@ struct NameRegistryEntry *find_or_create_name_registry_entry(struct NameRegistry
 int store_mac_spec_entry(MacSpecEntry *entry)
 {
     unsigned int index = entry->index;
+#if VERSION >= VERSION_GC_2_7
+    unsigned int directory = index >> 8;
+#else
     unsigned int directory = index;
+#endif
     unsigned int slot = index & 0xff;
 
+#if VERSION < VERSION_GC_2_7
     directory >>= 8;
+#endif
     if (directory >= directory_count) {
         do {
             if (directory >= 0x100) {
@@ -158,7 +164,6 @@ struct MacSpecEntry *lookup_dir_id(unsigned int dirID)
     return mac_spec_entries[index][entryIndex];
 }
 
-/* A named entry and the table that owns its entry chain. */
 MacSpecEntry *find_or_create_child_entry(MacSpecEntry *table, char *name)
 {
     MacSpecEntry **link;
@@ -207,9 +212,16 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
     NameRegistryEntry *node;
     MacSpecEntry *rec;
     char *tok;
+#if VERSION >= VERSION_GC_2_7
+    char ch;
+#endif
 
     if (!fn_00412340(spec, buf, 0x104))
         return 0;
+#if VERSION >= VERSION_GC_2_7
+    if (!buf[0])
+        return 0;
+#endif
     end = OS_GetDirPtr(buf);
     strncpy(name, buf, end - buf);
     name[end - buf] = '\0';
@@ -221,13 +233,27 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
     rec = &node->root;
     p = str + 1;
     if (str[0] != '\\')
-        CLIO_ReportAssertionFailure("*pb == OS_PATHSEP", "MacSpecs.c", 0x108);
+        CLIO_ReportAssertionFailure("*pb == OS_PATHSEP", "MacSpecs.c",
+#if VERSION >= VERSION_GC_2_7
+                                    267
+#else
+                                    0x108
+#endif
+        );
     while (*p != '\0') {
         tok = p;
+#if VERSION >= VERSION_GC_2_7
+        while ((ch = *p) && ch != '\\')
+#else
         while (*p != '\0' && *p != '\\')
+#endif
             p++;
         *p = '\0';
         rec = find_or_create_child_entry(rec, tok);
+#if VERSION >= VERSION_GC_2_7
+        if ((Boolean)(ch == 0))
+            break;
+#endif
         p++;
         if (rec == NULL)
             return 0;
@@ -236,7 +262,7 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
     return 1;
 }
 
-void lookup_spec_and_advance_parent(int *id, int *kind, unsigned int **result)
+void lookup_spec_and_advance_parent(int *id, int *kind, MacSpecEntry **result)
 {
     NameRegistryEntry *node;
 
@@ -248,16 +274,16 @@ void lookup_spec_and_advance_parent(int *id, int *kind, unsigned int **result)
             node = node->next;
         }
         if (node != NULL) {
-            *result = (unsigned int *)&node->root;
+            *result = &node->root;
             *id = 1;
             *kind = 1;
         } else {
             *result = NULL;
         }
     } else {
-        *result = (unsigned int *)lookup_dir_id(*kind);
+        *result = lookup_dir_id(*kind);
         if (*result != NULL) {
-            MacSpecEntry *entry = (MacSpecEntry *)*result;
+            MacSpecEntry *entry = *result;
             MacSpecEntry *parent = entry->parent.entry;
             *kind = parent->index;
         }
@@ -275,11 +301,14 @@ int find_or_create_spec_entry_negated(char *input, unsigned int *firstResult, un
     return 0;
 }
 
-int build_name_and_backslash_path(int a, int b, void *buffer1, void *buffer2)
+int build_name_and_backslash_path(int a, int b, char *buffer1, char *buffer2)
 {
     int n;
-    unsigned int *arr[256];
-    unsigned int *val;
+    MacSpecEntry *arr[256];
+    MacSpecEntry *val;
+#if VERSION >= VERSION_GC_2_7
+    int len;
+#endif
     char *p;
     char *out1 = buffer1;
     char *out2 = buffer2;
@@ -295,18 +324,28 @@ int build_name_and_backslash_path(int a, int b, void *buffer1, void *buffer2)
     } while (val != NULL);
 
     if (n != 0) {
-        strcpy(out1, (char *)*arr[--n]);
+        strcpy(out1, arr[--n]->name);
     } else {
         *out1 = 0;
         *out2 = 0;
         return 0;
     }
 
-    *out2 = '\\';
-    p = out2 + 1;
+    p = out2;
+    *p++ = '\\';
     while (n--) {
-        strcpy(p, (char *)*arr[n]);
+#if VERSION >= VERSION_GC_2_7
+        len = strlen(arr[n]->name);
+        if ((p - out2) + len + 1 > 0x104) {
+            *p = 0;
+            return 0;
+        }
+        memcpy(p, arr[n]->name, len);
+        p += len;
+#else
+        strcpy(p, arr[n]->name);
         p += strlen(p);
+#endif
         *p++ = '\\';
     }
     *p = 0;
@@ -372,7 +411,6 @@ DWORD __stdcall fn_00413670(short kind, int value, char *path)
     return 0;
 }
 
-/* Unused lookup request declaration removed: no accesses or allocations. */
 int __stdcall MacSpecs_MakeOSSpec(CWFileSpec *record, char *buffer)
 {
     int result = fn_00413670(record->fileData.file.volumeRef, record->fileData.file.directoryId, buffer);
