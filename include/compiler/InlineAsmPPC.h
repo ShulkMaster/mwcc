@@ -124,6 +124,9 @@ extern SInt32 data_005652f8;
 extern unsigned int data_00587128;
 extern SInt32 asm_instruction_count;
 extern char inlineAsmMode;
+#if VERSION >= VERSION_GC_1_3
+extern Boolean InlineAsm_gccmode;
+#endif
 extern PCodeInstruction *create_pcode_asm_instruction(ParsedAsmInstruction *ia, SInt32 argcount, UInt8 flag);
 extern UInt8 inlineAsmPPCEnabled;
 extern struct PCodeOpcodeDescriptor gPCodeOpcodeDescriptors[];

@@ -12666,14 +12666,16 @@
     "size": 638
   },
   {
-    "name": "fn_004d41c0",
+    "name": "CPrepTokenizer_SkipQuotedLiteral",
     "address": "0x004d41c0",
-    "size": 251
+    "size": 251,
+    "source": "src/frontend/CPrepTokenizer.c"
   },
   {
-    "name": "fn_004d42c0",
+    "name": "skip_line",
     "address": "0x004d42c0",
-    "size": 156
+    "size": 156,
+    "source": "src/frontend/CPrepTokenizer.c"
   },
   {
     "name": "fn_004d4360",

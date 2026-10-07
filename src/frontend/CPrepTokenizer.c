@@ -23,6 +23,7 @@
 #include "compiler/CompilerTools.h"
 #include "compiler/DWARF.h"
 #include "compiler/Intrinsics.h"
+#include "compiler/InlineAsmPPC.h"
 #include "compiler/IroCSE.h"
 #include "compiler/IroLoop.h"
 #include "compiler/IroTransform.h"
@@ -1793,9 +1794,18 @@ Boolean CPrepTokenizer_SkipQuotedLiteral(UInt8 *p, SInt16 quote)
 {
     UInt8 c;
     UInt8 *q;
+#if VERSION < VERSION_GC_1_3
     UInt8 *f;
+#endif
+#if VERSION >= VERSION_GC_1_3
+    UInt8 *start = p - 1;
+#endif
 
+#if VERSION >= VERSION_GC_1_3
+    currentTextPosition = start;
+#else
     currentTextPosition = (p - 1);
+#endif
     for (;;) {
         q = p++;
         c = *q;
@@ -1818,6 +1828,10 @@ Boolean CPrepTokenizer_SkipQuotedLiteral(UInt8 *p, SInt16 quote)
                 break;
             case '\\':
                 if (copts.f6f != 0) {
+#if VERSION >= VERSION_GC_1_3
+                    if (CompilerTools_IsByteInDBCSCharacter(start, p - 1))
+                        break;
+#else
                     f = q = p - 1;
                     if (macro_expansion_depth == 0) {
                         while (*f != '\r' && f > (UInt8 *)PTR_00587fb0)
@@ -1828,6 +1842,7 @@ Boolean CPrepTokenizer_SkipQuotedLiteral(UInt8 *p, SInt16 quote)
                     }
                     if (CompilerTools_IsByteInDBCSCharacter(f, q))
                         break;
+#endif
                 }
                 q = p++;
                 c = *q;
@@ -1854,9 +1869,14 @@ Boolean CPrepTokenizer_SkipQuotedLiteral(UInt8 *p, SInt16 quote)
 
 unsigned char *skip_line(unsigned char *p)
 {
+#if VERSION < VERSION_GC_1_3
     unsigned char *q;
     unsigned char *start;
     unsigned char *back;
+#endif
+#if VERSION >= VERSION_GC_1_3
+    unsigned char *commentStart = p;
+#endif
 
     for (;;) {
         switch (*p++) {
@@ -1872,6 +1892,10 @@ unsigned char *skip_line(unsigned char *p)
                 return p;
             case '\\':
                 if (copts.f6f != 0) {
+#if VERSION >= VERSION_GC_1_3
+                    if (CompilerTools_IsByteInDBCSCharacter(commentStart, p - 1))
+                        break;
+#else
                     start = p;
                     back = start;
                     q = --back;
@@ -1885,12 +1909,25 @@ unsigned char *skip_line(unsigned char *p)
                     }
                     if (CompilerTools_IsByteInDBCSCharacter(q, start))
                         break;
+#endif
                 }
-                if (*p == '\r')
+                if (*p == '\r') {
                     p++;
+#if VERSION >= VERSION_GC_1_3
+                    CPrep_IncrementCountersAndUpdateTextOffset();
+#endif
+                }
                 if (*p == '\n')
                     p++;
                 break;
+#if VERSION >= VERSION_GC_1_3
+            case '"':
+                if (InlineAsm_gccmode) {
+                    data_0058851a = '\r';
+                    return p - 1;
+                }
+                break;
+#endif
         }
     }
 }

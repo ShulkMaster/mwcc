@@ -1630,5 +1630,11 @@
   "_BE_symbol_Init": "0x004d04d0",
   "_BE_symbol_GetSymbolOrderTail": "0x004d04c0",
   "_symbol_order_tail": "0x005e6aa4",
-  "_data_0055da80": "0x005dca98"
+  "_data_0055da80": "0x005dca98",
+  "_CPrepTokenizer_SkipQuotedLiteral": "0x004d41c0",
+  "_skip_line": "0x004d42c0",
+  "_data_0058851a": "0x005e73e0",
+  "_InlineAsm_gccmode": "0x005e7403",
+  "_CompilerTools_IsByteInDBCSCharacter": "0x004422b0",
+  "_CPrep_IncrementCountersAndUpdateTextOffset": "0x0043d350"
 }

@@ -1752,5 +1752,11 @@
   "_symbol_tail": "0x005eea50",
   "_symbol_order_tail": "0x005eea54",
   "_data_005884aa": "0x005ef232",
-  "_data_0055da80": "0x005e0af8"
+  "_data_0055da80": "0x005e0af8",
+  "_CPrepTokenizer_SkipQuotedLiteral": "0x004d5590",
+  "_skip_line": "0x004d5690",
+  "_data_0058851a": "0x005ef398",
+  "_InlineAsm_gccmode": "0x005ef3bb",
+  "_CompilerTools_IsByteInDBCSCharacter": "0x00442210",
+  "_CPrep_IncrementCountersAndUpdateTextOffset": "0x0043d2b0"
 }
