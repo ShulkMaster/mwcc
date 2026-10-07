@@ -1610,5 +1610,6 @@
   "_CInt64_LessEqual": "0x004c2560",
   "_CInt64_Shr": "0x004c28d0",
   "_CInt64_ModU": "0x004c29b0",
-  "_CInt64_DivU": "0x004c2b90"
+  "_CInt64_DivU": "0x004c2b90",
+  "_copts": "0x005e70e2"
 }
