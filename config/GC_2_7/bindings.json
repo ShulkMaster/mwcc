@@ -1,4 +1,6 @@
 {
+  "_CWGetAccessPathListInfo@8": "0x0041ec10",
+  "_CWParserPluginsPrivate_CallFileOperationCallback@8": "0x0041c780",
   "_CExpr2_ReturnNode": "0x004bebb0",
   "_CLT_filesp": "0x005eeca0",
   "_CLT_filestack": "0x005eec50",

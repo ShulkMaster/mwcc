@@ -2,6 +2,7 @@
 #define DRIVER_TOOLHELPERS_CC_H
 
 #include <setjmp.h>
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/CLAccessPaths.h"
 
@@ -9,13 +10,6 @@
 extern "C" {
 #endif
 
-#pragma pack(push, 1)
-struct QueryValues {
-    int firstValue;
-    int secondValue;
-    char reserved[4];
-};
-#pragma pack(pop)
 union RecoveryPathFrame {
     OSPathBuffer copy;
     unsigned char bytes[324];
@@ -35,7 +29,11 @@ extern SInt32 ToolHelpers_cc_AddProjectEntry(OSSpec *path, SInt16 mode, char *na
 extern UInt8 data_00587e26;
 extern UInt8 data_00587e27;
 extern UInt8 data_00587e28;
+#if VERSION >= VERSION_GC_2_7
+extern int ToolHelpers_cc_AddAccessPath(char *spec, SInt16 use_first, int value, unsigned char option);
+#else
 extern int ToolHelpers_cc_AddAccessPath(char *spec, char use_first, int value, unsigned char option);
+#endif
 extern void ToolHelpers_cc_PassVirtualFileValuePair(char *fileData, struct StorageHandle **virtualFile);
 extern void ToolHelpers_cc_CallFileInfoForDirectory(OSSpec *input);
 extern int data_00587e04;

@@ -95,6 +95,16 @@ struct CWPluginPrivateContext {
 };
 typedef struct CWPluginPrivateContext *CWPluginContext;
 #pragma options align = reset
+#pragma pack(push, 1)
+struct CWAccessPathListInfo {
+    SInt32 systemPathCount;
+    SInt32 userPathCount;
+    Boolean alwaysSearchUserPaths;
+    Boolean convertPaths;
+};
+#pragma pack(pop)
+extern unsigned int __stdcall CWGetAccessPathListInfo(CWPluginPrivateContext *context,
+                                                      struct CWAccessPathListInfo *pathListInfo);
 struct CachedOpcodeMetadata {
     const char *operand_format;
     unsigned int unknown_04;

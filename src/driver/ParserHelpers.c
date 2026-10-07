@@ -134,13 +134,22 @@ int ParserHelpers_ParsePathList(char *path, char separator, char alternateSepara
     unsigned char plus;
     char component[260];
     char resolved[260];
+#if VERSION >= VERSION_GC_2_7
+    SInt16 path_type = (Boolean)(option == 1) | (mode == 0 ? 0 : 2);
+#endif
     plus = *path == '+';
     if (plus) {
         ++path;
     }
     if ((separator == ':' || alternateSeparator == ':') && Utils_IsAlpha(*path) != 0 && path[1] == ':' &&
         OS_MakePathSpec(NULL, path, resolved) == 0) {
-        result = ToolHelpers_cc_AddAccessPath(resolved, option, flags, plus ^ toggle);
+        result = ToolHelpers_cc_AddAccessPath(resolved,
+#if VERSION >= VERSION_GC_2_7
+                                              path_type,
+#else
+                                              option,
+#endif
+                                              flags, plus ^ toggle);
     } else {
         if (strchr(path, separator) == NULL) {
             separator = alternateSeparator;
@@ -161,7 +170,13 @@ int ParserHelpers_ParsePathList(char *path, char separator, char alternateSepara
                 report_environment_variable_message(Targets_ReportFormattedMessage, mode == 1 ? name : NULL, 45,
                                                     component);
             } else {
-                ToolHelpers_cc_AddAccessPath(resolved, option, flags, plus ^ toggle);
+                ToolHelpers_cc_AddAccessPath(resolved,
+#if VERSION >= VERSION_GC_2_7
+                                             path_type,
+#else
+                                             option,
+#endif
+                                             flags, plus ^ toggle);
             }
             if (*path != 0) {
                 ++path;

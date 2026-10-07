@@ -14,15 +14,10 @@ struct CommandLineArguments {
 };
 #pragma pack(push, 1)
 struct FileOperationInfo {
-    union {
-        CWFileSpec fileReference;
-        struct {
-            char reserved[70];
-            int value;
-        } selection;
-    } file;
-    char option_a;
-    char useSecondValue;
+    CWFileSpec pathSpec;
+    SInt32 position;
+    Boolean recursive;
+    UInt8 type;
 };
 #pragma pack(pop)
 struct IntegerSequenceResult {

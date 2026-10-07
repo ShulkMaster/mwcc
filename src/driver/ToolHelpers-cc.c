@@ -215,7 +215,11 @@ SInt32 ToolHelpers_cc_AddProjectEntry(OSSpec *path, SInt16 mode, char *name, Boo
     return result;
 }
 
+#if VERSION >= VERSION_GC_2_7
+int ToolHelpers_cc_AddAccessPath(char *spec, SInt16 use_first, int value, unsigned char option)
+#else
 int ToolHelpers_cc_AddAccessPath(char *spec, char use_first, int value, unsigned char option)
+#endif
 {
     int status;
     int result;
@@ -224,43 +228,55 @@ int ToolHelpers_cc_AddAccessPath(char *spec, char use_first, int value, unsigned
     char option_b;
     unsigned int update_status;
     FileOperationInfo info;
-    char path_buffer[324];
-    struct QueryValues values;
-    CLProj_MakeOSSpecFromPath(spec, NULL, 0, (OSSpec *)path_buffer);
-    status = MacSpecs_MakeCWFileSpecFromString(path_buffer, &info.file.fileReference);
+    OSSpec path_spec;
+    struct CWAccessPathListInfo values;
+#if VERSION >= VERSION_GC_2_7
+    if ((status = CLProj_MakeOSSpecFromPath(spec, NULL, 0, &path_spec)) ||
+        (status = MacSpecs_MakeCWFileSpecFromString((char *)&path_spec, &info.pathSpec))) {
+#else
+    CLProj_MakeOSSpecFromPath(spec, NULL, 0, &path_spec);
+    status = MacSpecs_MakeCWFileSpecFromString((char *)&path_spec, &info.pathSpec);
     if (status != 0) {
-        Targets_ReportOperatingSystemError(45, status, fn_00412340(path_buffer, data_005880e0, 260));
+#endif
+        Targets_ReportOperatingSystemError(45, status, fn_00412340(path_spec.directory.path, data_005880e0, 260));
         result = 0;
     } else {
         if (value == -2) {
             selected_value = 0;
-            info.file.selection.value = selected_value;
-        } else if ((unsigned int)(value + 1) <= 1) {
-            info.file.selection.value = -1;
+            info.position = selected_value;
+        } else if (value == -1 || value == 0) {
+            info.position = -1;
         } else if (value == -1) {
-            query_status =
-                ((unsigned int(__stdcall *)(CWPluginPrivateContext *, struct QueryValues *))get_opcode_descriptor)(
-                    pluginPrivateContext, &values);
+            query_status = CWGetAccessPathListInfo(pluginPrivateContext, &values);
             if (query_status != 0) {
                 DAT_00543380 = "CWGetAccessPathListInfo";
                 longjmp(plugin_request_jmp_buf, query_status);
             }
+#if VERSION >= VERSION_GC_2_7
+            if ((use_first & 1) == 1) {
+#else
             if (use_first != 0) {
-                selected_value = values.firstValue;
+#endif
+                selected_value = values.systemPathCount;
             } else {
-                selected_value = values.secondValue;
+                selected_value = values.userPathCount;
             }
-            info.file.selection.value = selected_value;
+            info.position = selected_value;
         } else {
-            info.file.selection.value = value;
+            info.position = value;
         }
+#if VERSION >= VERSION_GC_2_7
+        info.type = (use_first & 1) ? 0 : 1;
+        info.type = info.type | (UInt8)((use_first & 2) ? 2 : 0);
+#else
         if (use_first != 0) {
             option_b = 0;
         } else {
             option_b = 1;
         }
-        info.useSecondValue = option_b;
-        info.option_a = option;
+        info.type = option_b;
+#endif
+        info.recursive = option;
         update_status = CWParserPluginsPrivate_CallFileOperationCallback(pluginPrivateContext, &info);
         if (update_status != 0) {
             DAT_00543380 = "CWParserAddAccessPath";
