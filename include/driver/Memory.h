@@ -1,6 +1,7 @@
 #ifndef DRIVER_MEMORY_H
 #define DRIVER_MEMORY_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -34,7 +35,11 @@ extern unsigned short __stdcall Memory_AppendStorageHandle(const void *a0, Stora
 extern unsigned short __stdcall fn_00413b50(StorageHandle *a0, StorageHandle *a1);
 extern void __stdcall fn_00413a00(struct StorageHandle *data);
 extern void __stdcall Memory_FreeHandle(StorageHandle *record);
+#if VERSION >= VERSION_GC_2_7
+extern void __stdcall fn_00413a50(StorageHandle *handle);
+#else
 extern void __stdcall fn_00413a50(void *entry);
+#endif
 extern SInt32 __stdcall Memory_GetHandleSize(struct StorageHandle *a0);
 extern void __stdcall Memory_ResizeStorageHandle(struct StorageHandle *a0, unsigned int a1);
 

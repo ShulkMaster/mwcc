@@ -23,6 +23,13 @@
 
 typedef char **Handle;
 
+#if VERSION >= VERSION_GC_2_7
+int RegisterLibImporterResources(void)
+{
+    return 1;
+}
+#endif
+
 void format_message_and_longjmp()
 {
     CompilerTools_FormatMessageAndLongjmp(0xd, -0x6c);

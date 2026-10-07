@@ -138,7 +138,11 @@ void **copy_resource_by_name(char *name)
             fn_00413a00(handle);
             memcpy(handle->data, (resources = (Resource *)driverTool[11])[index].data,
                    (resources = (Resource *)driverTool[11])[index].size);
+#if VERSION >= VERSION_GC_2_7
+            fn_00413a50(handle);
+#else
             fn_00413a50((void **)handle);
+#endif
             return (void **)handle;
         }
     }

@@ -6,9 +6,12 @@
   },
   "matching": [
     "src/driver/CLProj.c",
+    "src/driver/CLStaticPlugins.c",
     "src/driver/CWParserPluginsPrivate.c",
     "src/driver/CWPluginsPrivate.c",
     "src/driver/DropInCompilerLinkerPrivate.c",
+    "src/driver/Memory.c",
+    "src/frontend/Unmangle.c",
     "src/msl/ansi_files.c",
     "src/msl/ansi_files_g.c",
     "src/msl/ansifp_x86.c",
@@ -41,6 +44,9 @@
     "src/runtime/maincrt.c"
   ],
   "content_literal_sources": [
-    "src/frontend/Unmangle.c"
+    "src/frontend/Unmangle.c",
+    "src/frontend/CPrep.c",
+    "src/frontend/CPreprocess.c",
+    "src/driver/libimp-eabi-ppc.c"
   ]
 }

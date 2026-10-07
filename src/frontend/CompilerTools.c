@@ -1252,22 +1252,21 @@ void resolve_file_name_to_pascal_string(short category, int recordId, void *inpu
 }
 #pragma auto_inline reset
 
-void CompilerTools_ResolveFileNameToCString(void *destination, PFile *record, SInt32 *result)
+void CompilerTools_ResolveFileNameToCString(void *destination, CWFileSpec *record, SInt32 *result)
 {
     RecordQuery query;
     if (result) {
-        query.name = record->header.fileData.file.name;
-        query.kind = record->header.fileData.file.volumeRef;
-        query.value = record->header.fileData.file.directoryId;
+        query.name = record->fileData.file.name;
+        query.kind = record->fileData.file.volumeRef;
+        query.value = record->fileData.file.directoryId;
         query.flags = 0;
         if (Files_UpdateRecordQuery(&query) == 0)
             *result = query.result;
         else
             *result = 0;
     }
-    copy_pstring(destination, record->header.fileData.file.name);
-    resolve_file_name_to_pascal_string(record->header.fileData.file.volumeRef, record->header.fileData.file.directoryId,
-                                       destination);
+    copy_pstring(destination, record->fileData.file.name);
+    resolve_file_name_to_pascal_string(record->fileData.file.volumeRef, record->fileData.file.directoryId, destination);
     CLIO_ConvertPascalToCString(destination);
 }
 

@@ -563,6 +563,11 @@ struct OptionEntry {
 #pragma options align = mac68k
 struct PFile {
     CWFileSpec header; /* 0x00: fn_004401b0 copies the resolved file specification */
+#if VERSION >= VERSION_GC_2_7
+    HashNameNode *nameNode;
+    SInt32 fileModDate;
+    SInt32 lineOffset;
+#endif
     char *textstart;
     SInt32 textlength;
     SInt32 linenumber;
@@ -571,9 +576,17 @@ struct PFile {
     UInt8 fileIDAlignment; /* 0x57: fn_004401b0 clears whole PFile; unused byte aligns the following SInt16 fileID */
     SInt16 fileID;
     Boolean recordbrowseinfo;
-    UInt8 unusedBytes[3]; /* 0x5b: fn_004401b0 clears these bytes with the whole PFile; no member reads or writes */
+    UInt8 unusedBytes[3]; /* 0x5b legacy, 0x67 GC 2.7: cleared with the whole PFile; no member reads or writes */
     Boolean isDefault;
 };
+#if VERSION >= VERSION_GC_2_7 && defined(__MWERKS__)
+typedef char PFileGC27SizeCheck[(sizeof(struct PFile) == 0x6c) ? 1 : -1];
+typedef char PFileGC27NameCheck[(offsetof(struct PFile, nameNode) == 0x46) ? 1 : -1];
+typedef char PFileGC27DateCheck[(offsetof(struct PFile, fileModDate) == 0x4a) ? 1 : -1];
+typedef char PFileGC27LineOffsetCheck[(offsetof(struct PFile, lineOffset) == 0x4e) ? 1 : -1];
+typedef char PFileGC27TextCheck[(offsetof(struct PFile, textstart) == 0x52) ? 1 : -1];
+typedef char PFileGC27FileIDCheck[(offsetof(struct PFile, fileID) == 0x64) ? 1 : -1];
+#endif
 #pragma options align = reset
 #pragma options align = mac68k
 struct PragmaNode {
@@ -591,8 +604,10 @@ struct PragmaSettings {
 struct PrepNameCacheEntry {
     struct PrepNameCacheEntry *next;
     struct PFile *name;
+#if VERSION < VERSION_GC_2_7
     HashNameNode *value;
     SInt32 auxiliaryValue;
+#endif
 };
 #pragma options align = reset
 struct PrepTokenBuffer {
@@ -717,6 +732,9 @@ extern SInt32 line_count;
 extern struct BufferedToken *bufferedTokenPosition;
 extern UInt8 *token_start;
 extern struct PFile *currentPFile;
+#if VERSION >= VERSION_GC_2_7
+extern PFile *data_005df25c;
+#endif
 extern UInt8 *cprep_cu;
 extern char *macro_text_start;
 extern short current_file_index;
@@ -764,7 +782,7 @@ extern unsigned int __stdcall CPrep_GetResultValues(CWPluginPrivateContext *hand
                                                     UInt32 *second_value);
 extern unsigned int __stdcall CPrep_InvokeCompilerCallback(CWPluginPrivateContext *instance_id,
                                                            struct FileProcessingInfo *argument, const char *value);
-extern HashNameNode *fn_00441850(PFile *a0, SInt32 *a1);
+extern HashNameNode *fn_00441850(CWFileSpec *file, SInt32 *fileModDate);
 extern struct Macro data_0054fd08;
 extern struct Macro data_0054fd1c;
 extern struct Macro data_0054fd30;

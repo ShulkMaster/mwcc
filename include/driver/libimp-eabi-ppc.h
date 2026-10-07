@@ -1,12 +1,17 @@
 #ifndef DRIVER_LIBIMP_EABI_PPC_H
 #define DRIVER_LIBIMP_EABI_PPC_H
 
+#include "version.h"
 #include <setjmp.h>
 #include "compiler/common.h"
 #include "compiler/InlineAsmPPC.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#if VERSION >= VERSION_GC_2_7
+extern int RegisterLibImporterResources(void);
 #endif
 
 struct ConfigurationBlock116 {

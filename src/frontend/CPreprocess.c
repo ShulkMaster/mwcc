@@ -633,6 +633,57 @@ static inline void CPreprocess_AppendLineBreak(void)
         CompilerTools_AppendGListData(&DAT_00586da8.list, &UCHAR_0Dh_00563350, 2);
 }
 
+#if VERSION >= VERSION_GC_2_7
+void CPreprocess_EmitLineDirective(char emitNewline)
+{
+    char buffer[512];
+    SInt32 fileValue;
+    NameBuf fileName;
+    UInt16 fileTag;
+    int length;
+
+    if (DAT_00586da8.handle != NULL && current_file_index >= 0) {
+        if (DAT_00586da8.list.size > 0 &&
+            ((data_00588470 != 0 && emitNewline) ||
+             (*DAT_00586da8.list.data)[DAT_00586da8.list.size - 1] != UCHAR_0Dh_00563350[1]))
+            CompilerTools_AppendGListString(&DAT_00586da8.list, UCHAR_0Dh_00563350);
+
+        if (CPreprocess_ShouldEmitLineDirectives())
+            length = sprintf(buffer, "#line %ld\t\"", DAT_00587ef0);
+        else
+            length = sprintf(buffer, "/* #line %ld\t\"", DAT_00587ef0);
+        CompilerTools_AppendGListData(&DAT_00586da8.list, buffer, length);
+
+        if (copts.f8c != 0) {
+            if (currentPFile->nameNode != NULL) {
+                CompilerTools_AppendGListData(&DAT_00586da8.list, currentPFile->nameNode->name,
+                                              strlen(currentPFile->nameNode->name));
+            } else {
+                CompilerTools_ResolveFileNameToCString(buffer, &currentPFile->header, &fileValue);
+                CompilerTools_AppendGListData(&DAT_00586da8.list, buffer, strlen(buffer));
+            }
+        } else {
+            if (currentPFile->nameNode != NULL) {
+                char *name = currentPFile->nameNode->name + strlen(currentPFile->nameNode->name);
+                while (name > currentPFile->nameNode->name && !strchr("/\\:", name[-1]))
+                    name--;
+                CompilerTools_AppendGListData(&DAT_00586da8.list, name, strlen(name));
+            } else {
+                CompilerTools_GetPFileFields(&currentPFile->header, &fileTag, &fileValue, &fileName.len);
+                CompilerTools_AppendGListData(&DAT_00586da8.list, fileName.name, fileName.len);
+            }
+        }
+
+        length = sprintf(buffer, "\"\t/* stack depth %ld */", current_file_index);
+        CompilerTools_AppendGListData(&DAT_00586da8.list, buffer, length);
+
+        if (CPreprocess_ShouldEmitLineDirectives() && emitNewline)
+            CPreprocess_AppendLineBreak();
+
+        data_00588470 = 1;
+    }
+}
+#else
 void CPreprocess_EmitLineDirective(void)
 {
     char buffer[512];
@@ -652,7 +703,7 @@ void CPreprocess_EmitLineDirective(void)
         CompilerTools_AppendGListData(&DAT_00586da8.list, buffer, length);
 
         if (copts.f8c != 0) {
-            CompilerTools_ResolveFileNameToCString(buffer, currentPFile, &fileValue);
+            CompilerTools_ResolveFileNameToCString(buffer, &currentPFile->header, &fileValue);
             CompilerTools_AppendGListData(&DAT_00586da8.list, buffer, strlen(buffer));
         } else {
             CompilerTools_GetPFileFields(&currentPFile->header, &fileTag, &fileValue, &fileName.len);
@@ -668,6 +719,7 @@ void CPreprocess_EmitLineDirective(void)
         data_00588470 = 1;
     }
 }
+#endif
 
 void fn_004d6ed0(void)
 {

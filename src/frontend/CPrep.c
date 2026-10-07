@@ -49,6 +49,9 @@
 #include "driver/CLPlugins.h"
 #include "driver/CWParserPluginsPrivate.h"
 #include "driver/CWPluginsPrivate.h"
+#if VERSION >= VERSION_GC_2_7
+#include "driver/cc-eabi-ppc.h"
+#endif
 #include "driver/Files.h"
 #include "driver/Memory.h"
 #include "msl/time_g.h"
@@ -1032,6 +1035,103 @@ struct CNameRef evaluate_unary_expression_value(void)
 #pragma sym reset
 
 #pragma sym on
+#if VERSION >= VERSION_GC_2_7
+void parse_line_directive(void)
+{
+    char filename[256];
+    short ch;
+    short length;
+    DropinFileCallback input;
+    SInt32 fileModDate;
+    SInt32 lineOffset;
+    HashNameNode *fileName;
+
+    data_0057f9dd = 1;
+    if (CPrep_ScanMacroExpandedChar() == 0) {
+        Boolean save = data_005884fd;
+        data_005884fd = 0;
+        DAT_0057f9dc = 1;
+        CError_ReportError(ERR_UNEXPECTED_END_LINE);
+        data_005884fd = save;
+        return;
+    }
+    if (CPrepTokenizer_ScanToken() != -1) {
+        Boolean save = data_005884fd;
+        data_005884fd = 0;
+        DAT_0057f9dc = 1;
+        CError_ReportError(ERR_PREPROCESSOR_SYNTAX_ERROR);
+        data_005884fd = save;
+        CPrepTokenizer_SkipToEndOfLine();
+        return;
+    }
+    DAT_00587ef0 = intconst_lo - 1;
+    if (CPrep_ScanMacroExpandedChar() == 0) {
+        fileName = data_0057f94a[current_file_index]->nameNode;
+        if (fileName == NULL)
+            fileName = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
+        strncpy(filename, fileName->name, 255);
+        filename[255] = 0;
+    } else {
+        ch = CPrepTokenizer_NextChar();
+        if (ch != '"') {
+            Boolean save = data_005884fd;
+            data_005884fd = 0;
+            DAT_0057f9dc = 1;
+            CError_ReportError(ERR_PREPROCESSOR_SYNTAX_ERROR);
+            data_005884fd = save;
+            CPrepTokenizer_SkipToEndOfLine();
+            return;
+        }
+        length = 0;
+        for (ch = CPrepTokenizer_NextChar(); ch != '"' && ch != 0; ch = CPrepTokenizer_NextChar()) {
+            if (length > 252) {
+                Boolean save = data_005884fd;
+                data_005884fd = 0;
+                DAT_0057f9dc = 1;
+                CError_ReportError(ERR_STRING_TOO_LONG);
+                data_005884fd = save;
+                CPrepTokenizer_SkipToEndOfLine();
+                return;
+            }
+            filename[length++] = ch;
+        }
+        filename[length] = 0;
+        if (CPrep_ScanMacroExpandedChar() != 0) {
+            Boolean save = data_005884fd;
+            data_005884fd = 0;
+            DAT_0057f9dc = 1;
+            CError_ReportError(ERR_END_LINE_EXPECTED);
+            data_005884fd = save;
+            CPrepTokenizer_SkipToEndOfLine();
+        }
+    }
+    memset(&input, 0, sizeof(input));
+    input.enableDependencyLookup = 1;
+    input.suppressFileReferenceLookup = 0;
+    input.searchOption = 1;
+    input.fileKey = 0xffffffff;
+    if (CWPluginsPrivate_CallSignatureCallback(compiler_plugin_cu.context, filename, &input) == 0) {
+        CompilerTools_ResolveFileNameToCString(filename, &input.output, &fileModDate);
+        lineOffset = data_0057f94a[current_file_index]->linenumber - DAT_00587ef0;
+    } else {
+        if (copts.fa1) {
+            Boolean save = data_005884fd;
+            data_005884fd = 0;
+            DAT_0057f9dc = 1;
+            CError_Warning(ERR_FILE_CANNOT_OPENED, filename);
+            data_005884fd = save;
+        }
+        lineOffset = 0;
+    }
+    data_0057f94a[current_file_index]->nameNode = GetHashNameNodeExport(filename);
+    data_0057f94a[current_file_index]->lineOffset = lineOffset;
+    data_0057f94a[current_file_index]->linenumber = DAT_00587ef0;
+    if (copts.filesyminfo && ((CPrepCU *)cprep_cu)->precompiling == 0)
+        fn_0048b160(data_0057f94a[current_file_index]->nameNode, fileModDate, 1);
+    if (DAT_0058850f && !copts.f8a)
+        CPreprocess_EmitLineDirective(0);
+}
+#else
 void parse_line_directive(void)
 {
     unsigned char filename[256];
@@ -1040,7 +1140,7 @@ void parse_line_directive(void)
     HashNameNode *oldFile;
     HashNameNode *newFile;
 
-    oldFile = fn_00441850(data_0057f94a[current_file_index], NULL);
+    oldFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
     data_0057f9dd = 1;
     if (CPrep_ScanMacroExpandedChar() == 0) {
         Boolean save = data_005884fd;
@@ -1091,7 +1191,7 @@ void parse_line_directive(void)
     CompilerTools_ConvertCStringToPString(filename);
     CompilerTools_MakeCWFileSpecFromPString(data_0057f94a[current_file_index], filename);
     if (copts.filesyminfo != 0 && cprep_cu[0xe0] == 0) {
-        newFile = fn_00441850(data_0057f94a[current_file_index], NULL);
+        newFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
         if (oldFile != newFile) {
             oldFile = !current_file_index ? NULL : oldFile;
             fn_0048b090(oldFile, newFile);
@@ -1106,6 +1206,7 @@ void parse_line_directive(void)
         CPrepTokenizer_SkipToEndOfLine();
     }
 }
+#endif
 #pragma sym reset
 
 /* Hash-bucket link for an include name. */
@@ -3947,8 +4048,50 @@ void CPrep_GetFOI(FOI *location, BufferedToken *record)
 
 /* Cached values associated with preprocessing names. */
 
-/* Cached name and the pair of values returned by fn_00441850. */
+/* Files already registered with the symbol information writer. */
 
+#if VERSION >= VERSION_GC_2_7
+void fn_0043f1f0(FOI *name)
+{
+    PrepNameCacheEntry *entry;
+    PrepNameCacheEntry *newEntry;
+    PFile *currentName;
+
+    if ((currentName = name->file) == NULL)
+        return;
+    if (currentName == data_0057f94a[0]) {
+        if (DAT_005875f8 == NULL)
+            return;
+        if (((CPrepCU *)cprep_cu)->precompiling != 1)
+            fn_0048b160(NULL, 0, 0);
+        DAT_005875f8 = NULL;
+        return;
+    }
+    if (DAT_005875f8 == currentName)
+        return;
+    for (entry = DAT_0057f9ca; entry != NULL; entry = entry->next) {
+        if (currentName == entry->name) {
+            if (((CPrepCU *)cprep_cu)->precompiling != 1)
+                fn_0048b160(entry->name->nameNode, entry->name->fileModDate, 0);
+            DAT_005875f8 = name->file;
+            return;
+        }
+    }
+    if (currentName == data_005df25c) {
+        if (((CPrepCU *)cprep_cu)->precompiling != 1)
+            fn_0048b160(data_005df25c->nameNode, data_005df25c->fileModDate, 0);
+        DAT_005875f8 = name->file;
+        return;
+    }
+    newEntry = galloc(sizeof(PrepNameCacheEntry));
+    newEntry->next = DAT_0057f9ca;
+    DAT_0057f9ca = newEntry;
+    newEntry->name = name->file;
+    if (((CPrepCU *)cprep_cu)->precompiling != 1)
+        fn_0048b160(newEntry->name->nameNode, newEntry->name->fileModDate, 1);
+    DAT_005875f8 = name->file;
+}
+#else
 void fn_0043f1f0(FOI *name)
 {
     PrepNameCacheEntry *entry;
@@ -3985,15 +4128,42 @@ void fn_0043f1f0(FOI *name)
     newEntry->next = DAT_0057f9ca;
     DAT_0057f9ca = newEntry;
     newEntry->name = name->file;
-    value = fn_00441850(newEntry->name, &newEntry->auxiliaryValue);
+    value = fn_00441850(&newEntry->name->header, &newEntry->auxiliaryValue);
     newEntry->value = value;
     if (*(cprep_cu + 0xe0) != '\x01') {
         fn_0048b160(newEntry->value, newEntry->auxiliaryValue, 1);
     }
     DAT_005875f8 = name->file;
 }
+#endif
 
 #pragma sym on
+#if VERSION >= VERSION_GC_2_7
+void CPrep_PopFile(void)
+{
+    if (current_file_index < 0)
+        return;
+    fn_0041b7f0(((CPrepCU *)cprep_cu)->context, currentPFile->textstart);
+    currentPFile->textstart = NULL;
+    if (data_005df25c != NULL && data_005df25c->textstart != NULL) {
+        fn_0041b7f0(compiler_plugin_cu.context, data_005df25c->textstart);
+        data_005df25c->textstart = NULL;
+        data_005df25c = NULL;
+    }
+    --current_file_index;
+    if (current_file_index >= 0) {
+        currentPFile = data_0057f94a[current_file_index];
+        PTR_00587fb0 = currentPFile->textstart;
+        textend = (UInt8 *)currentPFile->textstart + currentPFile->textlength;
+        currentTextPosition = (UInt8 *)PTR_00587fb0 + currentPFile->pos;
+        DAT_00587ef0 = currentPFile->linenumber;
+        data_0057f9dd = currentPFile->hasprepline;
+        data_00588524 = 1;
+    }
+    if (DAT_0058850f != 0 && copts.f8a == 0)
+        CPreprocess_EmitLineDirective(1);
+}
+#else
 void CPrep_PopFile(void)
 {
     PFile *input;
@@ -4018,6 +4188,7 @@ void CPrep_PopFile(void)
         CPreprocess_EmitLineDirective();
 }
 
+#endif
 #pragma sym reset
 void fn_0043f3b0(short warningCode)
 {
@@ -4608,6 +4779,9 @@ unsigned char fn_004401b0(unsigned char *name, unsigned char mode, unsigned char
         if ((skip != 0 || data_0057f9d3 != 0) && input.callbackState != 0)
             return 1;
         node.header = input.output;
+#if VERSION >= VERSION_GC_2_7
+        node.nameNode = fn_00441850(&input.output, &node.fileModDate);
+#endif
         if (input.fileReference != NULL) {
             if ((int)input.referenceKind == 1) {
                 node.textstart = (char *)input.fileReference;
@@ -4688,7 +4862,14 @@ unsigned char fn_004401b0(unsigned char *name, unsigned char mode, unsigned char
     PTR_00587fb0 = currentPFile->textstart;
     textend = (UInt8 *)currentPFile->textstart + currentPFile->textlength;
     if (DAT_0058850f != 0 && copts.f8a == 0)
+#if VERSION >= VERSION_GC_2_7
+        CPreprocess_EmitLineDirective(1);
+#else
         CPreprocess_EmitLineDirective();
+#endif
+#if VERSION >= VERSION_GC_2_7
+    data_005df25c = NULL;
+#endif
     return 1;
 }
 #pragma sym reset
@@ -5155,9 +5336,9 @@ int CPrep_AppendStringBounded(char *dst, char *src, int size)
     return 0;
 }
 
-HashNameNode *fn_00441850(PFile *file, SInt32 *position)
+HashNameNode *fn_00441850(CWFileSpec *file, SInt32 *fileModDate)
 {
     char fileName[256];
-    CompilerTools_ResolveFileNameToCString(fileName, file, position);
+    CompilerTools_ResolveFileNameToCString(fileName, file, fileModDate);
     return GetHashNameNode(fileName);
 }

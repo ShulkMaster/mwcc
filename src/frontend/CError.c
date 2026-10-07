@@ -678,7 +678,7 @@ void CError_FormatAndReportDiagnostic(int errorCode, const char *format, char *a
                         continue;
                     case 'f':
                         pfile = va_arg(args, PFile *);
-                        file = fn_00441850(pfile, &position);
+                        file = fn_00441850(&pfile->header, &position);
                         CError_BufferAppendString(&eb, file->name);
                         fmt += 2;
                         continue;

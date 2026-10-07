@@ -24,7 +24,11 @@ extern void output_escaped_wide_chars(UInt16 *data, SInt16 count);
 #else
 extern void output_escaped_wide_chars(char *data, SInt16 count);
 #endif
+#if VERSION >= VERSION_GC_2_7
+extern void CPreprocess_EmitLineDirective(char emitNewline);
+#else
 extern void CPreprocess_EmitLineDirective(void);
+#endif
 extern void fn_004d6ed0(void);
 extern char auto_string[];
 extern char DAT_00563388[];

@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/Memory.h"
 #include "compiler/win32.h"
@@ -99,6 +100,17 @@ void __stdcall fn_00413a40(struct StorageHandle *handle)
     fn_00413a00(handle);
 }
 
+#if VERSION >= VERSION_GC_2_7
+void __stdcall fn_00413a50(StorageHandle *handle)
+{
+    if (handle) {
+        memory_error = 0;
+        fn_004129c0(&handle->buffer);
+    } else {
+        memory_error = -109;
+    }
+}
+#else
 void __stdcall fn_00413a50(void *entry)
 {
     StorageHandle *record = entry;
@@ -109,6 +121,8 @@ void __stdcall fn_00413a50(void *entry)
         memory_error = -109;
     }
 }
+
+#endif
 
 SInt32 __stdcall Memory_GetHandleSize(struct StorageHandle *handle)
 {

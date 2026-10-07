@@ -314,8 +314,14 @@ void Unmangle_UnmangleName(char *name, char *out, UInt32 size)
             return;
         }
     }
+#if VERSION >= VERSION_GC_2_7
+    p = name;
+    templ = 0;
+    for (;; p++) {
+#else
     templ = 0;
     for (p = name;; p++) {
+#endif
         switch (*p) {
             case 0:
                 break;

@@ -100,7 +100,8 @@ def main():
         f"build build/{version}/report.json: report | build/{version}/ok build/tools/objdiff-cli",
         f"build all_source: phony {' '.join(objects)}",
         f"build progress: phony build/{version}/report.json",
-        "build build.ninja: configure | configure.py config/sources.json",
+        # Function ownership and version-specific Matching status are configuration inputs too.
+        f"build build.ninja: configure | configure.py {configs}",
         f"default build/{version}/ok",
         "",
     ]

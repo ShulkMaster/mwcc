@@ -1036,7 +1036,11 @@ NameTableEntry *create_data_block(char *name, const void *source, unsigned int s
         memset(end, 0, size);
         end += size;
     }
+#if VERSION >= VERSION_GC_2_7
+    fn_00413a50(block->handles.storage.destination);
+#else
     fn_00413a50(block->handles.preference.source);
+#endif
     block->next = NULL;
     return block;
 }

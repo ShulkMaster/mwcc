@@ -1,3 +1,4 @@
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/cc-eabi-ppc-mw.h"
 #include "compiler/InlineAsmPPC.h"
@@ -244,10 +245,13 @@ int fn_0040c060(void)
     return ClientGlue_CreateAndAddPlugin(&PTR_fn_0054a05c, &PTR_fn_0054a080);
 }
 
+#if VERSION < VERSION_GC_2_7
 unsigned int fn_0040c070(void)
 {
     return 1U;
 }
+
+#endif
 
 struct DriverLookupEntry *find_driver_lookup_entry(int key)
 {

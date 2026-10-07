@@ -1,6 +1,7 @@
 #ifndef DRIVER_CC_EABI_PPC_MW_H
 #define DRIVER_CC_EABI_PPC_MW_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -69,7 +70,9 @@ extern unsigned char data_00549fd4[];
 extern int __stdcall set_list_link_next(struct ListLink *link);
 extern unsigned int __stdcall fn_0040c050(struct ListLink *link);
 extern unsigned char data_0054a014[];
+#if VERSION < VERSION_GC_2_7
 extern unsigned int fn_0040c070(void);
+#endif
 extern struct DriverLookupEntry *find_driver_lookup_entry(int key);
 extern unsigned int fn_0040bed0(void);
 extern int fn_0040c060(void);

@@ -583,7 +583,11 @@ void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 
                                     goto bad2;
                                 memcpy(*hand, buf + fpos, *(signed *)&val);
                             }
+#if VERSION >= VERSION_GC_2_7
+                            fn_00413a50((StorageHandle *)hand);
+#else
                             fn_00413a50(hand);
+#endif
                             if (refs[j].nameOffset != 0xffff) {
                                 str = names + refs[j].nameOffset;
                                 name = (unsigned char *)malloc(*str + 1);

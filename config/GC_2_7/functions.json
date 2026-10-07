@@ -753,14 +753,16 @@
     "source": "src/driver/StaticParserGlue.c"
   },
   {
-    "name": "fn_00405360",
+    "name": "CLStaticPlugins_SetIdentifiers",
     "address": "0x00405360",
-    "size": 21
+    "size": 21,
+    "source": "src/driver/CLStaticPlugins.c"
   },
   {
-    "name": "fn_00405380",
+    "name": "fn_004053a0",
     "address": "0x00405380",
-    "size": 21
+    "size": 21,
+    "source": "src/driver/CLStaticPlugins.c"
   },
   {
     "name": "fn_004053c0",
@@ -1802,9 +1804,10 @@
     "source": "src/driver/cc-eabi-ppc-mw.c"
   },
   {
-    "name": "fn_0040c240",
+    "name": "RegisterLibImporterResources",
     "address": "0x0040c240",
-    "size": 6
+    "size": 6,
+    "source": "src/driver/libimp-eabi-ppc.c"
   },
   {
     "name": "fn_0040c250",
@@ -3025,9 +3028,10 @@
     "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414460",
+    "name": "Memory_GetError",
     "address": "0x00414460",
-    "size": 7
+    "size": 7,
+    "source": "src/driver/Memory.c"
   },
   {
     "name": "Memory_NewHandle",
@@ -3042,44 +3046,52 @@
     "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_004144e0",
+    "name": "Memory_FreeHandle",
     "address": "0x004144e0",
-    "size": 61
+    "size": 61,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414520",
+    "name": "fn_00413a00",
     "address": "0x00414520",
-    "size": 51
+    "size": 51,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414560",
+    "name": "fn_00413a40",
     "address": "0x00414560",
-    "size": 13
+    "size": 13,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414570",
+    "name": "fn_00413a50",
     "address": "0x00414570",
-    "size": 44
+    "size": 44,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_004145a0",
+    "name": "Memory_GetHandleSize",
     "address": "0x004145a0",
-    "size": 66
+    "size": 66,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_004145f0",
+    "name": "Memory_ResizeStorageHandle",
     "address": "0x004145f0",
-    "size": 58
+    "size": 58,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414630",
+    "name": "Memory_AppendStorageHandle",
     "address": "0x00414630",
-    "size": 63
+    "size": 63,
+    "source": "src/driver/Memory.c"
   },
   {
-    "name": "fn_00414670",
+    "name": "fn_00413b50",
     "address": "0x00414670",
-    "size": 47
+    "size": 47,
+    "source": "src/driver/Memory.c"
   },
   {
     "name": "get_file_query_info_and_identifiers",
