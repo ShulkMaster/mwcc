@@ -1433,6 +1433,7 @@
   "_resize_mem_handle@12": "0x004267f0",
   "_resourceRegistrations": "0x005dc8e8",
   "_resource_error": "0x005dc5e2",
+  "_resource_string_buffer": "0x005dc7e8",
   "_restrict_name": "0x005ab4c4",
   "_root_class_layout": "0x005e315e",
   "_rtti_offset_table_head": "0x005e4168",

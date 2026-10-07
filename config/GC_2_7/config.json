@@ -15,6 +15,7 @@
     "src/driver/Help.c",
     "src/driver/Memory.c",
     "src/driver/ParserGlue-eabi-ppc-cc.c",
+    "src/driver/ResourceStrings.c",
     "src/driver/StaticParserGlue.c",
     "src/driver/Utils.c",
     "src/driver/cc-eabi-ppc-mw.c",
@@ -59,6 +60,7 @@
     "src/frontend/CABI.c",
     "src/driver/CLFiles.c",
     "src/driver/StaticParserGlue.c",
-    "src/driver/CLWriteObjectFile.c"
+    "src/driver/CLWriteObjectFile.c",
+    "src/driver/ResourceStrings.c"
   ]
 }

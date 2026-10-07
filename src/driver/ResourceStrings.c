@@ -3,8 +3,13 @@
 #include "driver/ResourceStrings.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "version.h"
 
-#include <stdio.h>
+#if VERSION >= VERSION_GC_2_7
+#define FORMAT_RESOURCE_STRING(...) snprintf(resource_string_buffer, 256, __VA_ARGS__)
+#else
+#define FORMAT_RESOURCE_STRING(...) sprintf(resource_string_buffer, __VA_ARGS__)
+#endif
 
 int ResourceStrings_AddResource(char *resourceData, short resourceId, char **resourceValue)
 {
@@ -34,13 +39,13 @@ char *ResourceStrings_GetString(short id, short index)
         if (id == resourceRegistrations[i].resourceId) {
             j = 0;
             if (index < 0) {
-                sprintf(resource_string_buffer, "[Illegal string index #%d in list '%s' (%d)]", index,
+                FORMAT_RESOURCE_STRING("[Illegal string index #%d in list '%s' (%d)]", index,
                         resourceRegistrations[i].data, id);
                 return resource_string_buffer;
             }
             while (j <= index) {
                 if (resourceRegistrations[i].value[j] == NULL) {
-                    sprintf(resource_string_buffer, "[String #%d not found in resource '%s' (%d)]", index + 1,
+                    FORMAT_RESOURCE_STRING("[String #%d not found in resource '%s' (%d)]", index + 1,
                             resourceRegistrations[i].data, id);
                     return resource_string_buffer;
                 }
