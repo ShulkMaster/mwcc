@@ -21,6 +21,7 @@
 #include "compiler/CScope.h"
 #include "compiler/CTemplateFunc.h"
 #include "compiler/CTemplateTools.h"
+#include "compiler/CodeGen.h"
 #include "compiler/CompilerTools.h"
 #include "compiler/DWARF.h"
 #include "compiler/InlineAsmPPC.h"
@@ -73,20 +74,59 @@ HashNameNode *COptimizer_GetFunctionObject(Object *obj)
             return NULL;
     }
 }
+#if VERSION >= VERSION_GC_2_7
+static void CMangler_AppendTemplateArgumentList(CTStateElem *list);
+static void CMangler_CheckTemplateArguments(CTStateElem *list)
+{
+    ENode *expression;
+
+    for (; list != NULL; list = list->next) {
+        if (list->pid.type == 1) {
+            if ((expression = list->argument.expression) == NULL)
+                CError_FATAL(360);
+            if (expression->rtype->type != TYPETEMPLDEPEXPR) {
+                switch (expression->type) {
+                    case EINTCONST:
+                        break;
+                    case EOBJREF:
+                        (void)COptimizer_GetFunctionObject(expression->data.objref);
+                        break;
+                    default:
+                        CError_FATAL(383);
+                }
+            }
+        }
+    }
+}
+#endif
+
 HashNameNode *CMangler_GetLinkName(Object *obj)
 {
     NameSpace *nspace;
     HashNameNode *result;
 
+#if VERSION >= VERSION_GC_2_7
+    if (obj->u.func.inst != NULL)
+        CMangler_CheckTemplateArguments(obj->u.func.inst->templateArguments);
+    for (nspace = obj->nspace; nspace != NULL; nspace = nspace->parent) {
+        if (nspace->name != NULL)
+            break;
+    }
+#else
     nspace = obj->nspace;
     while (nspace != NULL && nspace->name == NULL)
         nspace = nspace->parent;
+#endif
     data_00583548.size = 0;
     if (is_pascal_object(obj) && (nspace == NULL || nspace->theclass == NULL))
         return obj->name;
     if ((obj->qual & Q_MANGLE_NAME) != 0 &&
         (memcmp("main", obj->name->name, 5) != 0 || obj->nspace != registration_context)) {
+#if VERSION >= VERSION_GC_2_7
+        mangle_function_name(obj, nspace);
+#else
         mangle_function_name(obj->name, nspace, obj->type);
+#endif
         AppendGListByte(&data_00583548, 0);
     } else {
         return obj->name;
@@ -97,6 +137,58 @@ HashNameNode *CMangler_GetLinkName(Object *obj)
     return (HashNameNode *)result;
 }
 
+#if VERSION >= VERSION_GC_2_7
+void mangle_function_name(Object *obj, NameSpace *chain)
+{
+    TypeFunc *func = TYPE_FUNC(obj->type);
+    TypeClass *cls;
+    FuncArg *arg = func->args;
+    UInt32 qual;
+
+    CompilerTools_AppendGListString(&data_00583548, obj->name->name);
+    if (obj->u.func.inst != NULL) {
+        if ((func->flags & FUNC_CONVERSION) != 0)
+            mangle_type(func->functype, func->qual);
+        CMangler_AppendTemplateArgumentList(obj->u.func.inst->templateArguments);
+    }
+    CompilerTools_AppendGListString(&data_00583548, "__");
+
+    while (chain != NULL && chain->name == NULL)
+        chain = chain->parent;
+
+    if (chain != NULL) {
+        mangle_qualified_name(chain->parent, chain->name->name);
+        if ((cls = chain->theclass) != NULL) {
+            if (obj->name == destructor_name) {
+                CompilerTools_AppendGListString(&data_00583548, "Fv");
+                return;
+            }
+
+            if (arg != NULL) {
+                if (obj->name == constructor_name) {
+                    arg = arg->next;
+                    if (arg != NULL && (cls->flags & CLASS_HAS_VBASES) != 0)
+                        arg = arg->next;
+                } else if ((func->flags & FUNC_METHOD) != 0 && !TYPE_METHOD(func)->is_static) {
+                    qual = arg->qual;
+                    if (qual & Q_CONST)
+                        AppendGListByte(&data_00583548, 'C');
+                    if (qual & Q_VOLATILE)
+                        AppendGListByte(&data_00583548, 'V');
+                    arg = arg->next;
+                }
+            }
+        }
+    }
+
+    AppendGListByte(&data_00583548, 'F');
+    mangle_args(arg);
+    if (obj->u.func.inst != NULL && copts.new_mangler) {
+        AppendGListByte(&data_00583548, '_');
+        mangle_type(func->functype, func->qual);
+    }
+}
+#else
 void mangle_function_name(HashNameNode *name, NameSpace *chain, Type *func)
 {
     TypeClass *cls;
@@ -140,6 +232,7 @@ void mangle_function_name(HashNameNode *name, NameSpace *chain, Type *func)
     AppendGListByte(&data_00583548, 'F');
     mangle_args(TYPE_FUNC(func)->args);
 }
+#endif
 void mangle_args(FuncArg *args)
 {
     TypePointer tptr;
@@ -362,8 +455,37 @@ void mangle_type(Type *type, UInt32 flags)
                 case IT_LONGDOUBLE:
                     AppendGListByte(&data_00583548, 'r');
                     return;
+#if VERSION >= VERSION_GC_2_7
+                case 17:
+                    AppendGListByte(&data_00583548, '0');
+                    return;
+                case 18:
+                    AppendGListByte(&data_00583548, '1');
+                    return;
+                case 19:
+                    AppendGListByte(&data_00583548, '2');
+                    return;
+                case 20:
+                    AppendGListByte(&data_00583548, '3');
+                    return;
+                case 21:
+                    AppendGListByte(&data_00583548, '4');
+                    return;
+                case 22:
+                    AppendGListByte(&data_00583548, '5');
+                    return;
+                case 23:
+                    AppendGListByte(&data_00583548, '6');
+                    return;
+                case 24:
+                    AppendGListByte(&data_00583548, '7');
+                    return;
+                default:
+                    CError_FATAL(619);
+#else
                 default:
                     CError_FATAL(544);
+#endif
             }
         case TYPEENUM:
             MangleQualifiers(flags);
@@ -469,7 +591,11 @@ void mangle_type(Type *type, UInt32 flags)
                         CompilerTools_AppendGListString(&data_00583548, "class");
                         return;
                     default:
+#if VERSION >= VERSION_GC_2_7
+                        CError_FATAL(701);
+#else
                         CError_FATAL(626);
+#endif
                 }
             }
             return;
@@ -485,7 +611,11 @@ void mangle_type(Type *type, UInt32 flags)
             CompilerTools_AppendGListString(&data_00583548, "1T");
             return;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(716);
+#else
             CError_FATAL(641);
+#endif
             return;
     }
 }
@@ -558,33 +688,6 @@ static HashNameNode *CMangler_LinkName(Object *obj)
             return NULL;
     }
 }
-
-#if VERSION >= VERSION_GC_2_7
-static void CMangler_AppendTemplateArgumentList(CTStateElem *list);
-static void CMangler_CheckTemplateArguments(CTStateElem *list)
-{
-    ENode *expression;
-
-    for (; list != NULL; list = list->next) {
-        if (list->pid.type == 1) {
-            if ((expression = list->argument.expression) == NULL)
-                CError_FATAL(360);
-            if (expression->rtype->type != TYPETEMPLDEPEXPR) {
-                switch (expression->type) {
-                    case EINTCONST:
-                        break;
-                    case EOBJREF:
-                        (void)COptimizer_GetFunctionObject(expression->data.objref);
-                        break;
-                    default:
-                        CError_FATAL(383);
-                }
-            }
-        }
-    }
-}
-
-#endif
 
 /* TODO: [near miss] GC 2.7 ~99.90%: initial validator register test. */
 HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *list)
@@ -816,7 +919,7 @@ char *CMangler_GetOperator(HashNameNode *name)
         return "operator=";
     }
     operatorCode = name->name;
-    if (memcmp(name->name, &operator_new_name, 5) == 0) {
+    if (memcmp(operatorCode, &operator_new_name, 5) == 0) {
         return "operator new";
     }
     if (memcmp(operatorCode, &delete_operator_name, 5) == 0) {

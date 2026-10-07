@@ -2,6 +2,7 @@
 #define COMPILER_CMANGLER_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,7 +10,11 @@ extern "C" {
 
 extern HashNameNode *COptimizer_GetFunctionObject(Object *obj);
 extern HashNameNode *CMangler_GetLinkName(Object *obj);
+#if VERSION >= VERSION_GC_2_7
+extern void mangle_function_name(Object *obj, NameSpace *chain);
+#else
 extern void mangle_function_name(HashNameNode *name, NameSpace *chain, Type *func);
+#endif
 extern void mangle_args(FuncArg *args);
 extern void fn_004c2ac0(Type *type, SInt32 flag);
 extern HashNameNode *CMangler_ConversionFuncName(Type *type, UInt32 qual);
