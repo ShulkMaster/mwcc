@@ -397,12 +397,12 @@ void instantiate_object_type(TemplateContext *context, TemplateClassDeclaration 
         if (IS_TYPE_FUNC(currentFunction->type) && (TYPE_FUNC(currentFunction->type)->flags & 0x400)) {
             currentFunction = (Object *)currentFunction->u.templateFunction;
             CError_ASSERT(1671, currentFunction != NULL);
-            CError_ASSERT(1672, !context->modes.processingArgument);
-            context->modes.processingArgument = 1;
-            context->parameterNIndex = ((TypeBitfield *)((TemplateFunction *)currentFunction)->params)->offset;
+            CError_ASSERT(1672, !context->processingArgument);
+            context->processingArgument = 1;
+            context->parameterNIndex = ((TemplateFunction *)currentFunction)->params->pid.nindex;
             OBJECT(object)->type =
                 CTemplateTools_ResolveType((TemplateContext *)context, OBJECT(object)->type, &OBJECT(object)->qual);
-            context->modes.processingArgument = 0;
+            context->processingArgument = 0;
             CError_ASSERT(1677, IS_TYPE_FUNC(OBJECT(object)->type));
             TYPE_FUNC(OBJECT(object)->type)->flags |= 0x400;
             return;
@@ -424,7 +424,14 @@ void instantiate_object_type(TemplateContext *context, TemplateClassDeclaration 
                         CScope_AddObject(context->instance->nspace, OBJECT(object)->name, (ObjBase *)OBJECT(object));
                     }
                 }
-                if ((TYPE_FUNC(OBJECT(object)->type)->flags & FUNC_IS_DTOR) && context->hasNewVBases) {
+                if ((TYPE_FUNC(OBJECT(object)->type)->flags &
+#if VERSION >= VERSION_GC_1_3
+                     FUNC_IS_CTOR
+#else
+                     FUNC_IS_DTOR
+#endif
+                     ) &&
+                    context->hasNewVBases) {
                     FuncArg *argument;
                     CError_ASSERT(1710, TYPE_FUNC(OBJECT(object)->type)->args != NULL);
                     argument = CParser_NewFuncArg();
@@ -498,8 +505,14 @@ void instantiate_template_object(TemplateContext *ctx, Object *templ)
                 CError_FATAL(1574);
             if (obj->base.u.func.u != NULL || obj->base.u.func.defargdata != NULL)
                 CError_FATAL(1575);
-            if ((((TypeFunc *)obj->base.type)->flags & FUNC_IS_DTOR) != 0 && ctx->hasNewVBases != 0 &&
-                matchingInstance == NULL) {
+            if ((((TypeFunc *)obj->base.type)->flags &
+#if VERSION >= VERSION_GC_1_3
+                 FUNC_IS_CTOR
+#else
+                 FUNC_IS_DTOR
+#endif
+                 ) != 0 &&
+                ctx->hasNewVBases != 0 && matchingInstance == NULL) {
                 FuncArg *arg;
                 if (((TypeFunc *)obj->base.type)->args == NULL)
                     CError_FATAL(1581);
@@ -588,8 +601,8 @@ void CTemplateClass_0051c680(TemplateContext *ctx, Object *obj)
     newobj->u.templateFunction = copy;
     newobj->nspace = ctx->instance->nspace;
 
-    CError_ASSERT(1465, ctx->modes.processingArgument == 0);
-    ctx->modes.processingArgument = 1;
+    CError_ASSERT(1465, ctx->processingArgument == 0);
+    ctx->processingArgument = 1;
     ctx->parameterNIndex = ((TemplateParameterRecord *)list->params)->depth;
 
     if (found != NULL) {
@@ -602,12 +615,19 @@ void CTemplateClass_0051c680(TemplateContext *ctx, Object *obj)
         newobj->type =
             (Type *)CTemplateTools_ResolveType((TemplateContext *)ctx, (Type *)newobj->type, (UInt32 *)&newobj->qual);
     }
-    ctx->modes.processingArgument = 0;
+    ctx->processingArgument = 0;
 
     CError_ASSERT(1477, newobj->type->type == TYPEFUNC);
     ((TypeFunc *)newobj->type)->flags |= 0x400;
 
-    if ((((TypeFunc *)newobj->type)->flags & FUNC_IS_DTOR) != 0 && ctx->hasNewVBases != 0 && found == NULL) {
+    if ((((TypeFunc *)newobj->type)->flags &
+#if VERSION >= VERSION_GC_1_3
+         FUNC_IS_CTOR
+#else
+         FUNC_IS_DTOR
+#endif
+         ) != 0 &&
+        ctx->hasNewVBases != 0 && found == NULL) {
         CError_ASSERT(1484, ((TypeFunc *)newobj->type)->args != NULL);
         arg = CParser_NewFuncArg();
         arg->type = (Type *)&stsignedshort;

@@ -8,6 +8,7 @@
 #include "compiler/CPrec.h"
 #include "compiler/CPrep.h"
 #include "compiler/CTemplateNew.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,6 +120,9 @@ struct TemplateClassMatch {
     struct ClassTemplateSpecialization *candidate;
 };
 #pragma pack(pop)
+#if VERSION >= VERSION_GC_1_3
+#pragma pack(push, 2)
+#endif
 struct TemplateContext {
     struct TypeClass *templateClass;
     struct TypeClass *instance;
@@ -127,16 +131,17 @@ struct TemplateContext {
     struct CTStateElem *
         instanceArgs; /* 0x0c: CTemplateFunc.c initializes from state->slots and bindingList; CTemplateClass.c uses classInstance->targs */
     struct TemplateInstantiationMapping *mappings;
-    union {
-        short reserved;
-        struct {
-            unsigned char processingClassTypes;
-            unsigned char processingArgument;
-        } modes;
-    };
+    Boolean processingClassTypes;
+    Boolean processingArgument;
+#if VERSION >= VERSION_GC_1_3
+    Boolean suppressDependentDiagnostics;
+#endif
     char hasNewVBases;
     unsigned char parameterNIndex;
 };
+#if VERSION >= VERSION_GC_1_3
+#pragma pack(pop)
+#endif
 #pragma pack(push, 2)
 struct TemplateExpressionRecord {
     struct TemplateExpressionRecord *next; /* 0x00: CTemplateClass_AppendExpressionRecord links declarations */

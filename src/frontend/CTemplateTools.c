@@ -83,7 +83,7 @@ Type *CTemplTool_ResolveMemberSelfRefs(TypeClass *tclass, Type *type, UInt32 *qu
     TemplateContext state;
     memclrw(&state, sizeof(state));
     state.templateClass = tclass;
-    state.modes.processingClassTypes = 1;
+    state.processingClassTypes = 1;
     if (type->type == TYPEFUNC) {
         TypeFunc *function = (TypeFunc *)type;
         function->functype = CTemplateTools_ResolveType(&state, function->functype, &function->qual);
@@ -122,8 +122,7 @@ Type *CTemplateTools_ResolveType(TemplateContext *ctx, Type *type, UInt32 *qual)
         case TYPEENUM: {
             TypeClassExt800 *theclass;
             if (((TypeEnum *)type)->nspace->theclass != NULL &&
-                (((TypeEnum *)type)->nspace->theclass->flags & Q_VIRTUAL) != 0 &&
-                ctx->modes.processingClassTypes == 0) {
+                (((TypeEnum *)type)->nspace->theclass->flags & Q_VIRTUAL) != 0 && ctx->processingClassTypes == 0) {
                 CError_ASSERT(2103, ((TypeEnum *)type)->enumname);
                 theclass = find_corresponding_instance_class(ctx, ((TypeEnum *)type)->nspace->theclass);
                 CError_ASSERT(2105, theclass != NULL && theclass->base.type == TYPECLASS);
@@ -134,7 +133,7 @@ Type *CTemplateTools_ResolveType(TemplateContext *ctx, Type *type, UInt32 *qual)
             return type;
         }
         case TYPECLASS: {
-            if (ctx->modes.processingClassTypes == 0) {
+            if (ctx->processingClassTypes == 0) {
                 if ((((TypeClass *)type)->flags & Q_VIRTUAL) != 0) {
                     TypeClassExt800 *resolvedClass = find_corresponding_instance_class(ctx, (TypeClass *)type);
                     return (Type *)resolvedClass;
@@ -182,8 +181,12 @@ Type *CTemplateTools_ResolveType(TemplateContext *ctx, Type *type, UInt32 *qual)
             *memberPointer = *original;
             memberPointer->memberType = CTemplateTools_ResolveType(ctx, original->memberType, qual);
             memberPointer->owner.type = CTemplateTools_ResolveType(ctx, original->owner.type, qual);
-            if (memberPointer->owner.type->type != TYPECLASS && ctx->modes.processingClassTypes == 0 &&
-                ctx->modes.processingArgument == 0) {
+            if (memberPointer->owner.type->type != TYPECLASS && ctx->processingClassTypes == 0 &&
+                ctx->processingArgument == 0
+#if VERSION >= VERSION_GC_1_3
+                && !ctx->suppressDependentDiagnostics
+#endif
+            ) {
                 CError_ReportError(ERR_ILLEGAL_TEMPLATE_ARGUMENTS);
                 return memberPointer->memberType;
             }
@@ -272,7 +275,7 @@ FuncArg *CTemplateTools_005160b0(TemplateContext *ctx, FuncArg *args)
         }
         *tail = *args;
         tail->type = resolve_templ_dep_pointer_target(ctx, tail->type, &tail->qual);
-        if (ctx->modes.processingClassTypes == 0 && (copts.f96 == 0 || ctx->modes.processingArgument == 0)) {
+        if (ctx->processingClassTypes == 0 && (copts.f96 == 0 || ctx->processingArgument == 0)) {
             expression = tail->dexpr;
             if (expression == NULL)
                 isDependentExpression = 0;
@@ -302,7 +305,7 @@ Type *resolve_templ_dep_type(TemplateContext *ctx, TypeTemplDep *arg, UInt32 *ou
     CTStateElem *item;
     TypeClassTemplate *resolvedClass;
 
-    if (ctx->modes.processingClassTypes != 0) {
+    if (ctx->processingClassTypes != 0) {
         resolvedClass = CTemplTool_IsTemplate(arg);
         if (resolvedClass != NULL && &resolvedClass->base == ctx->templateClass)
             return (Type *)resolvedClass;
@@ -352,7 +355,7 @@ Type *resolve_templ_dep_type(TemplateContext *ctx, TypeTemplDep *arg, UInt32 *ou
     } else {
         switch (arg->kind) {
             case 0:
-                if (ctx->modes.processingArgument != 0 && arg->u.pid.nindex == ctx->parameterNIndex)
+                if (ctx->processingArgument != 0 && arg->u.pid.nindex == ctx->parameterNIndex)
                     return (Type *)arg;
                 item = find_template_argument(ctx, arg->u.pid);
                 CError_ASSERT(1887, item->pid.type != 0);
@@ -367,7 +370,7 @@ Type *resolve_templ_dep_type(TemplateContext *ctx, TypeTemplDep *arg, UInt32 *ou
                         return result;
                     CError_ReportError(ERR_NOT_STRUCT_UNION_CLASS_MEMBER, arg->u.qual.name->name);
                 } else {
-                    if ((ctx->modes.processingArgument != 0 || ctx->instance == NULL) && type->type == TYPETEMPLATE) {
+                    if ((ctx->processingArgument != 0 || ctx->instance == NULL) && type->type == TYPETEMPLATE) {
                         copy = galloc(sizeof(*copy));
                         *copy = *arg;
                         copy->u.qual.type = (TypeTemplDep *)type;
@@ -399,7 +402,10 @@ Type *resolve_templ_dep_type(TemplateContext *ctx, TypeTemplDep *arg, UInt32 *ou
                         base = (Type *)&stsignedchar;
                     base = CDecl_NewArrayType(base, base->size * (SInt32)resolvedSize->data.intval.lo);
                 } else {
-                    CError_ReportError(ERR_ILLEGAL_CONSTANT_EXPRESSION);
+#if VERSION >= VERSION_GC_1_3
+                    if (!ctx->suppressDependentDiagnostics)
+#endif
+                        CError_ReportError(ERR_ILLEGAL_CONSTANT_EXPRESSION);
                 }
                 return base;
             }
@@ -654,7 +660,7 @@ ENode *CTemplTool_DeduceExpr(TemplateContext *ctx, ENode *node)
         case EOBJLIST:
             switch (node->data.templatecomparison.tag) {
                 case 0:
-                    if (ctx->modes.processingArgument != 0 &&
+                    if (ctx->processingArgument != 0 &&
                         node->data.templatecomparison.u.wb.templateLevel == ctx->parameterNIndex) {
                         return CloneNode(node);
                     }
