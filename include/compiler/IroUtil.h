@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+extern VarRecord *IRO_GetTemp(IROExpr *expr);
 extern IROLinear *IroUtil_GetFirstLinear(IROLinear *p);
 extern IROLinear *IroUtil_AppendObjectRefAndUse(Object *obj, IROList *list);
 extern void IroUtil_InitList(IROList *state);

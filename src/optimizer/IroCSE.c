@@ -1,5 +1,6 @@
 #define CERROR_FILE "IroCSE.c"
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/IroCSE.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -190,8 +191,12 @@ void move_common_sub(IROExpr *group)
     } else {
         IroDump_Print("Moving common sub from node %d to %d\n", group->linear->index, nodes[splitIndex]->index);
         splitNode = IroUtil_GetLinearRangeStart(nodes[splitIndex]);
+#if VERSION >= VERSION_GC_1_3
+        IRO_GetTemp(group);
+#else
         group->temp = create_temp_object(group->linear->rtype);
         fn_0044ba70(group->temp, 1, 1);
+#endif
         IroCSE_ReplaceReference(group->linear, group->temp, group->linear);
         IroUtil_MoveExprBefore(group, splitNode);
         node = IrOptimizer_NewLinear(IROLinearOp2Arg);
@@ -212,8 +217,12 @@ void create_replacement_temp_assignment(IROExpr *replacement)
     IROLinear *conversion;
     IROLinear *assignment;
 
+#if VERSION >= VERSION_GC_1_3
+    IRO_GetTemp(replacement);
+#else
     replacement->temp = create_temp_object(replacement->linear->rtype);
     fn_0044ba70(replacement->temp, 1, 1);
+#endif
     reference = IrOptimizer_NewLinear(IROLinearOperand);
     reference->u.node = create_objectrefnode(replacement->temp);
     reference->rtype = reference->u.node->data.objref->type;
@@ -237,20 +246,9 @@ void create_replacement_temp_assignment(IROExpr *replacement)
     IroUtil_InsertLinearRangeAfter(reference, assignment, replacement->linear);
 }
 
-/* Makes EXPRESSION's temporary. */
-void IroCSE_CreateTemp(IROExpr *mapping)
-{
-    IROLinear *original;
-    Type *type;
-    Object *replacement;
-    Object *mappedObject;
-    original = mapping->linear;
-    type = original->rtype;
-    replacement = create_temp_object(type);
-    mapping->temp = replacement;
-    mappedObject = mapping->temp;
-    fn_0044ba70(mappedObject, 1U, 1U);
-}
+#if VERSION < VERSION_GC_1_3
+#include "IroGetTemp.inc"
+#endif
 
 /* 0x552bbc, file name string */
 /* 0x552bf0, message string */

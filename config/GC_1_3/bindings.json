@@ -1611,5 +1611,10 @@
   "_CInt64_Shr": "0x004c28d0",
   "_CInt64_ModU": "0x004c29b0",
   "_CInt64_DivU": "0x004c2b90",
-  "_copts": "0x005e70e2"
+  "_copts": "0x005e70e2",
+  "_data_005870f8": "0x005dc1e0",
+  "_DAT_00587e58": "0x005e73d2",
+  "_DAT_00587630": "0x005e7374",
+  "_IRO_GetTemp": "0x00467850",
+  "_create_temp_object": "0x004f4200"
 }

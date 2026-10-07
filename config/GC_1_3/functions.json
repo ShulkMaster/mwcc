@@ -8652,9 +8652,10 @@
     "size": 247
   },
   {
-    "name": "fn_00467850",
+    "name": "IRO_GetTemp",
     "address": "0x00467850",
-    "size": 39
+    "size": 39,
+    "source": "src/optimizer/IroUtil.c"
   },
   {
     "name": "fn_00467880",

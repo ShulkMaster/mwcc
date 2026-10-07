@@ -1731,5 +1731,9 @@
   "_CInt64_LessEqual": "0x004c36d0",
   "_CInt64_Shr": "0x004c3a40",
   "_CInt64_ModU": "0x004c3b20",
-  "_CInt64_DivU": "0x004c3d00"
+  "_CInt64_DivU": "0x004c3d00",
+  "_data_005870f8": "0x005e0238",
+  "_DAT_00587e58": "0x005ef38a",
+  "_DAT_00587630": "0x005ef32c",
+  "_IRO_GetTemp": "0x00468710"
 }

@@ -9150,10 +9150,10 @@
     "size": 247
   },
   {
-    "name": "IroCSE_CreateTemp",
+    "name": "IRO_GetTemp",
     "address": "0x00468710",
     "size": 39,
-    "source": "src/optimizer/IroCSE.c"
+    "source": "src/optimizer/IroUtil.c"
   },
   {
     "name": "IroCSE_0044e560",

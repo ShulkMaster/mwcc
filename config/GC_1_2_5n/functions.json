@@ -8796,7 +8796,7 @@
     "source": "src/optimizer/IroCSE.c"
   },
   {
-    "name": "IroCSE_CreateTemp",
+    "name": "IRO_GetTemp",
     "address": "0x0044e530",
     "size": 39,
     "source": "src/optimizer/IroCSE.c"

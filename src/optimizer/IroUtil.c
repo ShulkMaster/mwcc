@@ -1,5 +1,6 @@
 #define CERROR_FILE "IroUtil.c"
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/IroUtil.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -781,6 +782,10 @@ void fn_0044c6b0(IROLinear *object, unsigned int enabled)
         } while (node != NULL);
     }
 }
+
+#if VERSION >= VERSION_GC_1_3
+#include "IroGetTemp.inc"
+#endif
 
 IROLinear *IroUtil_GetFirstLinear(IROLinear *p)
 {

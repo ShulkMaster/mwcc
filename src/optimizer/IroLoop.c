@@ -2860,7 +2860,7 @@ void reduce_strength_and_move_loop_invariants(IRONode *func)
                     }
                 }
                 if (matched == 0 && entry->temp == NULL) {
-                    IroCSE_CreateTemp(entry);
+                    IRO_GetTemp(entry);
                     IroCSE_ReplaceReference(entry->linear, entry->temp, entry->linear);
                     IroUtil_MoveExprBefore(entry, loop_candidate_last);
                     IroCSE_CreateTempAssignment(entry);

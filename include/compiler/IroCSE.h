@@ -2,6 +2,7 @@
 #define COMPILER_IROCSE_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,18 +10,23 @@ extern "C" {
 
 #pragma options align = mac68k
 struct IROExpr {
+#if VERSION >= VERSION_GC_1_3
+    UInt8 state;
+#endif
     UInt16 index;
     struct IROLinear *linear;
     struct Object *temp;
     struct IRONode *node;
     struct BitVector *depends;
     struct IROExpr *use;
+#if VERSION < VERSION_GC_1_3
     UInt8 state;
-    UInt8
-        mayTrap; /* 0x17: fn_0044f230 copies DAT_00587e58 from IroCSE_0044f6a0 (unknown indirection or possibly zero divisor); IroLoop requires mustreach before hoisting */
-    UInt8
-        hasSideEffects; /* 0x18: fn_0044f230 copies DAT_00587630 from IroCSE_0044f6a0 (volatile access, effectful operator or call); IroCSE excludes these candidates */
-    UInt8 alignmentPadding; /* 0x19: fn_0044f230 leaves this byte unused; alignment before factor. */
+#endif
+    UInt8 mayTrap;
+    UInt8 hasSideEffects;
+#if VERSION < VERSION_GC_1_3
+    UInt8 alignmentPadding; /* Alignment before factor. */
+#endif
     struct IROLinear *factor;
     struct VarRecord *var;
     struct IROLinear *expr;
@@ -42,7 +48,6 @@ extern UInt8 nested_bitwise_type;
 extern void IRO_CommonSubs(void);
 extern void move_common_sub(IROExpr *group);
 extern void create_replacement_temp_assignment(IROExpr *replacement);
-extern void IroCSE_CreateTemp(IROExpr *mapping);
 extern void IroCSE_ComputeAvailableExpressions(void);
 extern void mark_dependent_exprs(IROLinear *node);
 extern void IroCSE_BuildLoopExprList(void);
@@ -59,12 +64,21 @@ extern void collect_expression_var_refs_and_flags(IROLinear *e, SInt32 flag);
 extern void IroCSE_0044e560(IROLinear *from, IROLinear *to);
 extern void IroCSE_ReplaceReference(IROLinear *target, Object *object, IROLinear *reference);
 extern void IroCSE_0044f6a0(IROLinear *e, SInt32 flag);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean DAT_00587630;
+extern Boolean DAT_00587e58;
+#else
 extern unsigned int DAT_00587630;
 extern int DAT_00587e58;
+#endif
 extern SInt32 DAT_005880a4;
 extern struct BitVector *data_00552b88;
 extern unsigned int expression_count;
+#if VERSION >= VERSION_GC_1_3
+extern Boolean data_005870f8;
+#else
 extern unsigned int data_005870f8;
+#endif
 extern struct IROExpr *expr_tail;
 extern struct IROExpr *expr_list;
 extern BitVector *killed_exprs;

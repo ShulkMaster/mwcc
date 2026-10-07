@@ -4352,7 +4352,7 @@
   "_fn_0044e340": "0x0044e340",
   "_fn_0044e360": "0x0044e360",
   "_IroCSE_CreateTempAssignment": "0x0044e470",
-  "_IroCSE_CreateTemp": "0x0044e530",
+  "_IRO_GetTemp": "0x0044e530",
   "_IroCSE_RemoveExpr": "0x0044f0b0",
   "_IroCSE_ClearExpr": "0x0044f1c0",
   "_fn_0044f230": "0x0044f230",
