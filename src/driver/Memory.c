@@ -8,10 +8,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-MemBuffer *Memory_GetSizeAddress(void *allocation)
+MemBuffer *Memory_GetSizeAddress(StorageHandle *allocation)
 {
-    MemBuffer *buffer = (MemBuffer *)allocation;
-    return (MemBuffer *)&buffer->size;
+    return &allocation->buffer;
 }
 
 unsigned int set_storage_handle_data(StorageHandle *handle, char *data)
@@ -35,23 +34,13 @@ StorageHandle *Memory_CreateStorageHandle(MemBuffer *input)
     return record;
 }
 
-void Memory_ExtractMemBuffer(void *input, MemBuffer *result)
+void Memory_ExtractMemBuffer(StorageHandle *handle, MemBuffer *result)
 {
     MemBuffer *buffer;
-    char *data;
-    MemBuffer *destination;
-    StorageHandle *handle;
-    StorageHandle *argument;
-    handle = input;
-    destination = result;
-    argument = handle;
-    buffer = Memory_GetSizeAddress(argument);
-    data = buffer->ptr;
-    buffer = (MemBuffer *)buffer->size;
-    destination->ptr = data;
-    destination->size = (UInt32)buffer;
-    argument = handle;
-    free(argument);
+
+    buffer = Memory_GetSizeAddress(handle);
+    *result = *buffer;
+    free(handle);
 }
 
 unsigned short Memory_GetError(void)

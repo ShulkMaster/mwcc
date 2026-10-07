@@ -2770,15 +2770,16 @@
     "size": 171
   },
   {
-    "name": "fn_00412c50",
+    "name": "fn_00412340",
     "address": "0x00412c50",
-    "size": 98
+    "size": 98,
+    "source": "src/driver/MsDos.c"
   },
   {
-    "name": "ClientGlue_DuplicateString",
+    "name": "MsDos_CopyStringToBuffer",
     "address": "0x00412cc0",
     "size": 98,
-    "source": "src/driver/ClientGlue.c"
+    "source": "src/driver/MsDos.c"
   },
   {
     "name": "fn_00412d30",
@@ -3469,24 +3470,28 @@
     "size": 6
   },
   {
-    "name": "fn_00417280",
+    "name": "xmalloc",
     "address": "0x00417280",
-    "size": 117
+    "size": 117,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_00417300",
+    "name": "xcalloc",
     "address": "0x00417300",
-    "size": 34
+    "size": 34,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_00417330",
+    "name": "xrealloc",
     "address": "0x00417330",
-    "size": 117
+    "size": 117,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_004173b0",
+    "name": "xstrdup",
     "address": "0x004173b0",
-    "size": 41
+    "size": 41,
+    "source": "src/driver/MemUtils.c"
   },
   {
     "name": "fn_004173e0",

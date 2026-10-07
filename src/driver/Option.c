@@ -3,6 +3,9 @@
 #include "driver/Option.h"
 #include "driver/CLIO.h"
 #include "driver/ClientGlue.h"
+#if VERSION >= VERSION_GC_2_7
+#include "driver/MemUtils.h"
+#endif
 #include "driver/Help.h"
 #include "driver/Parameter.h"
 #include "driver/ParserGlue-eabi-ppc-cc.h"
@@ -34,7 +37,11 @@ void push_option_arg(Option *opt, char *arg)
         if (Utils_MatchStringSegments(opt->names, arg, opt->avail & 4, 2))
             flags |= 0x80;
     }
+#if VERSION >= VERSION_GC_2_7
+    Option_Push(flags, opt, xstrdup(arg));
+#else
     Option_Push(flags, opt, ClientGlue_DuplicateString(arg));
+#endif
 }
 
 void fn_0041c1ae(char *destination)

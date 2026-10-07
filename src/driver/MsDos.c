@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/MsDos.h"
 #include "compiler/win32.h"
@@ -773,7 +774,11 @@ char *__stdcall MsDos_CopyStringToBuffer(char *source, char *buffer, unsigned in
     int length;
 
     if (capacity == 0) {
+#if VERSION >= VERSION_GC_2_7
+        capacity = 0x100;
+#else
         capacity = 0x40;
+#endif
     }
     if (buffer == NULL) {
         buffer = malloc(capacity);

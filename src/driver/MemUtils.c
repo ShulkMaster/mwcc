@@ -25,6 +25,48 @@
 #include <stdio.h>
 #include <setjmp.h>
 
+#if VERSION >= VERSION_GC_2_7
+void *__stdcall xmalloc(const char *what, int size)
+{
+    void *memory;
+
+    memory = malloc(size ? size : 1);
+    if (!memory) {
+        fprintf(stderr, "*** Out of memory when allocating %d bytes%s%s", size, what ? " for " : "", what ? what : "");
+        exit(-23);
+        return NULL;
+    }
+    return memory;
+}
+
+void *__stdcall xcalloc(const char *what, int size)
+{
+    void *memory;
+
+    memory = xmalloc(what, size);
+    memset(memory, 0, size);
+    return memory;
+}
+
+void *__stdcall xrealloc(const char *what, void *old, int size)
+{
+    void *memory;
+
+    memory = realloc(old, size ? size : 1);
+    if (!memory) {
+        fprintf(stderr, "*** Out of memory when resizing buffer to %d bytes%s%s", size, what ? " for " : "",
+                what ? what : "");
+        exit(-23);
+        return NULL;
+    }
+    return memory;
+}
+
+char *__stdcall xstrdup(const char *s)
+{
+    return strcpy(xmalloc(NULL, strlen(s) + 1), s);
+}
+#else
 void *xmalloc(const char *text, unsigned int size)
 {
     char message[80];
@@ -68,6 +110,8 @@ char *xstrdup(const char *s)
 {
     return strcpy(xmalloc(NULL, strlen(s) + 1), s);
 }
+
+#endif
 
 int __stdcall MemUtils_CallPluginEntry(Plugin *entry)
 {

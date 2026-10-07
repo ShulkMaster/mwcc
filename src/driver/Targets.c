@@ -12,6 +12,9 @@
 #include "driver/CWParserPluginsPrivate.h"
 #include "driver/CWPluginsPrivate.h"
 #include "driver/ClientGlue.h"
+#if VERSION >= VERSION_GC_2_7
+#include "driver/MemUtils.h"
+#endif
 #include "driver/Help.h"
 #include "driver/Memory.h"
 #include "driver/MsDos.h"
@@ -216,7 +219,11 @@ void append_coalesced_argument(short kind, char *text)
     entry = token_texts + coalesced_argument_count;
     entry->kind = kind;
     if (text) {
+#if VERSION >= VERSION_GC_2_7
+        entry->text = xstrdup(text);
+#else
         entry->text = ClientGlue_DuplicateString(text);
+#endif
     } else {
         entry->text = NULL;
     }
@@ -664,7 +671,11 @@ void append_text_to_ptrlist_item(struct PtrList *list, char *text)
     char *value = text;
     char **slot = &list->items[list->count];
     if (!*slot) {
+#if VERSION >= VERSION_GC_2_7
+        *slot = xstrdup(value);
+#else
         *slot = ClientGlue_DuplicateString(value);
+#endif
     } else {
         char *string = value;
         *slot = ToolHelpers_ResizeBuffer("command line", *slot, strlen(*slot) + strlen(string) + 1);

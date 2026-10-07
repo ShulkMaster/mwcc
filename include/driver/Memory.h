@@ -22,11 +22,11 @@ struct StorageHandle {
 struct StorageHandle;
 struct StorageHandle;
 extern unsigned short memory_error;
-extern MemBuffer *Memory_GetSizeAddress(void *a0);
+extern MemBuffer *Memory_GetSizeAddress(StorageHandle *allocation);
 extern unsigned int set_storage_handle_data(StorageHandle *a0, char *a1);
 extern unsigned short Memory_GetError(void);
 extern StorageHandle *Memory_CreateStorageHandle(MemBuffer *input);
-extern void Memory_ExtractMemBuffer(void *input, MemBuffer *result);
+extern void Memory_ExtractMemBuffer(StorageHandle *handle, MemBuffer *result);
 extern unsigned int Memory_NewHandle(unsigned int input);
 extern unsigned int fn_00413990(unsigned int operand, short *value);
 extern void __stdcall fn_00413a40(struct StorageHandle *a0);

@@ -1518,5 +1518,9 @@
   "_volatile_string": "0x005ab4b8",
   "_writtenEntry": "0x005ea7e4",
   "_written_entry_buckets": "0x005e305c",
-  "_wscanf_g_parse_format": "0x004220d0"
+  "_wscanf_g_parse_format": "0x004220d0",
+  "_xcalloc@8": "0x00417300",
+  "_xmalloc@8": "0x00417280",
+  "_xrealloc@12": "0x00417330",
+  "_xstrdup@4": "0x004173b0"
 }

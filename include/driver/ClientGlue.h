@@ -1,6 +1,7 @@
 #ifndef DRIVER_CLIENTGLUE_H
 #define DRIVER_CLIENTGLUE_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -12,7 +13,9 @@ struct PluginRequiredInputRecord {
 };
 extern int fn_004050e0(char *left, char *right, int count);
 extern int ClientGlue_CompareLowercaseStrings(const char *left, const char *right);
+#if VERSION < VERSION_GC_2_7
 extern char *ClientGlue_DuplicateString(const char *a0);
+#endif
 extern int __stdcall ClientGlue_AddResourceStrings(char *arg1, SInt16 arg2, char **arg3);
 extern void __stdcall ClientGlue_AddPlugin(PluginRequiredInputRecord *a0);
 extern int __stdcall ClientGlue_CreateAndAddPlugin(void *a0, void *a1);

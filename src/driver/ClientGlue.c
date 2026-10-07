@@ -47,6 +47,7 @@ int ClientGlue_CompareLowercaseStrings(const char *left, const char *right)
     return 0;
 }
 
+#if VERSION < VERSION_GC_2_7
 char *ClientGlue_DuplicateString(const char *a0)
 {
     unsigned int n;
@@ -58,6 +59,8 @@ char *ClientGlue_DuplicateString(const char *a0)
     }
     return p;
 }
+
+#endif
 
 int __stdcall ClientGlue_AddResourceStrings(char *arg1, SInt16 arg2, char **arg3)
 {
