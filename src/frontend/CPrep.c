@@ -62,7 +62,6 @@
 #include <stdio.h>
 
 #include <setjmp.h>
-#include <stddef.h>
 /* Declarations gathered from the merged files. */
 
 typedef void (*Callback)(BufferedToken *);
@@ -1035,17 +1034,26 @@ struct CNameRef evaluate_unary_expression_value(void)
 #pragma sym reset
 
 #pragma sym on
-#if VERSION >= VERSION_GC_2_7
 void parse_line_directive(void)
 {
+#if VERSION >= VERSION_GC_2_7
     char filename[256];
-    short ch;
-    short length;
+#else
+    unsigned char filename[256];
+#endif
+    SInt16 ch;
+    SInt16 length;
+#if VERSION >= VERSION_GC_2_7
     DropinFileCallback input;
     SInt32 fileModDate;
     SInt32 lineOffset;
     HashNameNode *fileName;
+#else
+    HashNameNode *oldFile;
+    HashNameNode *newFile;
 
+    oldFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
+#endif
     data_0057f9dd = 1;
     if (CPrep_ScanMacroExpandedChar() == 0) {
         Boolean save = data_005884fd;
@@ -1066,11 +1074,15 @@ void parse_line_directive(void)
     }
     DAT_00587ef0 = intconst_lo - 1;
     if (CPrep_ScanMacroExpandedChar() == 0) {
+#if VERSION >= VERSION_GC_2_7
         fileName = data_0057f94a[current_file_index]->nameNode;
         if (fileName == NULL)
             fileName = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
         strncpy(filename, fileName->name, 255);
         filename[255] = 0;
+#else
+        return;
+#endif
     } else {
         ch = CPrepTokenizer_NextChar();
         if (ch != '"') {
@@ -1083,7 +1095,9 @@ void parse_line_directive(void)
             return;
         }
         length = 0;
-        for (ch = CPrepTokenizer_NextChar(); ch != '"' && ch != 0; ch = CPrepTokenizer_NextChar()) {
+        for (ch = CPrepTokenizer_NextChar(); ch != '"'; ch = CPrepTokenizer_NextChar()) {
+            if (ch == 0)
+                break;
             if (length > 252) {
                 Boolean save = data_005884fd;
                 data_005884fd = 0;
@@ -1096,6 +1110,17 @@ void parse_line_directive(void)
             filename[length++] = ch;
         }
         filename[length] = 0;
+#if VERSION < VERSION_GC_2_7
+        CompilerTools_ConvertCStringToPString(filename);
+        CompilerTools_MakeCWFileSpecFromPString(data_0057f94a[current_file_index], filename);
+        if (copts.filesyminfo != 0 && cprep_cu[0xe0] == 0) {
+            newFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
+            if (oldFile != newFile) {
+                oldFile = !current_file_index ? NULL : oldFile;
+                fn_0048b090(oldFile, newFile);
+            }
+        }
+#endif
         if (CPrep_ScanMacroExpandedChar() != 0) {
             Boolean save = data_005884fd;
             data_005884fd = 0;
@@ -1105,6 +1130,7 @@ void parse_line_directive(void)
             CPrepTokenizer_SkipToEndOfLine();
         }
     }
+#if VERSION >= VERSION_GC_2_7
     memset(&input, 0, sizeof(input));
     input.enableDependencyLookup = 1;
     input.suppressFileReferenceLookup = 0;
@@ -1130,83 +1156,8 @@ void parse_line_directive(void)
         fn_0048b160(data_0057f94a[current_file_index]->nameNode, fileModDate, 1);
     if (DAT_0058850f && !copts.f8a)
         CPreprocess_EmitLineDirective(0);
-}
-#else
-void parse_line_directive(void)
-{
-    unsigned char filename[256];
-    SInt16 ch;
-    SInt16 length;
-    HashNameNode *oldFile;
-    HashNameNode *newFile;
-
-    oldFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
-    data_0057f9dd = 1;
-    if (CPrep_ScanMacroExpandedChar() == 0) {
-        Boolean save = data_005884fd;
-        data_005884fd = 0;
-        DAT_0057f9dc = 1;
-        CError_ReportError(ERR_UNEXPECTED_END_LINE);
-        data_005884fd = save;
-        return;
-    }
-    if (CPrepTokenizer_ScanToken() != -1) {
-        Boolean save = data_005884fd;
-        data_005884fd = 0;
-        DAT_0057f9dc = 1;
-        CError_ReportError(ERR_PREPROCESSOR_SYNTAX_ERROR);
-        data_005884fd = save;
-        CPrepTokenizer_SkipToEndOfLine();
-        return;
-    }
-    DAT_00587ef0 = intconst_lo - 1;
-    if (CPrep_ScanMacroExpandedChar() == 0)
-        return;
-    ch = CPrepTokenizer_NextChar();
-    if (ch != '"') {
-        Boolean save = data_005884fd;
-        data_005884fd = 0;
-        DAT_0057f9dc = 1;
-        CError_ReportError(ERR_PREPROCESSOR_SYNTAX_ERROR);
-        data_005884fd = save;
-        CPrepTokenizer_SkipToEndOfLine();
-        return;
-    }
-    length = 0;
-    for (ch = CPrepTokenizer_NextChar(); ch != '"'; ch = CPrepTokenizer_NextChar()) {
-        if (ch == 0)
-            break;
-        if (length > 252) {
-            Boolean save = data_005884fd;
-            data_005884fd = 0;
-            DAT_0057f9dc = 1;
-            CError_ReportError(ERR_STRING_TOO_LONG);
-            data_005884fd = save;
-            CPrepTokenizer_SkipToEndOfLine();
-            return;
-        }
-        filename[length++] = ch;
-    }
-    filename[length] = 0;
-    CompilerTools_ConvertCStringToPString(filename);
-    CompilerTools_MakeCWFileSpecFromPString(data_0057f94a[current_file_index], filename);
-    if (copts.filesyminfo != 0 && cprep_cu[0xe0] == 0) {
-        newFile = fn_00441850(&data_0057f94a[current_file_index]->header, NULL);
-        if (oldFile != newFile) {
-            oldFile = !current_file_index ? NULL : oldFile;
-            fn_0048b090(oldFile, newFile);
-        }
-    }
-    if (CPrep_ScanMacroExpandedChar() != 0) {
-        Boolean save = data_005884fd;
-        data_005884fd = 0;
-        DAT_0057f9dc = 1;
-        CError_ReportError(ERR_END_LINE_EXPECTED);
-        data_005884fd = save;
-        CPrepTokenizer_SkipToEndOfLine();
-    }
-}
 #endif
+}
 #pragma sym reset
 
 /* Hash-bucket link for an include name. */
