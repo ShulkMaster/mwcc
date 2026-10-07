@@ -1,6 +1,7 @@
 #ifndef COMPILER_OBJECTS_H
 #define COMPILER_OBJECTS_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -92,11 +93,10 @@ struct InlineXRef {
     } xref[1];
 };
 #pragma options align = reset
-/* sizeof(Object) is 0x36: every allocation site requests 54 bytes, so the
- * union at 0x26 is 16 bytes wide. Field positions verified in this build:
- * datatype 0x02, nspace 0x06, name 0x0a, type 0x0e, qual 0x12, flags 0x18,
- * union 0x26. The remaining positions follow the reference order and still
- * need confirmation. */
+/* Legacy Object: sizeof 0x36, union at 0x26. GC 1.3 and later Object: sizeof 0x44,
+ * union at 0x2a; allocation, clearing and alias copying use 68 bytes.
+ * Both versions retain datatype 0x02, nspace 0x06, name 0x0a, type 0x0e,
+ * qual 0x12 and flags 0x18. Unknown modern storage remains explicit. */
 #pragma options align = mac68k
 struct Object {
     UInt8 otype;
@@ -111,6 +111,9 @@ struct Object {
     UInt16 sclass;
     UInt8 flags;
     UInt8 unk19;
+#if VERSION >= VERSION_GC_1_3
+    UInt8 field_0x1a[4];
+#endif
     union {
         struct Object *toc;
         struct DwarfNode *pendingEntry;
@@ -137,14 +140,26 @@ struct Object {
                 VarInfo *info;
                 struct InterruptGenerationRecord *interruptInfo;
             };
+#if VERSION >= VERSION_GC_1_3 && VERSION < VERSION_GC_2_7
+            UInt16 field_0x36; /* CParser_NewFunctionObject copies DeclInfo+0x68 for DDATA */
+#endif
             HashNameNode *linkname;
+#if VERSION >= VERSION_GC_2_7
+            UInt16 field_0x3a; /* CParser_NewFunctionObject copies DeclInfo+0x68 when datatype is DDATA */
+#endif
         } data;
         struct {
             struct CInlineInfo *
-                u; /* 0x26: write_object selects inline body when TypeFunc flags & 0x400 is clear and Q_INLINE is set; CInline_0050ee60 stores CInline_SaveInfo output. */
+                u; /* 0x26 legacy, 0x2a GC 1.3+: write_object selects inline body when TypeFunc template flag (0x400 legacy, 0x100000 GC 1.3+) is clear and Q_INLINE is set; CInline_0050ee60 stores CInline_SaveInfo output. */
             struct DefArg *
-                defargdata; /* 0x2a: make_defarg_function stores the constructor and default expression; make_auto_generated_method tests it before CABI_MakeDefaultArgConstructor. */
+                defargdata; /* 0x2a legacy, 0x2e GC 1.3+: make_defarg_function stores the constructor and default expression; make_auto_generated_method tests it before CABI_MakeDefaultArgConstructor. */
             HashNameNode *linkname;
+#if VERSION >= VERSION_GC_1_3
+            struct TemplateSpecializationData *inst; /* 0x36: CMangler reads templateArguments at inst+8 */
+            UInt8 field_0x3a[8];                     /* no supported member identity for 0x3a..0x41 */
+            UInt8 field_0x42; /* CParser_NewFunctionObject copies DeclInfo+0x67 for DFUNC/DVFUNC */
+            UInt8 field_0x43; /* remaining byte of the proven 0x44-byte allocation */
+#endif
         } func;
         struct {
             VarInfo *info;
@@ -152,7 +167,7 @@ struct Object {
         } var;
         struct {
             UInt8 *
-                data; /* 0x26: write_object selects DINLINEFUNC (datatype 5) and copies size bytes from this inline machine-code buffer through unsigned char *data. */
+                data; /* 0x26 legacy, 0x2a GC 1.3+: write_object selects DINLINEFUNC (datatype 5) and copies size bytes from this inline machine-code buffer through unsigned char *data. */
             SInt32 size;
             InlineXRef *xrefs;
         } ifunc;
@@ -162,7 +177,7 @@ struct Object {
             SInt32 offset;
         } alias;
         struct TemplateFunction *
-            templateFunction; /* 0x26: write_object and instantiate_object_type select this arm when TypeFunc flags & 0x400; parse_function_template_declaration sets that flag and stores templ. */
+            templateFunction; /* 0x26 legacy, 0x2a GC 1.3+: write_object and instantiate_object_type select this arm when TypeFunc template flag (0x400 legacy, 0x100000 GC 1.3+); parse_function_template_declaration sets that flag and stores templ. */
         SInt16 intrinsic;
         ENode *expr;
     } u;
