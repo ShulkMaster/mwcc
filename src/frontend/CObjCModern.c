@@ -75,7 +75,7 @@ void CObjCModern_GenerateSymbolTableAndModule(void)
     int count2;
     int index;
     int count1;
-    int size;
+    unsigned int size;
     ObjCSymbolTable *symbols;
     RelocationList *references;
     Object *object;
