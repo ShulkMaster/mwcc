@@ -5868,10 +5868,10 @@
     "size": 3
   },
   {
-    "name": "format_operand",
+    "name": "format_num_parm",
     "address": "0x0042a513",
     "size": 394,
-    "source": "src/backend/PCodeListing.c"
+    "source": "src/driver/Parameter.c"
   },
   {
     "name": "fn_0042a69d",
