@@ -131,7 +131,11 @@ ENode *CABI_DestroyObject(Object *dtor, ENode *objexpr, UInt8 mode, Boolean flag
             val = 0;
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(2791);
+#else
             CError_FATAL(2751);
+#endif
     }
 
     expr = CompilerTools_AllocatePool(sizeof(ENode));
