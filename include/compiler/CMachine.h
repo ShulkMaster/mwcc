@@ -36,7 +36,11 @@ extern unsigned char CMach_CalcVectorDiadicBool(unsigned int context, const unio
 extern Boolean CMach_CalcFloatDiadicBool(Type *self, volatile double a, SInt16 op, volatile double b);
 extern Float CMach_CalcFloatMonadic(Type *type, short op, double value);
 extern Float CMach_CalcFloatDiadic(Type *type, Float left, short op, Float right);
+#if VERSION >= VERSION_GC_2_7
+extern void CMach_InitVectorMem(Type *type, MWVector128 val, void *mem, Boolean convertEndian);
+#else
 extern void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem);
+#endif
 extern void CMach_InitIntMem(Type *type, CInt64 val, void *mem);
 extern CInt64 CMach_CalcIntConvertFromFloat(Type *type, double value);
 extern CInt64 CMach_CalcIntMonadic(Type *type, SInt16 op, CInt64 val);

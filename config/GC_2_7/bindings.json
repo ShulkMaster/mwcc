@@ -427,6 +427,8 @@
   "_CScope_NextObject": "0x004d7c50",
   "_CTemplateTools_FirstArg": "0x00564010",
   "_CTool_EndianConvertMem": "0x004407d0",
+  "_CTool_EndianConvertWord64": "0x004406c0",
+  "_cmachine_filename": "0x005b14e0",
   "_CTool_EndianConvertWord32": "0x00440810",
   "_CWParserPluginsPrivate_CallParserTextCallback@16": "0x0041c830",
   "_CWParserPluginsPrivate_CallValuePairCallback@12": "0x0041c8b0",

@@ -814,7 +814,11 @@ Float CMachine_RoundFloatToType(Type *type, Float value)
         case 12:
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_Internal(cmachine_filename, 805);
+#else
             CError_Internal(cmachine_filename, 714);
+#endif
     }
     return value;
 }
@@ -962,7 +966,11 @@ Float CMach_CalcFloatDiadic(Type *type, Float left, short op, Float right)
     return CMach_CalcFloatConvert(type, left);
 }
 
+#if VERSION >= VERSION_GC_2_7
+void CMach_InitVectorMem(Type *type, MWVector128 val, void *mem, Boolean convertEndian)
+#else
 void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem)
+#endif
 {
     UInt8 uc[16];
     UInt16 us[8];
@@ -989,10 +997,19 @@ void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem)
                 case 9:
                 case 14:
                     for (i = 0; i < 8; i++) {
+#if VERSION >= VERSION_GC_2_7
+                        if (!copts.nativeByteOrder)
+                            us[i] = val.shortElements[i];
+                        else
+                            us[i] = val.shortElements[7 - i];
+                        if (convertEndian)
+                            us[i] = CTool_EndianConvertWord16(us[i]);
+#else
                         if (!copts.nativeByteOrder)
                             us[i] = CTool_EndianConvertWord16(val.shortElements[i]);
                         else
                             us[i] = CTool_EndianConvertWord16(val.shortElements[7 - i]);
+#endif
                     }
                     memcpy(mem, us, 16);
                     break;
@@ -1000,10 +1017,19 @@ void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem)
                 case 11:
                 case 12:
                     for (i = 0; i < 4; i++) {
+#if VERSION >= VERSION_GC_2_7
+                        if (!copts.nativeByteOrder)
+                            ul[i] = val.longElements[i];
+                        else
+                            ul[i] = val.longElements[3 - i];
+                        if (convertEndian)
+                            ul[i] = CTool_EndianConvertWord32(ul[i]);
+#else
                         if (!copts.nativeByteOrder)
                             ul[i] = CTool_EndianConvertWord32(val.longElements[i]);
                         else
                             ul[i] = CTool_EndianConvertWord32(val.longElements[3 - i]);
+#endif
                     }
                     memcpy(mem, ul, 16);
                     break;
@@ -1013,16 +1039,26 @@ void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem)
                             f[i] = val.floatElements[i];
                         else
                             f[i] = val.floatElements[3 - i];
+#if VERSION < VERSION_GC_2_7
                         CTool_EndianConvertMem(&f[i], 4);
+#endif
                     }
                     memcpy(mem, f, 16);
                     break;
                 default:
+#if VERSION >= VERSION_GC_2_7
+                    CError_FATAL(659);
+#else
                     CError_FATAL(568);
+#endif
             }
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(663);
+#else
             CError_FATAL(572);
+#endif
     }
 }
 
@@ -1052,11 +1088,19 @@ void CMach_InitIntMem(Type *type, CInt64 val, void *mem)
                     CTool_EndianConvertWord64(val, mem);
                     break;
                 default:
+#if VERSION >= VERSION_GC_2_7
+                    CError_FATAL(570);
+#else
                     CError_FATAL(482);
+#endif
             }
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(574);
+#else
             CError_FATAL(486);
+#endif
     }
 }
 

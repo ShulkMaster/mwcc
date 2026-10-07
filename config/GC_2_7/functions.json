@@ -12367,9 +12367,10 @@
     "size": 26
   },
   {
-    "name": "fn_004c1320",
+    "name": "CMachine_RoundFloatToType",
     "address": "0x004c1320",
-    "size": 93
+    "size": 93,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "CMach_CalcFloatConvertFromInt",
@@ -12400,13 +12401,13 @@
     "source": "src/backend/CMachine.c"
   },
   {
-    "name": "CMach_InitIntMem",
+    "name": "CMach_InitVectorMem",
     "address": "0x004c16b0",
     "size": 376,
     "source": "src/backend/CMachine.c"
   },
   {
-    "name": "CMachine_RoundFloatToType",
+    "name": "CMach_InitIntMem",
     "address": "0x004c1830",
     "size": 167,
     "source": "src/backend/CMachine.c"

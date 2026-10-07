@@ -77,6 +77,7 @@
     "src/driver/MemUtils.c",
     "src/driver/CLDependencies.c",
     "src/frontend/CError.c",
-    "src/optimizer/GlobalOptimizer.c"
+    "src/optimizer/GlobalOptimizer.c",
+    "src/backend/CMachine.c"
   ]
 }

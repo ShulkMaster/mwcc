@@ -1260,7 +1260,11 @@ void replace_vector_constant_with_objectref(ENode *node)
     MWVector128 *newValue;
     DeclInfo objectInfo;
     newValue = (MWVector128 *)galloc(sizeof(*newValue));
+#if VERSION >= VERSION_GC_2_7
+    CMach_InitVectorMem(node->rtype, node->data.vector128, newValue, 1);
+#else
     CMachine_InitVectorMem(node->rtype, node->data.vector128, newValue);
+#endif
     if (cprep_cu[0xe0] == 1) {
         CError_ReportError(ERR_ILLEGAL_USE_PRECOMPILED_HEADER);
     }
