@@ -164,8 +164,8 @@ void CopyPropagation_ComputeInOutSets(void)
     block = gPCodeBlocks;
     {
         struct CopyPropagationBitSets *entrySets = &copyPropagationBitSets[block->index];
-        CRTTI_FillWords(entrySets->out, wordIndex = copyCount, 0);
-        CodeMotion_AllocateBits(entrySets->in, entrySets->gen, copyCount);
+        bitvectorinitialize(entrySets->out, wordIndex = copyCount, 0);
+        bitvectorcopy(entrySets->in, entrySets->gen, copyCount);
     }
 
     for (block = gPCodeBlocks->next; block != NULL; block = block->next) {
@@ -188,8 +188,8 @@ void CopyPropagation_ComputeInOutSets(void)
                 sets = &copyPropagationBitSets[block->index];
                 if ((predecessor = block->predecessors) != NULL) {
                     predecessorOut = sets->out;
-                    CodeMotion_AllocateBits(predecessorOut,
-                                            copyPropagationBitSets[predecessor->payload.block->index].in, copyCount);
+                    bitvectorcopy(predecessorOut, copyPropagationBitSets[predecessor->payload.block->index].in,
+                                  copyCount);
                     for (predecessor = predecessor->next; predecessor != NULL; predecessor = predecessor->next)
                         CRTTI_IntersectBitVectors(
                             predecessorOut, copyPropagationBitSets[predecessor->payload.block->index].in, copyCount);
@@ -225,8 +225,8 @@ void CopyPropagation_ComputeGenKill(void)
         sets = copyPropagationBitSets + block->index;
         localBits = sets->gen;
         otherBits = sets->kill;
-        CRTTI_FillWords(localBits, copyCount, 0);
-        CRTTI_FillWords(otherBits, copyCount, 0);
+        bitvectorinitialize(localBits, copyCount, 0);
+        bitvectorinitialize(otherBits, copyCount, 0);
         bitIndex = blockCopyStartIndices[block->index];
         for (instruction = block->instructions; instruction != NULL; instruction = instruction->next) {
             if ((instruction->flags & PCodeInstruction_SkipCodeMotion) == 0 && instruction->operand_count != 0) {
@@ -282,7 +282,7 @@ void CopyPropagation_BuildCodeMotionRecords(void)
     for (block = gPCodeBlocks; block != NULL; block = block->next) {
         if (block_copy_counts[block->index] == 0)
             continue;
-        CodeMotion_AllocateBits(bits, data_00587fe4[block->index].use_sets[3], data_00587e38);
+        bitvectorcopy(bits, data_00587fe4[block->index].use_sets[3], data_00587e38);
         record = code_motion_records + (blockCopyStartIndices[block->index] + block_copy_counts[block->index] - 1);
         for (instruction = block->reverse_instructions; instruction != NULL; instruction = instruction->previous) {
             if ((instruction->flags & fIsBranch) != 0)

@@ -799,7 +799,6 @@
   "_clone_block_with_bridge": "0x00525b20",
   "_CodeMotion_00525e70": "0x00525e70",
   "_CodeMotion_00526070": "0x00526070",
-  "_CodeMotion_AllocateBits": "0x00533ed0",
   "_Coloring_AllocateRegisters": "0x004cdef0",
   "_Coloring_ClaimFPRColor": "0x004c1a20",
   "_Coloring_ClaimGPRColor": "0x004c1a50",
@@ -5481,9 +5480,7 @@
   "_create_rtti_base_records": "0x005339c0",
   "_collect_public_bases": "0x00533c40",
   "_build_vbase_path_list": "0x00533cf0",
-  "_CRTTI_OrBitVector": "0x00533de0",
   "_CRTTI_IntersectBitVectors": "0x00533e20",
-  "_CRTTI_FillWords": "0x00533e60",
   "_BitVectors_CopyAndCheckChanged": "0x00533e90",
   "_fread": "0x405d20",
   "_free": "0x404650",
@@ -6302,5 +6299,8 @@
   "_compiler_linker_callbacks": "0x0054d774",
   "_CClass_IsConstructor": "0x004ebc70",
   "_CDecl_MakeCopyCtorType": "0x004fc550",
-  "_CDecl_AddDefaultConstructor": "0x004fc610"
+  "_CDecl_AddDefaultConstructor": "0x004fc610",
+  "_bitvectorunion": "0x00533de0",
+  "_bitvectorinitialize": "0x00533e60",
+  "_bitvectorcopy": "0x00533ed0"
 }

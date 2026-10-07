@@ -21183,9 +21183,10 @@
     "size": 66
   },
   {
-    "name": "fn_0057acb0",
+    "name": "bitvectorunion",
     "address": "0x0057acb0",
-    "size": 49
+    "size": 49,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "fn_0057acf0",
@@ -21193,9 +21194,10 @@
     "size": 49
   },
   {
-    "name": "fn_0057ad30",
+    "name": "bitvectorinitialize",
     "address": "0x0057ad30",
-    "size": 44
+    "size": 44,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "fn_0057ad60",
@@ -21203,9 +21205,10 @@
     "size": 59
   },
   {
-    "name": "fn_0057ada0",
+    "name": "bitvectorcopy",
     "address": "0x0057ada0",
-    "size": 49
+    "size": 49,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "fn_0057ade0",

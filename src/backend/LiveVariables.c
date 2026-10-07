@@ -116,34 +116,10 @@ void SpillCode_InitializeLiveness(Object *func, SInt32 coloring_class, UInt32 nb
     liveness = gPCodeBlockLiveness;
 
     for (blockIndex = 0; blockIndex < gPCodeBlockCount; blockIndex++) {
-#if VERSION >= VERSION_GC_2_7
-        bitvectorinitialize(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                            nbits, 0);
-#else
-        CRTTI_FillWords(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits,
-                        0);
-#endif
-#if VERSION >= VERSION_GC_2_7
-        bitvectorinitialize(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                            nbits, 0);
-#else
-        CRTTI_FillWords(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits,
-                        0);
-#endif
-#if VERSION >= VERSION_GC_2_7
-        bitvectorinitialize(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                            nbits, 0);
-#else
-        CRTTI_FillWords(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                        nbits, 0);
-#endif
-#if VERSION >= VERSION_GC_2_7
-        bitvectorinitialize(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                            nbits, 0);
-#else
-        CRTTI_FillWords(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
-                        nbits, 0);
-#endif
+        bitvectorinitialize(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits, 0);
+        bitvectorinitialize(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits, 0);
+        bitvectorinitialize(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits, 0);
+        bitvectorinitialize(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits, 0);
         liveness++;
     }
 
@@ -240,18 +216,9 @@ void SpillCode_SolveLiveness(UInt32 nbits)
             live = &gPCodeBlockLiveness[block->index];
             if ((successor = block->successors) != NULL) {
                 live_out = live->liveout;
-#if VERSION >= VERSION_GC_2_7
-                bitvectorcopy(
-#else
-                CodeMotion_AllocateBits(
-#endif
-                    live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
+                bitvectorcopy(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
                 for (successor = successor->next; successor != NULL; successor = successor->next)
-#if VERSION >= VERSION_GC_2_7
                     bitvectorunion(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
-#else
-                    CRTTI_OrBitVector(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
-#endif
             }
             live_out = live->liveout;
             live_in = live->livein;

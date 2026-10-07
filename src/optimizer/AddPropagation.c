@@ -273,8 +273,8 @@ void compute_add_propagation_in_out(void)
     words = (add_propagation_entry_count + 0x1f) >> 5;
 
     rec = &addPropagationBlockBits[gPCodeBlocks->index];
-    CRTTI_FillWords(rec->in, add_propagation_entry_count, 0);
-    CodeMotion_AllocateBits(rec->out, rec->gen, add_propagation_entry_count);
+    bitvectorinitialize(rec->in, add_propagation_entry_count, 0);
+    bitvectorcopy(rec->out, rec->gen, add_propagation_entry_count);
 
     for (b = gPCodeBlocks->next; b != NULL; b = b->next) {
         rec = &addPropagationBlockBits[b->index];
@@ -291,8 +291,8 @@ void compute_add_propagation_in_out(void)
                 rec = &addPropagationBlockBits[b->index];
                 if ((e = b->predecessors) != NULL) {
                     in = rec->in;
-                    CodeMotion_AllocateBits(in, addPropagationBlockBits[e->payload.block->index].out,
-                                            add_propagation_entry_count);
+                    bitvectorcopy(in, addPropagationBlockBits[e->payload.block->index].out,
+                                  add_propagation_entry_count);
                     for (e = e->next; e != NULL; e = e->next)
                         CRTTI_IntersectBitVectors(in, addPropagationBlockBits[e->payload.block->index].out,
                                                   add_propagation_entry_count);
@@ -331,8 +331,8 @@ void fn_00521480(void)
 
         local = vectors->gen;
         external = vectors->kill;
-        CRTTI_FillWords(local, add_propagation_entry_count, 0);
-        CRTTI_FillWords(external, add_propagation_entry_count, 0);
+        bitvectorinitialize(local, add_propagation_entry_count, 0);
+        bitvectorinitialize(external, add_propagation_entry_count, 0);
         bitIndex = add_propagation_block_bit_indices[block->index];
         for (instruction = (PCodeInstruction *)block->instructions; instruction != NULL;
              instruction = instruction->next) {
@@ -397,7 +397,7 @@ void build_add_propagation_entries(void)
     bits = (UInt32 *)CompilerTools_AllocatePoolMemory(((data_00587e38 + 0x1f) >> 5) << 2);
     for (block = gPCodeBlocks; block != NULL; block = block->next) {
         if (add_propagation_entry_counts[block->index] != 0) {
-            CodeMotion_AllocateBits(bits, data_00587fe4[block->index].use_sets[3], data_00587e38);
+            bitvectorcopy(bits, data_00587fe4[block->index].use_sets[3], data_00587e38);
             out = add_propagation_entries +
                   (add_propagation_block_bit_indices[block->index] + add_propagation_entry_counts[block->index] - 1);
             for (node = block->reverse_instructions; node != NULL; node = node->previous) {

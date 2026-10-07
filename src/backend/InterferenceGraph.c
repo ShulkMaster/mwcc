@@ -492,7 +492,7 @@ void SpillCode_MarkLastUses(SInt32 var, UInt32 count)
 
     bits = (UInt32 *)CompilerTools_AllocatePoolMemory(((count + 31) >> 5) * sizeof(UInt32));
     for (block = gPCodeBlocks; block != NULL; block = block->next) {
-        CodeMotion_AllocateBits(bits, gPCodeBlockLiveness[block->index].liveout, count);
+        bitvectorcopy(bits, gPCodeBlockLiveness[block->index].liveout, count);
         for (instr = block->reverse_instructions; instr != NULL; instr = instr->previous) {
             if (SpillCode_IsDeadInstruction(instr, var, bits) != 0) {
                 PCode_UnlinkInstruction(instr);
@@ -727,7 +727,7 @@ void SpillCode_ConstructInterference(SInt32 registerClass, UInt32 registerCount)
     UInt32 i, j, k;
     gInterferenceBits =
         (UInt32 *)CompilerTools_AllocatePoolMemory(((registerCount * registerCount / 2 + 0x1f) >> 5) << 2);
-    CRTTI_FillWords(gInterferenceBits, registerCount * registerCount / 2, 0);
+    bitvectorinitialize(gInterferenceBits, registerCount * registerCount / 2, 0);
     for (i = 0; i < 0x20; i++) {
         for (j = 0; j < 0x20; j++) {
             if (i != j)
@@ -736,7 +736,7 @@ void SpillCode_ConstructInterference(SInt32 registerClass, UInt32 registerCount)
     }
     bits = (UInt32 *)CompilerTools_AllocatePoolMemory(((registerCount + 0x1f) >> 5) << 2);
     for (block = gPCodeBlocks; block != NULL; block = block->next) {
-        CodeMotion_AllocateBits(bits, gPCodeBlockLiveness[block->index].liveout, registerCount);
+        bitvectorcopy(bits, gPCodeBlockLiveness[block->index].liveout, registerCount);
         for (instruction = block->reverse_instructions; instruction != NULL; instruction = instruction->previous) {
             for (i = instruction->operand_count, operand = instruction->operandData.operands; i--; operand++) {
                 if (operand->kind == registerClass && (operand->flags & 2)) {

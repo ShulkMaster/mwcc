@@ -1,6 +1,26 @@
 #include "compiler/common.h"
 #include "compiler/BitVectors.h"
 
+void bitvectorunion(UInt32 *destination, const UInt32 *source, int bitCount)
+{
+    int wordCount = (bitCount + 31) >> 5;
+
+    while (wordCount != 0) {
+        *destination++ |= *source++;
+        wordCount--;
+    }
+}
+
+void bitvectorinitialize(UInt32 *words, int bitCount, UInt32 value)
+{
+    int wordCount = (bitCount + 31) >> 5;
+
+    while (wordCount != 0) {
+        *words++ = value;
+        wordCount--;
+    }
+}
+
 /* Copies bit_count bits rounded up to a whole word count. */
 SInt32 BitVectors_CopyAndCheckChanged(UInt32 *destination, UInt32 *source, SInt32 bitCount)
 {
@@ -38,7 +58,7 @@ SInt32 BitVectors_CopyAndCheckChanged(UInt32 *destination, UInt32 *source, SInt3
     return changed;
 }
 
-void CodeMotion_AllocateBits(UInt32 *destination, const UInt32 *source, SInt32 bit_count)
+void bitvectorcopy(UInt32 *destination, const UInt32 *source, int bit_count)
 {
     int count = (bit_count + 31) >> 5;
 

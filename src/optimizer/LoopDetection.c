@@ -816,14 +816,14 @@ void create_loops(void)
         block->footer = NULL;
         block->inductionUpdate = NULL;
         block->execution_weight = block->body->execution_weight;
-        CRTTI_FillWords(block->memberblocks = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
-                        data_005871a4, 0);
-        CRTTI_FillWords(block->exitblocks = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2), data_005871a4,
-                        0);
-        CRTTI_FillWords(block->block_membership = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
-                        data_005871a4, 0);
-        CRTTI_FillWords(block->backedge_dominators = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
-                        data_005871a4, 0);
+        bitvectorinitialize(block->memberblocks = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
+                            data_005871a4, 0);
+        bitvectorinitialize(block->exitblocks = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
+                            data_005871a4, 0);
+        bitvectorinitialize(block->block_membership = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
+                            data_005871a4, 0);
+        bitvectorinitialize(block->backedge_dominators = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) << 2),
+                            data_005871a4, 0);
         compute_loop_block_sets(block);
         fn_00523000(block, &data_0058763c);
         selected_nodes = selected_nodes->next;
@@ -978,10 +978,10 @@ void compute_dominators(void)
 
     bits = (UInt32 *)CompilerTools_AllocatePoolMemory(((count + 0x1f) >> 5) << 2);
 
-    CRTTI_FillWords(dominators[gPCodeBlocks->index], count, 0);
+    bitvectorinitialize(dominators[gPCodeBlocks->index], count, 0);
     dominators[gPCodeBlocks->index][0] |= 1;
     for (block = gPCodeBlocks->next; block != NULL; block = block->next)
-        CRTTI_FillWords(dominators[block->index], count, -1);
+        bitvectorinitialize(dominators[block->index], count, -1);
 
     SpillCode_BuildBlockOrder();
 
@@ -989,7 +989,7 @@ void compute_dominators(void)
         changed = 0;
         for (i = 0; i < gPCodeBlockCount; i++) {
             if ((block = gPCodeBlockOrder[i]) != NULL && block->index != gPCodeBlocks->index) {
-                CodeMotion_AllocateBits(bits, dominators[block->predecessors->payload.block->index], count);
+                bitvectorcopy(bits, dominators[block->predecessors->payload.block->index], count);
                 for (node = block->predecessors->next; node != NULL; node = node->next)
                     CRTTI_IntersectBitVectors(bits, dominators[node->payload.block->index], count);
                 bits[block->index >> 5] |= 1 << block->index;

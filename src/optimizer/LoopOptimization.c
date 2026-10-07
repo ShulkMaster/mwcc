@@ -1,5 +1,6 @@
 #define CERROR_FILE "LoopOptimization.c"
 #include "compiler/common.h"
+#include "compiler/BitVectors.h"
 #include "compiler/LoopOptimization.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -1455,7 +1456,7 @@ void remove_unused_self_addi(Loop *loop)
     int candidateReg;
     PCodeBlockLink *scan;
 
-    CRTTI_FillWords(self_addi_candidate_regs, data_00582c70, -1);
+    bitvectorinitialize(self_addi_candidate_regs, data_00582c70, -1);
     scan = loop->blocks;
     while (scan != NULL) {
         instruction = scan->payload.block->instructions;
@@ -1514,16 +1515,16 @@ void mark_registers_used_outside_loop(Loop *state)
     PCodeBlockLink *objectUse;
     SInt32 registerNumber;
 
-    CRTTI_FillWords(useMap = (UInt32 *)CompilerTools_AllocatePoolMemory(((data_00587e38 + 31) >> 5) << 2),
-                    data_00587e38, 0);
+    bitvectorinitialize(useMap = (UInt32 *)CompilerTools_AllocatePoolMemory(((data_00587e38 + 31) >> 5) << 2),
+                        data_00587e38, 0);
 
     for (objectUse = state->blocks; objectUse != NULL; objectUse = objectUse->next) {
         SInt32 objectRegister = objectUse->payload.block->index;
         if (state->exitblocks[objectRegister >> 5] & (1 << objectRegister))
-            CRTTI_OrBitVector(useMap, data_00587fe4[objectRegister].use_sets[3], data_00587e38);
+            bitvectorunion(useMap, data_00587fe4[objectRegister].use_sets[3], data_00587e38);
     }
 
-    CRTTI_FillWords(registers_used_outside_loop, data_00582c70, 0);
+    bitvectorinitialize(registers_used_outside_loop, data_00582c70, 0);
 
     for (registerNumber = 32; registerNumber < data_00582c70; registerNumber++) {
         CodeMotionEntryLink *use;

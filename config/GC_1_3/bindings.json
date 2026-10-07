@@ -1601,5 +1601,8 @@
   "_memberpointercompare": "0x0053e620",
   "_compiler_linker_callbacks": "0x005a24bc",
   "_realloc": "0x004047a0",
-  "_CDecl_MakeCopyCtorType": "0x00532f40"
+  "_CDecl_MakeCopyCtorType": "0x00532f40",
+  "_bitvectorunion": "0x0057acb0",
+  "_bitvectorinitialize": "0x0057ad30",
+  "_bitvectorcopy": "0x0057ada0"
 }

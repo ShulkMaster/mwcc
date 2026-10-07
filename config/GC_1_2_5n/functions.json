@@ -21422,10 +21422,10 @@
     "source": "src/frontend/CRTTI.c"
   },
   {
-    "name": "CRTTI_OrBitVector",
+    "name": "bitvectorunion",
     "address": "0x00533de0",
     "size": 49,
-    "source": "src/frontend/CRTTI.c"
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "CRTTI_IntersectBitVectors",
@@ -21434,10 +21434,10 @@
     "source": "src/frontend/CRTTI.c"
   },
   {
-    "name": "CRTTI_FillWords",
+    "name": "bitvectorinitialize",
     "address": "0x00533e60",
     "size": 44,
-    "source": "src/frontend/CRTTI.c"
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "BitVectors_CopyAndCheckChanged",
@@ -21446,7 +21446,7 @@
     "source": "src/backend/BitVectors.c"
   },
   {
-    "name": "CodeMotion_AllocateBits",
+    "name": "bitvectorcopy",
     "address": "0x00533ed0",
     "size": 49,
     "source": "src/backend/BitVectors.c"

@@ -58,8 +58,8 @@ void LoadDeletion_BuildLoadLivenessSets(void)
         bd = data_00587c98 + cb->index;
         setA = bd->generatedLoads;
         setB = bd->killedLoads;
-        CRTTI_FillWords(setA, data_0058820c, 0);
-        CRTTI_FillWords(setB, data_0058820c, 0);
+        bitvectorinitialize(setA, data_0058820c, 0);
+        bitvectorinitialize(setB, data_0058820c, 0);
         start = load_liveness_record_start[cb->index];
         for (obj = cb->instructions; obj != NULL; obj = obj->next) {
             if ((obj->flags & fIsBranch) == 0 && obj->operand_count != 0) {
@@ -115,7 +115,7 @@ void LoadDeletion_RecordImmediateLoadLiveness(void)
     block = gPCodeBlocks;
     while (block != NULL) {
         if (block_record_counts[block->index] != 0) {
-            CodeMotion_AllocateBits(liveBits, data_00587fe4[block->index].use_sets[3], data_00587e38);
+            bitvectorcopy(liveBits, data_00587fe4[block->index].use_sets[3], data_00587e38);
             record = immediateLoadLiveness +
                      (load_liveness_record_start[block->index] + block_record_counts[block->index] - 1);
             instruction = block->reverse_instructions;

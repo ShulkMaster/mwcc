@@ -126,9 +126,9 @@ void propagate_use_sets(void)
                 if ((range = block->successors) != NULL) {
                     dst = state->use_sets[3];
                     srcstate = &data_00587fe4[range->payload.block->index];
-                    CodeMotion_AllocateBits(dst, srcstate->use_sets[2], data_00587e38);
+                    bitvectorcopy(dst, srcstate->use_sets[2], data_00587e38);
                     for (range = range->next; range != NULL; range = range->next)
-                        CRTTI_OrBitVector(dst, data_00587fe4[range->payload.block->index].use_sets[2], data_00587e38);
+                        bitvectorunion(dst, data_00587fe4[range->payload.block->index].use_sets[2], data_00587e38);
                 }
                 def = state->use_sets[3];
                 out = state->use_sets[2];
@@ -174,13 +174,11 @@ void solve_definition_sets(void)
                 state = &data_00587fe4[block->index];
                 if ((predecessor = block->predecessors) != NULL) {
                     mergedBits = state->definition_sets[2];
-                    CodeMotion_AllocateBits(mergedBits,
-                                            data_00587fe4[predecessor->payload.block->index].definition_sets[3],
-                                            codeMotionEntryCount);
+                    bitvectorcopy(mergedBits, data_00587fe4[predecessor->payload.block->index].definition_sets[3],
+                                  codeMotionEntryCount);
                     for (predecessor = predecessor->next; predecessor != NULL; predecessor = predecessor->next) {
-                        CRTTI_OrBitVector(mergedBits,
-                                          data_00587fe4[predecessor->payload.block->index].definition_sets[3],
-                                          codeMotionEntryCount);
+                        bitvectorunion(mergedBits, data_00587fe4[predecessor->payload.block->index].definition_sets[3],
+                                       codeMotionEntryCount);
                     }
                 }
                 outgoing = state->definition_sets[3];
@@ -236,14 +234,14 @@ void compute_block_definition_and_use_sets(void)
         killedDefinitions = state->definition_sets[1];
         exposedUses = state->use_sets[0];
         killedUses = state->use_sets[1];
-        CRTTI_FillWords(generatedDefinitions, codeMotionEntryCount, 0);
-        CRTTI_FillWords(killedDefinitions, codeMotionEntryCount, 0);
-        CRTTI_FillWords(exposedUses, data_00587e38, 0);
-        CRTTI_FillWords(killedUses, data_00587e38, 0);
-        CRTTI_FillWords(state->definition_sets[2], codeMotionEntryCount, 0);
-        CRTTI_FillWords(state->definition_sets[3], codeMotionEntryCount, 0);
-        CRTTI_FillWords(state->use_sets[2], data_00587e38, 0);
-        CRTTI_FillWords(state->use_sets[3], data_00587e38, 0);
+        bitvectorinitialize(generatedDefinitions, codeMotionEntryCount, 0);
+        bitvectorinitialize(killedDefinitions, codeMotionEntryCount, 0);
+        bitvectorinitialize(exposedUses, data_00587e38, 0);
+        bitvectorinitialize(killedUses, data_00587e38, 0);
+        bitvectorinitialize(state->definition_sets[2], codeMotionEntryCount, 0);
+        bitvectorinitialize(state->definition_sets[3], codeMotionEntryCount, 0);
+        bitvectorinitialize(state->use_sets[2], data_00587e38, 0);
+        bitvectorinitialize(state->use_sets[3], data_00587e38, 0);
         for (instruction = block->instructions; instruction != NULL; instruction = instruction->next) {
             if ((instruction->flags & fIsBranch) == 0 && instruction->operand_count != 0) {
                 for (use = &cm_entries[useIndex = instruction->definitionStart];
@@ -837,7 +835,7 @@ void move_instructions_to_preheader(Loop *node)
         for (block_link = node->blocks; block_link != NULL; block_link = block_link->next) {
             block = block_link->payload.block;
             definitions = data_00587fe4[block->index].definition_sets[2];
-            CodeMotion_AllocateBits(available_definitions, definitions, codeMotionEntryCount);
+            bitvectorcopy(available_definitions, definitions, codeMotionEntryCount);
             for (instruction = block->instructions; instruction != NULL; instruction = next_instruction) {
                 next_instruction = instruction->next;
                 if ((instruction->flags & PCodeInstruction_SkipCodeMotion) != 0)
@@ -1107,7 +1105,7 @@ void unswitch_loop(Loop *loop)
         return;
 
     definitions = CompilerTools_AllocatePoolMemory(((codeMotionEntryCount + 31) >> 5) * sizeof(*definitions));
-    CodeMotion_AllocateBits(definitions, data_00587fe4[block->index].definition_sets[2], codeMotionEntryCount);
+    bitvectorcopy(definitions, data_00587fe4[block->index].definition_sets[2], codeMotionEntryCount);
 
     for (candidate = loop->preheader->next->instructions; candidate != NULL; candidate = candidate->next) {
         if ((candidate->flags & 0x204e0) == 0) {
@@ -1228,18 +1226,18 @@ void unswitch_loop(Loop *loop)
         newLoop->inductionUpdate = NULL;
         newLoop->execution_weight = loop->execution_weight;
 
-        CRTTI_FillWords(newLoop->memberblocks =
-                            CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) * sizeof(*newLoop->memberblocks)),
-                        data_005871a4, 0);
-        CRTTI_FillWords(newLoop->exitblocks =
-                            CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) * sizeof(*newLoop->exitblocks)),
-                        data_005871a4, 0);
-        CRTTI_FillWords(newLoop->block_membership = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) *
-                                                                               sizeof(*newLoop->block_membership)),
-                        data_005871a4, 0);
-        CRTTI_FillWords(newLoop->backedge_dominators = CompilerTools_AllocatePool(
-                            ((data_005871a4 + 31) >> 5) * sizeof(*newLoop->backedge_dominators)),
-                        data_005871a4, 0);
+        bitvectorinitialize(newLoop->memberblocks = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) *
+                                                                               sizeof(*newLoop->memberblocks)),
+                            data_005871a4, 0);
+        bitvectorinitialize(newLoop->exitblocks =
+                                CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) * sizeof(*newLoop->exitblocks)),
+                            data_005871a4, 0);
+        bitvectorinitialize(newLoop->block_membership = CompilerTools_AllocatePool(((data_005871a4 + 31) >> 5) *
+                                                                                   sizeof(*newLoop->block_membership)),
+                            data_005871a4, 0);
+        bitvectorinitialize(newLoop->backedge_dominators = CompilerTools_AllocatePool(
+                                ((data_005871a4 + 31) >> 5) * sizeof(*newLoop->backedge_dominators)),
+                            data_005871a4, 0);
 
         remove_block(loop, newLoop->body);
 

@@ -199,8 +199,8 @@ void VectorArraysToRegs_ComputeInOutBits(void)
     SInt32 changed;
     nwords = (load_index_count + 0x1f) >> 5;
     bits = &codeMotionBits[gPCodeBlocks->index];
-    CRTTI_FillWords(bits->in, load_index_count, 0);
-    CodeMotion_AllocateBits(bits->out, bits->gen, load_index_count);
+    bitvectorinitialize(bits->in, load_index_count, 0);
+    bitvectorcopy(bits->out, bits->gen, load_index_count);
     for (blk = gPCodeBlocks->next; blk != NULL; blk = blk->next) {
         bits = &codeMotionBits[blk->index];
         qq = bits->out;
@@ -215,7 +215,7 @@ void VectorArraysToRegs_ComputeInOutBits(void)
                 bits = &codeMotionBits[gPCodeBlockOrder[i]->index];
                 if ((node = gPCodeBlockOrder[i]->predecessors) != NULL) {
                     ip = bits->in;
-                    CodeMotion_AllocateBits(ip, codeMotionBits[node->payload.block->index].out, load_index_count);
+                    bitvectorcopy(ip, codeMotionBits[node->payload.block->index].out, load_index_count);
                     for (node = node->next; node != NULL; node = node->next)
                         CRTTI_IntersectBitVectors(ip, codeMotionBits[node->payload.block->index].out, load_index_count);
                 }
@@ -258,8 +258,8 @@ void VectorArraysToRegs_ComputeGenKill(struct AggregateRecord *entries)
         block_data = codeMotionBits + block->index;
         local_bits = block_data->gen;
         incoming_bits = block_data->kill;
-        CRTTI_FillWords(local_bits, load_index_count, 0);
-        CRTTI_FillWords(incoming_bits, load_index_count, 0);
+        bitvectorinitialize(local_bits, load_index_count, 0);
+        bitvectorinitialize(incoming_bits, load_index_count, 0);
         object_index = block_entry_start[block->index];
         instruction = block->instructions;
         while (instruction != NULL) {
@@ -331,7 +331,7 @@ void VectorArraysToRegs_BuildLoadIndexEntries(struct AggregateRecord *argument)
     block = gPCodeBlocks;
     while (block != NULL) {
         if (load_index_entry_counts[block->index] != 0) {
-            CodeMotion_AllocateBits(indexBits, data_00587fe4[block->index].use_sets[3], data_00587e38);
+            bitvectorcopy(indexBits, data_00587fe4[block->index].use_sets[3], data_00587e38);
             entryStart = block_entry_start[block->index];
             entryCount = load_index_entry_counts[block->index];
             entry = load_index_entries + (entryStart + entryCount - 1);

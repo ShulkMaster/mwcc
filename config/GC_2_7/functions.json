@@ -23039,7 +23039,8 @@
   {
     "name": "bitvectorunion",
     "address": "0x0057dea0",
-    "size": 49
+    "size": 49,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "fn_0057dee0",
@@ -23059,7 +23060,8 @@
   {
     "name": "bitvectorinitialize",
     "address": "0x0057dff0",
-    "size": 44
+    "size": 44,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "fn_0057e020",
@@ -23069,7 +23071,8 @@
   {
     "name": "bitvectorcopy",
     "address": "0x0057e060",
-    "size": 49
+    "size": 49,
+    "source": "src/backend/BitVectors.c"
   },
   {
     "name": "CRTTI_ParseConstCast",
