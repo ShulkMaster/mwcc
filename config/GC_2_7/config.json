@@ -5,6 +5,7 @@
     "pro53": "pro6"
   },
   "matching": [
+    "src/driver/CLLoadAndCache.c",
     "src/driver/CLProj.c",
     "src/driver/CLStaticPlugins.c",
     "src/driver/CWParserPluginsPrivate.c",

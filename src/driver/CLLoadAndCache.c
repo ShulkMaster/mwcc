@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/CLLoadAndCache.h"
 #include "compiler/win32.h"
@@ -12,6 +13,8 @@
 #include "driver/MsDos.h"
 #include <string.h>
 #include <setjmp.h>
+#include <stdio.h>
+#include <stdlib.h>
 #pragma auto_inline off
 
 #pragma auto_inline reset
@@ -47,8 +50,13 @@ int CLLoadAndCache_GetFileText(OSSpec *path, StorageHandle **outHandle, UInt8 *o
 
     buf = (StorageHandle *)Memory_NewHandle(size + 1);
     if (buf == NULL) {
+#if VERSION >= VERSION_GC_2_7
+        fprintf(stderr, "\n*** Out of memory\n");
+        exit(-23);
+#else
         CLIO_FormatAndDispatchText("\nOut of memory\n");
         longjmp(driver_jmp_buf, 1);
+#endif
     }
 
     fn_00413a00(buf);
