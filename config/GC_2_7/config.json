@@ -48,6 +48,7 @@
     "src/msl/wchar_io.c",
     "src/msl/wcstoul.c",
     "src/msl/wctype.c",
+    "src/optimizer/CIRTransform.c",
     "src/optimizer/IroBitVect.c",
     "src/runtime/NMWException.cpp",
     "src/runtime/NewHand.cpp",

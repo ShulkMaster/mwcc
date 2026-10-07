@@ -18309,7 +18309,7 @@
     "size": 200
   },
   {
-    "name": "simplify_unused_enode_values",
+    "name": "expand_compound_assignment",
     "address": "0x0052b990",
     "size": 552,
     "source": "src/optimizer/CIRTransform.c"
