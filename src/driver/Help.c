@@ -9,7 +9,9 @@
 #include "driver/ToolHelpers-cc.h"
 #include "driver/ToolHelpers.h"
 #include "driver/Utils.h"
+#include "version.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <setjmp.h>
 #include "compiler/win32.h"
@@ -515,8 +517,13 @@ void Help_InitColumns(void)
     short thirdColumn;
     short lastColumn;
     if (!(help_output = (struct StorageHandle *)Memory_NewHandle(0))) {
+#if VERSION >= VERSION_GC_2_7
+        fprintf(stderr, "\n*** Out of memory\n");
+        exit(-23);
+#else
         Targets_ForwardVarArgsAndLongjmp("Out of memory");
         longjmp(plugin_request_jmp_buf, 7);
+#endif
     }
     firstColumn = help_width / 40;
     secondColumn = help_width / 3 + firstColumn;

@@ -10,6 +10,7 @@
     "src/driver/CWParserPluginsPrivate.c",
     "src/driver/CWPluginsPrivate.c",
     "src/driver/DropInCompilerLinkerPrivate.c",
+    "src/driver/Help.c",
     "src/driver/Memory.c",
     "src/frontend/Unmangle.c",
     "src/msl/ansi_files.c",
