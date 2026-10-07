@@ -784,15 +784,19 @@ Boolean Targets_MatchCommandLineOptions(int argc, char **argv)
 #undef CERROR_FILE
 #define CERROR_FILE __FILE__
 
-/* Indexed values with an opaque 32-byte prefix. */
-
+#if VERSION >= VERSION_GC_2_7
+Boolean Targets_RegisterOptionLists(void)
+#else
 int Targets_RegisterOptionLists(void)
+#endif
 {
     int index;
     Option_ResetOptionLists();
-    for (index = 0; index < ((struct IndexedValueTable *)driverTool)->count; index++) {
-        OptionList **values = (OptionList **)((struct IndexedValueTable *)driverTool)->values;
-        Option_RegisterOptionList(values[index]);
+    for (index = 0; index < ((DriverTool *)driverTool)->optionListCount; index++) {
+        Option_RegisterOptionList(((DriverTool *)driverTool)->optionLists[index]);
     }
+#if VERSION >= VERSION_GC_2_7
+    fn_0041cd95();
+#endif
     return 1;
 }

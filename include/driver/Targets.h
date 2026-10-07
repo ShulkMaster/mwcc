@@ -2,6 +2,7 @@
 #define DRIVER_TARGETS_H
 
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/win32.h"
 
 #ifdef __cplusplus
@@ -58,7 +59,11 @@ extern void Targets_InitIntegerSequenceResult(PtrList *source, IntegerSequenceRe
 extern int Targets_SetTool(int *tool);
 extern Boolean Targets_MatchTool(int cpu, int os, int lang, int type);
 extern Boolean Targets_MatchCommandLineOptions(int argc, char **argv);
+#if VERSION >= VERSION_GC_2_7
+extern Boolean Targets_RegisterOptionLists(void);
+#else
 extern int Targets_RegisterOptionLists(void);
+#endif
 extern void Targets_InitPtrList(PtrList *state);
 extern void fn_0040ecb1(SInt32 a, ...);
 extern void Targets_ReportMessage(int a, ...);
