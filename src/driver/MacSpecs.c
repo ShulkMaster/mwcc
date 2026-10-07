@@ -214,6 +214,7 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
     char *tok;
 #if VERSION >= VERSION_GC_2_7
     char ch;
+    Boolean terminal;
 #endif
 
     if (!fn_00412340(spec, buf, 0x104))
@@ -233,13 +234,11 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
     rec = &node->root;
     p = str + 1;
     if (str[0] != '\\')
-        CLIO_ReportAssertionFailure("*pb == OS_PATHSEP", "MacSpecs.c",
 #if VERSION >= VERSION_GC_2_7
-                                    267
+        CLIO_ReportAssertionFailure("*pb == OS_PATHSEP", "MacSpecs.c", 267);
 #else
-                                    0x108
+        CLIO_ReportAssertionFailure("*pb == OS_PATHSEP", "MacSpecs.c", 0x108);
 #endif
-        );
     while (*p != '\0') {
         tok = p;
 #if VERSION >= VERSION_GC_2_7
@@ -251,7 +250,8 @@ int find_or_create_spec_entry(char *spec, unsigned int *typePtr, unsigned int *o
         *p = '\0';
         rec = find_or_create_child_entry(rec, tok);
 #if VERSION >= VERSION_GC_2_7
-        if ((Boolean)(ch == 0))
+        terminal = ch == 0;
+        if (terminal)
             break;
 #endif
         p++;
