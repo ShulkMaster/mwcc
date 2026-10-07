@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CopyPropagation.h"
 #include "compiler/enode.h"
@@ -346,9 +347,13 @@ void CopyPropagation_CountBlockCopies(void)
         blockCopyStartIndices[block->index] = copyCount;
         count = 0;
         for (instruction = block->instructions; instruction != NULL; instruction = instruction->next) {
+#if VERSION >= VERSION_GC_2_7
+            if (is_copy_instruction(instruction)) {
+#else
             if (((instruction->opcode == PC_MR) || (instruction->opcode == PC_FMR) ||
                  (instruction->opcode == PC_VMR)) &&
                 (0x20 <= instruction->operandData.operands[0].value.reg)) {
+#endif
                 ++copyCount;
                 ++count;
             }

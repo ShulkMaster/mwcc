@@ -1,6 +1,7 @@
 #ifndef COMPILER_COPYPROPAGATION_H
 #define COMPILER_COPYPROPAGATION_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -37,6 +38,10 @@ extern void CopyPropagation_ComputeGenKill(void);
 extern UInt32 *block_copy_counts;
 extern SInt32 copyCount;
 extern SInt32 *blockCopyStartIndices;
+#if VERSION >= VERSION_GC_2_7
+/* Set by the GC 2.7 copy-propagation driver; tests whether an instruction is a register copy. */
+extern int (*is_copy_instruction)(struct PCodeInstruction *instruction);
+#endif
 extern SInt32 copy_propagation_mode;
 extern struct CodeMotionRec *code_motion_records;
 extern struct CopyPropagationBitSets *copyPropagationBitSets;
