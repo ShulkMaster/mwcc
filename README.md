@@ -58,6 +58,23 @@ Diffing
 
 Open the project in [objdiff](https://github.com/encounter/objdiff) after building.
 
+Before changing compiler sources, capture an instruction-row baseline after building each supported version:
+
+```sh
+python tools/check_regressions.py snapshot local/before-GC_2_7.json GC_2_7
+```
+
+After rebuilding the changed sources for the same version, run:
+
+```sh
+python tools/check_regressions.py check local/before-GC_2_7.json GC_2_7
+```
+
+Repeat for all four versions before landing changes. The gate rejects lost matching instructions, opcodes or
+arguments, new inserted rows, lost mappings, and changed exact code bytes. It checks the original's row addresses
+instead of aggregate percentages, so gains elsewhere cannot hide a regression. Missing or stale comparison
+evidence fails the check. Run `python tools/test_check_regressions.py` to test the gate itself.
+
 Project structure
 =================
 
