@@ -68,6 +68,7 @@
     "src/frontend/CInit.c",
     "src/frontend/CObjCModern.c",
     "src/driver/CLAccessPaths.c",
-    "src/optimizer/IroDump.c"
+    "src/optimizer/IroDump.c",
+    "src/frontend/CMangler.c"
   ]
 }

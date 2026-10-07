@@ -496,7 +496,6 @@
   "_Files_UpdateRecordQuery@4": "0x00415110",
   "_Files_Write@12": "0x00414ea0",
   "_FindLabel": "0x004f5c00",
-  "_FlushData": "0x004fe9b0",
   "_GetF8": "0x00436460",
   "_GetSelType": "0x00556de0",
   "_IRO_LoopScratchVector_005880dc": "0x005eea8c",
@@ -1555,5 +1554,10 @@
   "_next_label_number": "0x005e0bb4",
   "_initialize_aliases": "0x00512f00",
   "_INT_005882b8": "0x005ef3b9",
-  "_iro_dump_output": "0x005dff14"
+  "_iro_dump_output": "0x005dff14",
+  "_CMangler_ConversionFuncName": "0x004fe9b0",
+  "_CMangler_GetCovariantFunctionName": "0x004fe720",
+  "_CMangler_TemplateInstanceName": "0x004ff4a0",
+  "_CMangler_RTTIObjectName": "0x004ff8b0",
+  "_covariant_function_name_prefix": "0x005bd1dc"
 }

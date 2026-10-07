@@ -1590,5 +1590,6 @@
   "_writtenEntry": "0x005e684c",
   "_written_entry_buckets": "0x005df0fc",
   "_fn_004bece0": "0x004bece0",
-  "_CMach_GetMemberAlignment": "0x004bf830"
+  "_CMach_GetMemberAlignment": "0x004bf830",
+  "_CMangler_ConversionFuncName": "0x004fd150"
 }

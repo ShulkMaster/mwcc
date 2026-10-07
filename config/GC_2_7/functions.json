@@ -15951,7 +15951,7 @@
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "CMangler_RTTIObjectName",
+    "name": "CMangler_GetCovariantFunctionName",
     "address": "0x004fe720",
     "size": 231,
     "source": "src/frontend/CMangler.c"
@@ -15963,9 +15963,10 @@
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "fn_004fe9b0",
+    "name": "CMangler_ConversionFuncName",
     "address": "0x004fe9b0",
-    "size": 131
+    "size": 131,
+    "source": "src/frontend/CMangler.c"
   },
   {
     "name": "mangle_function_name",
@@ -15998,13 +15999,13 @@
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "CMangler_GetCovariantFunctionName",
+    "name": "CMangler_TemplateInstanceName",
     "address": "0x004ff4a0",
     "size": 303,
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "CMangler_TemplateInstanceName",
+    "name": "CMangler_AppendTemplateArgumentList",
     "address": "0x004ff5d0",
     "size": 410,
     "source": "src/frontend/CMangler.c"
@@ -16016,7 +16017,7 @@
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "CMangler_ConversionFuncName",
+    "name": "CMangler_RTTIObjectName",
     "address": "0x004ff8b0",
     "size": 104,
     "source": "src/frontend/CMangler.c"

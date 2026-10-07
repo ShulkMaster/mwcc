@@ -14874,9 +14874,10 @@
     "size": 416
   },
   {
-    "name": "fn_004fd150",
+    "name": "CMangler_ConversionFuncName",
     "address": "0x004fd150",
-    "size": 131
+    "size": 131,
+    "source": "src/frontend/CMangler.c"
   },
   {
     "name": "fn_004fd1e0",
@@ -14919,12 +14920,6 @@
     "name": "fn_004fdf10",
     "address": "0x004fdf10",
     "size": 316
-  },
-  {
-    "name": "CMangler_ConversionFuncName",
-    "address": "0x004fe050",
-    "size": 104,
-    "source": "src/frontend/CMangler.c"
   },
   {
     "name": "CMangler_RTTIObjectName",

@@ -44,7 +44,6 @@
 
 /* 0x561a30, "CMangler.c" */
 
-/* TODO: [near miss] GC 2.7 ~99.98%: stale literal bindings await identity repair. */
 HashNameNode *COptimizer_GetFunctionObject(Object *obj)
 {
     while (obj->datatype == DALIAS)
@@ -178,6 +177,10 @@ HashNameNode *CMangler_ConversionFuncName(Type *type, UInt32 qual)
 {
     char **buffer;
     HashNameNode *name;
+#if VERSION >= VERSION_GC_1_3
+    if (CTemplateTools_IsDependentType(type))
+        return GetHashNameNode("__op");
+#endif
     data_00583548.size = 0;
     CompilerTools_AppendGListString(&data_00583548, "__op");
     mangle_type(type, qual);
@@ -261,7 +264,11 @@ HashNameNode *CMangler_GetCovariantFunctionName(Object *object, Type *type)
             result = target->name;
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1110);
+#else
             CError_FATAL(1012);
+#endif
             result = NULL;
             break;
     }
@@ -482,7 +489,6 @@ void mangle_type(Type *type, UInt32 flags)
             return;
     }
 }
-/* TODO: [near miss] GC 2.7 ~99.99%: stale literal bindings await identity repair. */
 void mangle_qualified_name(NameSpace *nameSpace, const char *name)
 {
     NameSpace *scope;
@@ -519,7 +525,11 @@ void mangle_qualified_name(NameSpace *nameSpace, const char *name)
     }
 }
 /* Compute (and cache) the link name of an object, following aliases. */
+#if VERSION >= VERSION_GC_2_7
+static inline HashNameNode *CMangler_LinkName(Object *obj)
+#else
 static HashNameNode *CMangler_LinkName(Object *obj)
+#endif
 {
     while (obj->datatype == DALIAS)
         obj = obj->u.alias.object;
@@ -540,20 +550,57 @@ static HashNameNode *CMangler_LinkName(Object *obj)
         case DUNUSED:
             return obj->name;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1110);
+#else
             CError_FATAL(1012);
+#endif
             return NULL;
     }
 }
 
+#if VERSION >= VERSION_GC_2_7
+static void CMangler_AppendTemplateArgumentList(CTStateElem *list);
+static void CMangler_CheckTemplateArguments(CTStateElem *list)
+{
+    ENode *expression;
+
+    for (; list != NULL; list = list->next) {
+        if (list->pid.type == 1) {
+            if ((expression = list->argument.expression) == NULL)
+                CError_FATAL(360);
+            if (expression->rtype->type != TYPETEMPLDEPEXPR) {
+                switch (expression->type) {
+                    case EINTCONST:
+                        break;
+                    case EOBJREF:
+                        (void)COptimizer_GetFunctionObject(expression->data.objref);
+                        break;
+                    default:
+                        CError_FATAL(383);
+                }
+            }
+        }
+    }
+}
+
+#endif
+
+/* TODO: [near miss] GC 2.7 ~99.90%: initial validator register test. */
 HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *list)
 {
+#if VERSION < VERSION_GC_2_7
     CTStateElem *argument;
     ENode *expression;
     HashNameNode *link;
     char decimal[32];
+#endif
     HashNameNode *result;
     char **buffer;
 
+#if VERSION >= VERSION_GC_2_7
+    CMangler_CheckTemplateArguments(list);
+#else
     for (argument = list; argument != NULL; argument = argument->next) {
         if (argument->pid.type == 0) {
             if ((expression = argument->argument.expression) == NULL)
@@ -572,8 +619,13 @@ HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *lis
         }
     }
 
+#endif
+
     data_00583548.size = 0;
     CompilerTools_AppendGListString(&data_00583548, name->name);
+#if VERSION >= VERSION_GC_2_7
+    CMangler_AppendTemplateArgumentList(list);
+#else
     AppendGListByte(&data_00583548, '<');
 
     for (argument = list; argument != NULL; argument = argument->next) {
@@ -605,6 +657,7 @@ HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *lis
     }
 
     AppendGListByte(&data_00583548, '>');
+#endif
     AppendGListByte(&data_00583548, 0);
     fn_00443190(data_00583548.data);
     buffer = data_00583548.data;
@@ -612,7 +665,53 @@ HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *lis
     fn_004431b0(data_00583548.data);
     return result;
 }
-/* TODO: [near miss] GC 2.7 ~99.97%: stale literal bindings await identity repair. */
+#if VERSION >= VERSION_GC_2_7
+static void CMangler_AppendTemplateArgumentList(CTStateElem *list)
+{
+    ENode *expression;
+    HashNameNode *link;
+    char decimal[32];
+
+    AppendGListByte(&data_00583548, '<');
+
+    for (; list != NULL; list = list->next) {
+        if (list->pid.type == 1) {
+            if ((expression = list->argument.expression) == NULL)
+                CError_FATAL(409);
+            if (expression->rtype->type != TYPETEMPLDEPEXPR) {
+                switch (expression->type) {
+                    case EINTCONST:
+                        CExpr2_FormatCInt64Decimal(decimal, expression->data.intval);
+                        CompilerTools_AppendGListString(&data_00583548, decimal);
+                        break;
+                    case EOBJREF:
+                        AppendGListByte(&data_00583548, '&');
+                        link = CMangler_LinkName(expression->data.objref);
+                        CompilerTools_AppendGListString(&data_00583548, link->name);
+                        break;
+                    default:
+                        CError_FATAL(452);
+                }
+            } else {
+                AppendGListByte(&data_00583548, 'T');
+            }
+        } else {
+            if (list->pid.type == 0)
+                mangle_type(list->argument.type, list->qualifiers);
+            else {
+                if (list->pid.type != 2)
+                    CError_FATAL(467);
+                mangle_type(list->argument.type, 0);
+            }
+        }
+        if (list->next != NULL)
+            AppendGListByte(&data_00583548, ',');
+    }
+
+    AppendGListByte(&data_00583548, '>');
+}
+#endif
+
 HashNameNode *CMangler_ThunkName(Object *input, int offset, int adjustment, int index)
 {
     Object *object = input;
@@ -934,7 +1033,6 @@ HashNameNode *CMangler_OperatorName(short token)
     return NULL;
 }
 
-/* TODO: [near miss] GC 2.7 ~99.92%: stale literal bindings await identity repair. */
 void CMangler_Setup(void)
 {
     constructor_name = GetHashNameNode("__ct");
