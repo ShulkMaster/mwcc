@@ -2,6 +2,7 @@
 #define COMPILER_CEXPR2_H
 
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/CSOM.h"
 
 typedef struct {
@@ -97,6 +98,10 @@ extern Boolean CExpr_MatchCompare(Object *obj, ArgMatch *dst, ArgMatch *src);
 extern SInt16 assign_check(ENode *e1, Type *t2, SInt32 a3, Boolean a4, Boolean a5, Boolean a6);
 extern ENode *get_address_of_temp_copy(ENode *expr, char materialize);
 extern void CExpr_CheckArithmConversion(ENode *node, Type *type);
+#if VERSION >= VERSION_GC_1_3
+extern ENode *CExpr_ConvertToCondition(ENode *expr);
+extern ENode *CExpr_ConvertToIntegral(ENode *expr);
+#endif
 extern ENode *CExpr2_ConvertScalarOperand(ENode *result, Boolean integerOnly, Boolean preferBool);
 extern Object *CExpr_ConversionIteratorNext(ConversionSearchState *ctx);
 extern void build_convertible_bases_tree(ConvNode *self);
@@ -121,7 +126,7 @@ extern ENode *CExpr_TempModifyExpr(ENode *expr);
 extern ENode *get_indirect_operand(ENode *node);
 extern ENode *CExpr2_00473720(ENode *expr, Type *type);
 extern CInt64 CExpr_IntConstConvert(Type *type, Type *otherType, CInt64 value);
-extern ENode *forceintegral(ENode *node);
+extern ENode *integralpromote(ENode *node);
 extern ENode *CExpr2_RewriteExprToTemp(ENode *a);
 extern UInt8 CExpr_IsOne(ENode *expr);
 extern SInt16 isnotzero(ENode *node);
@@ -138,7 +143,7 @@ extern unsigned char has_indirect_class_objref(ENode *expr, TypeClass *arg2);
 extern ENode *CExpr2_NewENEWEXCEPTIONARRAYNode(unsigned int value);
 extern unsigned int fn_0046cea0(void);
 extern void match_function_arguments(Object *signature, FuncArg *argument, ENodeList *objects, ArgMatch *value);
-extern ENode *CExpr_ConvertToIntegral(ENode *expr);
+extern ENode *forceintegral(ENode *expr);
 extern void init_comparison_values(unsigned int kind, ComparisonValues *counts, Type *sourceType,
                                    unsigned int sourceQual, Type *targetType, unsigned int targetQual,
                                    unsigned int flag);

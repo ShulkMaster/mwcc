@@ -3,6 +3,7 @@
 
 #include <setjmp.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +54,9 @@ extern ENode *CExpr_New_EXOR_Node(ENode *e1, ENode *e2);
 extern ENode *CExpr_New_EAND_Node(ENode *left, ENode *right);
 extern ENode *fold_or_make_comparison_node(ENode *left, ENode *right);
 extern ENode *CExpr_MakeComparisonNode(ENode *left, ENode *right);
+#if VERSION >= VERSION_GC_1_3
+extern ENode *CExpr_Convert(ENode *expr, Type *type, UInt32 qual, Boolean isExplicit, Boolean checkAccess);
+#endif
 extern ENode *memberpointercompare(UInt8 op, ENode *e1, ENode *e2);
 extern ENode *CExpr_New_EGREATEREQU_Node(ENode *left, ENode *right);
 extern ENode *CExpr_New_EGREATER_Node(ENode *left, ENode *right);

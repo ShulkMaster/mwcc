@@ -11220,14 +11220,16 @@
     "size": 595
   },
   {
-    "name": "fn_004b9e30",
+    "name": "CExpr_ConvertToIntegral",
     "address": "0x004b9e30",
-    "size": 544
+    "size": 544,
+    "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004ba050",
+    "name": "CExpr_ConvertToCondition",
     "address": "0x004ba050",
-    "size": 169
+    "size": 169,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004ba100",
@@ -11380,9 +11382,10 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004bd290",
+    "name": "integralpromote",
     "address": "0x004bd290",
-    "size": 148
+    "size": 148,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bd330",
@@ -11425,14 +11428,16 @@
     "size": 97
   },
   {
-    "name": "fn_004bd890",
+    "name": "makemonadicnode",
     "address": "0x004bd890",
-    "size": 57
+    "size": 57,
+    "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004bd8d0",
+    "name": "forceintegral",
     "address": "0x004bd8d0",
-    "size": 74
+    "size": 74,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bd920",
@@ -18878,7 +18883,7 @@
     "size": 334
   },
   {
-    "name": "fn_0054ccd0",
+    "name": "CExpr_Convert",
     "address": "0x0054ccd0",
     "size": 1695
   },

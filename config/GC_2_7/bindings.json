@@ -768,7 +768,6 @@
   "_call_overlays_and_translate_status@20": "0x00425320",
   "_call_primary_reference_callback@12": "0x00427030",
   "_category_definitions": "0x005e3abc",
-  "_ce_error": "0x004beaa0",
   "_cinit_state": "0x005ea6b0",
   "_cint64_one": "0x005b1cb8",
   "_clabels": "0x005eebe4",
@@ -1594,5 +1593,10 @@
   "_CMangler_GetCovariantFunctionName": "0x004fe720",
   "_CMangler_TemplateInstanceName": "0x004ff4a0",
   "_CMangler_RTTIObjectName": "0x004ff8b0",
-  "_covariant_function_name_prefix": "0x005bd1dc"
+  "_covariant_function_name_prefix": "0x005bd1dc",
+  "_CExpr_ConvertToIntegral": "0x004bb000",
+  "_CExpr_ConvertToCondition": "0x004bb220",
+  "_integralpromote": "0x004be460",
+  "_forceintegral": "0x004beaa0",
+  "_CExpr_Convert": "0x0054f7a0"
 }

@@ -1591,5 +1591,12 @@
   "_written_entry_buckets": "0x005df0fc",
   "_fn_004bece0": "0x004bece0",
   "_CMach_GetMemberAlignment": "0x004bf830",
-  "_CMangler_ConversionFuncName": "0x004fd150"
+  "_CMangler_ConversionFuncName": "0x004fd150",
+  "_CExpr_ConvertToIntegral": "0x004b9e30",
+  "_CExpr_ConvertToCondition": "0x004ba050",
+  "_integralpromote": "0x004bd290",
+  "_forceintegral": "0x004bd8d0",
+  "_CExpr_Convert": "0x0054ccd0",
+  "_CExpr_ConversionIteratorNext": "0x004ba8c0",
+  "_memberpointercompare": "0x0053e620"
 }

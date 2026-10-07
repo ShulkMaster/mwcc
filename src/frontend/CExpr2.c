@@ -1200,8 +1200,8 @@ static inline void begin_conversion_search(ConversionSearchState *search, Type *
 
     memclrw(search, sizeof(ConversionSearchState));
     if ((theclass->flags & CLASS_IS_CONVERTIBLE) != 0) {
-        search->iterator.cls = theclass;
         search->current = &search->iterator;
+        search->iterator.cls = theclass;
         build_convertible_bases_tree(&search->iterator);
         CScope_InitScopeSearch(&search->scope, theclass->nspace);
     }
@@ -2776,6 +2776,108 @@ static inline ENode *enumOperand(ENode *expr, UInt8 type)
     return expr;
 }
 
+ENode *nullnode(void)
+{
+    ENode *node;
+    node = (ENode *)CompilerTools_AllocatePool(sizeof(ENode));
+    memclrw(node, sizeof(ENode));
+    node->type = EINTCONST;
+    node->rtype = (Type *)&stsignedlong;
+    return node;
+}
+
+ENode *forceintegral(ENode *expr)
+{
+    if (expr->rtype->type != TYPEENUM) {
+        CError_ReportError(ERR_ILLEGAL_OPERAND);
+        return nullnode();
+    }
+    expr->rtype = TYPE_ENUM(expr->rtype)->enumtype;
+    return expr;
+}
+
+ENode *makemonadicnode(ENode *expr, UInt8 type)
+{
+    ENode *node;
+
+    node = CompilerTools_AllocatePool(sizeof(ENode));
+    node->type = type;
+    node->cost = expr->cost;
+    if (node->cost == 0) {
+        node->cost = 1;
+    }
+    node->flags = expr->flags & ENODE_FLAG_QUALS;
+    node->rtype = expr->rtype;
+    node->data.monadic = expr;
+    return node;
+}
+
+ENode *integralpromote(ENode *expr)
+{
+    if (expr->rtype->type != TYPEINT)
+        expr = forceintegral(expr);
+    if (TYPE_INTEGRAL(expr->rtype)->integral >= IT_INT)
+        return expr;
+    if (expr->type != EINTCONST)
+        expr = makemonadicnode(expr, ETYPCON);
+    expr->rtype = (Type *)&stsignedint;
+    return expr;
+}
+
+#if VERSION >= VERSION_GC_1_3
+ENode *CExpr_ConvertToIntegral(ENode *expr)
+{
+    ConversionSearchState search;
+    Type *found;
+    Object *conversion;
+
+    switch ((SInt8)expr->rtype->type) {
+        case TYPEINT:
+        case TYPEENUM:
+            return integralpromote(expr);
+        case TYPECLASS:
+            CDecl_CompleteType(expr->rtype);
+            found = NULL;
+            begin_conversion_search(&search, expr->rtype);
+            while ((conversion = CExpr_ConversionIteratorNext(&search)) != NULL) {
+                if (TYPE_FUNC(conversion->type)->functype->type == TYPEINT ||
+                    TYPE_FUNC(conversion->type)->functype->type == TYPEENUM) {
+                    if (found != NULL) {
+                        CError_ReportError(ERR_AMBIGUOUS_ACCESS_OVERLOADED_FUNCTION);
+                        break;
+                    }
+                    found = TYPE_FUNC(conversion->type)->functype;
+                }
+            }
+            if (found != NULL)
+                return integralpromote(CExpr_Convert(expr, found, 0, 0, 1));
+            break;
+    }
+    CError_ReportError(376, expr->rtype, expr->flags & ENODE_FLAG_QUALS);
+    return nullnode();
+}
+ENode *CExpr_ConvertToCondition(ENode *expr)
+{
+    switch ((SInt8)expr->rtype->type) {
+        case TYPEINT:
+        case TYPEFLOAT:
+        case TYPEPOINTER:
+            return expr;
+        case TYPEENUM:
+            expr->rtype = TYPE_ENUM(expr->rtype)->enumtype;
+            return expr;
+        case TYPEMEMBERPOINTER:
+            return memberpointercompare(ENOTEQU, expr, nullnode());
+        case TYPECLASS:
+            return CExpr_Convert(expr, (Type *)&stbool, 0, 0, 1);
+        default:
+            CError_ReportError(376, expr->rtype, expr->flags & ENODE_FLAG_QUALS);
+            return nullnode();
+    }
+}
+
+#endif
+
 ENode *CExpr2_ConvertScalarOperand(ENode *result, Boolean integerOnly, Boolean preferBool)
 {
     UInt8 type;
@@ -3470,7 +3572,11 @@ static ENode *mkmondonode(ENode *inner, UInt8 type)
 ENode *CExpr_ConvertToBool(ENode *node, Boolean flag)
 {
     if (node->rtype->type == TYPEMEMBERPOINTER)
+#if VERSION >= VERSION_GC_1_3
+        node = CExpr_ConvertToCondition(node);
+#else
         node = CExpr2_ConvertScalarOperand(node, 0, 0);
+#endif
     switch ((SInt8)node->rtype->type) {
         case TYPEINT:
         case TYPEFLOAT:
@@ -4885,43 +4991,6 @@ CInt64 CExpr_IntConstConvert(Type *type, Type *otherType, CInt64 value)
     return CMach_CalcIntDiadic(type, value, 0x2b, qval_zero);
 }
 
-ENode *forceintegral(ENode *node)
-{
-    UInt8 t;
-    Type *type;
-
-    if ((t = (type = node->rtype)->type) != TYPEINT) {
-        if (t != TYPEENUM) {
-            CError_ReportError(ERR_ILLEGAL_OPERAND);
-            node = (ENode *)CompilerTools_AllocatePool(sizeof(ENode));
-            memclrw(node, sizeof(ENode));
-            node->type = EINTCONST;
-            node->rtype = (Type *)&stsignedlong;
-        } else {
-            node->rtype = TYPE_ENUM(type)->enumtype;
-        }
-    }
-
-    if (TYPE_INTEGRAL(node->rtype)->integral >= IT_INT)
-        return node;
-
-    if (node->type != EINTCONST) {
-        ENode *newnode = (ENode *)CompilerTools_AllocatePool(sizeof(ENode));
-
-        newnode->type = ETYPCON;
-        newnode->cost = node->cost;
-        if (newnode->cost == 0)
-            newnode->cost = 1;
-        newnode->flags = node->flags & ENODE_FLAG_QUALS;
-        newnode->rtype = node->rtype;
-        newnode->data.monadic = node;
-        node = newnode;
-    }
-    node->rtype = (Type *)&stsignedint;
-
-    return node;
-}
-
 static ENode *mkInd(ENode *src)
 {
     ENode *n = (ENode *)CompilerTools_AllocatePool(sizeof(ENode));
@@ -5175,42 +5244,6 @@ ENode *makediadicnode(ENode *left, ENode *right, UInt8 ty)
     return node;
 }
 
-ENode *makemonadicnode(ENode *expr, UInt8 type)
-{
-    ENode *node;
-
-    node = (ENode *)CompilerTools_AllocatePool(0x1a);
-    node->type = type;
-    node->cost = expr->cost;
-    if (node->cost == 0) {
-        node->cost = 1;
-    }
-    node->flags = expr->flags & ENODE_FLAG_QUALS;
-    node->rtype = expr->rtype;
-    node->data.monadic = expr;
-    return node;
-}
-
-ENode *CExpr_ConvertToIntegral(ENode *expr)
-{
-    ENode *result;
-    ENode *error;
-    TypeEnum *enumType;
-    if (expr->rtype->type != TYPEENUM) {
-        CError_ReportError(144U);
-        error = (ENode *)CompilerTools_AllocatePool(26U);
-        memclrw(error, 26U);
-        result = error;
-        error->type = 50U;
-        error->rtype = (Type *)&stsignedlong;
-        return result;
-    }
-    enumType = (TypeEnum *)expr->rtype;
-    expr->rtype = enumType->enumtype;
-    result = expr;
-    return result;
-}
-
 ENode *intconstnode(Type *valueType, SInt32 value)
 {
     ENode *expr;
@@ -5221,18 +5254,6 @@ ENode *intconstnode(Type *valueType, SInt32 value)
     expr->rtype = valueType;
     CInt64_SetLong(&expr->data.intval, value);
     return expr;
-}
-
-/* Integer expression record with a split 64-bit value. */
-
-ENode *nullnode(void)
-{
-    ENode *node;
-    node = (ENode *)CompilerTools_AllocatePool(sizeof(ENode));
-    memclrw(node, sizeof(ENode));
-    node->type = EINTCONST;
-    node->rtype = (Type *)&stsignedlong;
-    return node;
 }
 
 ENode *CExpr2_NewENEWEXCEPTIONARRAYNode(unsigned int value)

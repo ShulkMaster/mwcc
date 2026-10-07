@@ -1131,11 +1131,16 @@ void parse_statement(StatementContext *context)
                 conditionExpr = s_expression();
                 switchScope = NULL;
             }
+#if VERSION >= VERSION_GC_1_3
+            stmt = AppendStmt(5);
+            stmt->expr.expression = CExpr_ConvertToIntegral(conditionExpr);
+#else
             expr = CExpr2_ConvertScalarOperand(conditionExpr, 1, 0);
             if (expr->rtype->type != TYPEINT && expr->rtype->type != TYPEFLOAT && expr->rtype->type != TYPEPOINTER)
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
             stmt = AppendStmt(5);
-            stmt->expr.expression = forceintegral(expr);
+            stmt->expr.expression = integralpromote(expr);
+#endif
             if (tk != ')')
                 CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);
             else
@@ -1252,10 +1257,14 @@ void parse_statement(StatementContext *context)
                     conditionExpr = s_expression();
                     CExpr_CheckUnwantedAssignment(conditionExpr);
                 }
+#if VERSION >= VERSION_GC_1_3
+                testExpr = CExpr_ConvertToCondition(conditionExpr);
+#else
                 testExpr = CExpr2_ConvertScalarOperand(conditionExpr, 0, 1);
                 if (testExpr->rtype->type != TYPEINT && testExpr->rtype->type != TYPEFLOAT &&
                     testExpr->rtype->type != TYPEPOINTER)
                     CError_ReportError(ERR_ILLEGAL_OPERAND);
+#endif
                 if (tk == ';')
                     fn_00449d60();
                 else
@@ -1363,9 +1372,13 @@ void parse_statement(StatementContext *context)
                 CError_ReportErrorAndUpdateToken(ERR_LPAREN_EXPECTED);
             else
                 tk = CPrepTokenizer_GetNextToken();
+#if VERSION >= VERSION_GC_1_3
+            expr = CExpr_ConvertToCondition(s_expression());
+#else
             expr = CExpr2_ConvertScalarOperand(s_expression(), 0, 1);
             if (expr->rtype->type != TYPEINT && expr->rtype->type != TYPEFLOAT && expr->rtype->type != TYPEPOINTER)
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
+#endif
             CExpr_CheckUnwantedAssignment(expr);
             if (tk != ')')
                 CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);
@@ -1404,9 +1417,13 @@ void parse_statement(StatementContext *context)
                 whileScope = NULL;
                 CExpr_CheckUnwantedAssignment(conditionExpr);
             }
+#if VERSION >= VERSION_GC_1_3
+            expr = CExpr_ConvertToCondition(conditionExpr);
+#else
             expr = CExpr2_ConvertScalarOperand(conditionExpr, 0, 1);
             if (expr->rtype->type != TYPEINT && expr->rtype->type != TYPEFLOAT && expr->rtype->type != TYPEPOINTER)
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
+#endif
             if (tk != ')')
                 CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);
             else {
@@ -1474,9 +1491,13 @@ void parse_statement(StatementContext *context)
                 ifScope = NULL;
                 CExpr_CheckUnwantedAssignment(conditionExpr);
             }
+#if VERSION >= VERSION_GC_1_3
+            expr = CExpr_ConvertToCondition(conditionExpr);
+#else
             expr = CExpr2_ConvertScalarOperand(conditionExpr, 0, 1);
             if (expr->rtype->type != TYPEINT && expr->rtype->type != TYPEFLOAT && expr->rtype->type != TYPEPOINTER)
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
+#endif
             CondJump(expr, endLabel = continueLabel = NewLabel(), 0, 0);
             if (tk != ')')
                 CError_ReportErrorAndUpdateToken(ERR_RPAREN_EXPECTED);

@@ -11902,13 +11902,13 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "make_objectref_offset",
+    "name": "CExpr_ConvertToIntegral",
     "address": "0x004bb000",
     "size": 544,
-    "source": "src/backend/TOC.c"
+    "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "CExpr_ConvertToIntegral",
+    "name": "CExpr_ConvertToCondition",
     "address": "0x004bb220",
     "size": 169,
     "source": "src/frontend/CExpr2.c"
@@ -12084,7 +12084,7 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "forceintegral",
+    "name": "integralpromote",
     "address": "0x004be460",
     "size": 148,
     "source": "src/frontend/CExpr2.c"
@@ -12133,14 +12133,16 @@
     "size": 97
   },
   {
-    "name": "fn_004bea60",
+    "name": "makemonadicnode",
     "address": "0x004bea60",
-    "size": 57
+    "size": 57,
+    "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004beaa0",
+    "name": "forceintegral",
     "address": "0x004beaa0",
-    "size": 74
+    "size": 74,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004beaf0",
@@ -20426,7 +20428,7 @@
     "size": 334
   },
   {
-    "name": "fn_0054f7a0",
+    "name": "CExpr_Convert",
     "address": "0x0054f7a0",
     "size": 1695
   },

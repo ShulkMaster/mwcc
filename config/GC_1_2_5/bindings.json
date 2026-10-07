@@ -246,7 +246,6 @@
   "_CExpr_TempModifyExpr": "0x004730d0",
   "_CExpr2_00473720": "0x00473720",
   "_CExpr_IntConstConvert": "0x00473870",
-  "_forceintegral": "0x004738d0",
   "_CExpr2_RewriteExprToTemp": "0x00473970",
   "_isnotzero": "0x00473be0",
   "_CExpr2_IsZero": "0x00473cb0",
@@ -4476,7 +4475,6 @@
   "_CExpr2_NewESCOPEBEGINNode": "0x00473ae0",
   "_CExpr_AllBitsSet": "0x00473b30",
   "_CExpr_IsOne": "0x00473b90",
-  "_CExpr_ConvertToIntegral": "0x00473ee0",
   "_nullnode": "0x00473f70",
   "_CExpr2_NewENEWEXCEPTIONARRAYNode": "0x00473fa0",
   "_CExpr_NewENode": "0x00473fd0",
@@ -6300,5 +6298,7 @@
   "_xor_64": "0x00474e10",
   "_elfBigEndian": "0x00580df0",
   "_elf_header": "0x00587f1c",
-  "_data_005374c4": "0x005374c4"
+  "_data_005374c4": "0x005374c4",
+  "_integralpromote": "0x004738d0",
+  "_forceintegral": "0x00473ee0"
 }

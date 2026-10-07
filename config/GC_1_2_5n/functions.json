@@ -10116,7 +10116,7 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "forceintegral",
+    "name": "integralpromote",
     "address": "0x004738d0",
     "size": 151,
     "source": "src/frontend/CExpr2.c"
@@ -10176,7 +10176,7 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "CExpr_ConvertToIntegral",
+    "name": "forceintegral",
     "address": "0x00473ee0",
     "size": 74,
     "source": "src/frontend/CExpr2.c"

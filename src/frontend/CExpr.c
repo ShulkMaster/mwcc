@@ -437,7 +437,7 @@ ENode *parse_arithmetic_binary_expression(ENode *left, char op, SInt16 token)
         promotedLeft = CExpr_LValue(operand, 1, 1);
     } else {
         if (operand->rtype->type == TYPEENUM)
-            operand = CExpr_ConvertToIntegral(operand);
+            operand = forceintegral(operand);
         if (operand->rtype->type != TYPEINT && (operand->rtype->type != TYPEFLOAT || op == 33)) {
             CError_ReportError(ERR_ILLEGAL_OPERAND);
             return nullnode();
@@ -449,7 +449,7 @@ ENode *parse_arithmetic_binary_expression(ENode *left, char op, SInt16 token)
     if (wasArray != 0)
         CError_ReportError(ERR_ILLEGAL_OPERAND);
     if (right->rtype->type == TYPEENUM)
-        right = CExpr_ConvertToIntegral(right);
+        right = forceintegral(right);
     if (promotedLeft->rtype->type == TYPEINT && right->rtype->type == TYPEFLOAT && op == 33) {
         CError_ReportError(ERR_ILLEGAL_OPERAND);
         return nullnode();
@@ -497,7 +497,7 @@ ENode *parse_arithmetic_compound_assignment(ENode *e, char operatorKind, SInt16 
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
                 return e;
             }
-            e = CExpr_ConvertToIntegral(e);
+            e = forceintegral(e);
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -505,7 +505,7 @@ ENode *parse_arithmetic_compound_assignment(ENode *e, char operatorKind, SInt16 
     }
 
     if (right->rtype->type == TYPEENUM) {
-        right = CExpr_ConvertToIntegral(right);
+        right = forceintegral(right);
     }
     if (CExpr2_IsZero(right) != 0) {
         return e;
@@ -592,7 +592,7 @@ ENode *parse_assignment_operator(ENode *expr, UInt8 assignmentKind, SInt16 overl
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
                 return expr;
             }
-            expr = CExpr_ConvertToIntegral(expr);
+            expr = forceintegral(expr);
             if (expr->rtype->type != TYPEINT) {
                 CError_ReportError(ERR_ILLEGAL_OPERAND);
                 return expr;
@@ -663,7 +663,11 @@ ENode *conditional_expression(void)
     cv = CExpr_RewriteConst(pointer_generation(cond));
     cond = cv;
     if (cv->rtype->type != TYPETEMPLDEPEXPR) {
+#if VERSION >= VERSION_GC_1_3
+        cond = CExpr_ConvertToCondition(cv);
+#else
         cond = CExpr2_ConvertScalarOperand(cv, 0, 1);
+#endif
         if (cond->rtype->type != TYPEINT && cond->rtype->type != TYPEFLOAT && cond->rtype->type != TYPEPOINTER) {
             CError_ReportError(ERR_ILLEGAL_OPERAND);
             return nullnode();
@@ -747,7 +751,11 @@ ENode *CExpr_New_ECOND_Node(ENode *condition, ENode *trueExpr, ENode *falseExpr)
     ENode *trueOperand;
     ENode *falseOperand;
 
+#if VERSION >= VERSION_GC_1_3
+    condition = CExpr_ConvertToCondition(normalize(condition));
+#else
     condition = CExpr2_ConvertScalarOperand(normalize(condition), 0, 1);
+#endif
     trueExpr = normalize(trueExpr);
     falseExpr = normalize(falseExpr);
 
@@ -824,7 +832,7 @@ ENode *CExpr_New_ECOND_Node(ENode *condition, ENode *trueExpr, ENode *falseExpr)
         case TYPEENUM:
             if (trueExpr->rtype == falseExpr->rtype)
                 break;
-            trueExpr = CExpr_ConvertToIntegral(trueExpr);
+            trueExpr = forceintegral(trueExpr);
         case TYPEINT:
             if (falseExpr->rtype->type == TYPEPOINTER && trueExpr->type == EINTCONST &&
                 IsZeroCInt64(&trueExpr->data.intval)) {
@@ -1253,7 +1261,11 @@ ENode *make_logical_or_node(ENode *left, ENode *right)
             break;
         case TYPEENUM:
         case TYPEMEMBERPOINTER:
+#if VERSION >= VERSION_GC_1_3
+            left = CExpr_ConvertToCondition(left);
+#else
             left = CExpr2_ConvertScalarOperand(left, 0, 0);
+#endif
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -1268,7 +1280,11 @@ ENode *make_logical_or_node(ENode *left, ENode *right)
             break;
         case TYPEENUM:
         case TYPEMEMBERPOINTER:
+#if VERSION >= VERSION_GC_1_3
+            right = CExpr_ConvertToCondition(right);
+#else
             right = CExpr2_ConvertScalarOperand(right, 0, 0);
+#endif
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -1331,7 +1347,11 @@ ENode *CExpr_New_ELAND_Node(ENode *left, ENode *right)
             break;
         case TYPEENUM:
         case TYPEMEMBERPOINTER:
+#if VERSION >= VERSION_GC_1_3
+            left = CExpr_ConvertToCondition(left);
+#else
             left = CExpr2_ConvertScalarOperand(left, 0, 0);
+#endif
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -1347,7 +1367,11 @@ ENode *CExpr_New_ELAND_Node(ENode *left, ENode *right)
             break;
         case TYPEENUM:
         case TYPEMEMBERPOINTER:
+#if VERSION >= VERSION_GC_1_3
+            right = CExpr_ConvertToCondition(right);
+#else
             right = CExpr2_ConvertScalarOperand(right, 0, 0);
+#endif
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -1424,8 +1448,8 @@ ENode *CExpr_New_EOR_Node(ENode *left, ENode *right)
         CError_ASSERT(4891, right != NULL);
     }
 
-    left = forceintegral(left);
-    right = forceintegral(right);
+    left = integralpromote(left);
+    right = integralpromote(right);
     CExpr_ArithmeticConversion(&left, &right);
 
     if (CExpr2_IsZero(right) || CExpr_AllBitsSet(left))
@@ -1466,8 +1490,8 @@ ENode *CExpr_New_EXOR_Node(ENode *left, ENode *right)
             CError_ASSERT(4855, operatorResult.right != 0);
         }
     }
-    left = forceintegral(left);
-    right = forceintegral(right);
+    left = integralpromote(left);
+    right = integralpromote(right);
     CExpr_ArithmeticConversion(&left, &right);
     if (CExpr2_IsZero(right))
         return left;
@@ -1509,8 +1533,8 @@ ENode *CExpr_New_EAND_Node(ENode *left, ENode *right)
         }
     }
 
-    left = forceintegral(left);
-    right = forceintegral(right);
+    left = integralpromote(left);
+    right = integralpromote(right);
     CExpr_ArithmeticConversion(&left, &right);
 
     if (CExpr2_IsZero(left) || CExpr_AllBitsSet(right))
@@ -2094,8 +2118,8 @@ ENode *CExpr_New_ESHR_Node(ENode *left, ENode *right)
         }
     }
 
-    leftOperand = forceintegral(left);
-    rightOperand = forceintegral(right);
+    leftOperand = integralpromote(left);
+    rightOperand = integralpromote(right);
 
     if (CExpr2_IsZero(leftOperand) != 0 || CExpr2_IsZero(rightOperand) != 0)
         return leftOperand;
@@ -2135,8 +2159,8 @@ ENode *CExpr_New_ESHL_Node(ENode *left, ENode *right)
         }
     }
 
-    leftOperand = forceintegral(left);
-    rightOperand = forceintegral(right);
+    leftOperand = integralpromote(left);
+    rightOperand = integralpromote(right);
 
     if (CExpr2_IsZero(leftOperand) != 0 || CExpr2_IsZero(rightOperand) != 0)
         return leftOperand;
@@ -2175,8 +2199,8 @@ ENode *CExpr_New_EMODULO_Node(ENode *left, ENode *right, Boolean suppressWarning
         }
     }
 
-    left = forceintegral(left);
-    right = forceintegral(right);
+    left = integralpromote(left);
+    right = integralpromote(right);
     CExpr_ArithmeticConversion(&left, &right);
 
     if (CExpr2_IsZero(right) != 0) {
@@ -2573,7 +2597,7 @@ ENode *do_typecast(ENode *expr, Type *type, UInt32 qual)
             return expr;
         }
         if (expr->rtype->type == TYPEENUM)
-            expr = CExpr_ConvertToIntegral(expr);
+            expr = forceintegral(expr);
         if (expr->rtype->type == TYPEINT || expr->rtype->type == TYPEFLOAT) {
             result = CExpr2_00473720(expr, type);
             result->flags = nodeQual;
@@ -2626,7 +2650,7 @@ ENode *do_typecast(ENode *expr, Type *type, UInt32 qual)
                                    type, qual);
                 return expr;
             }
-            expr = CExpr_ConvertToIntegral(expr);
+            expr = forceintegral(expr);
         }
         if (expr->rtype->size != 4) {
             if (expr->type != EINTCONST)
@@ -2867,7 +2891,7 @@ ENode *unary_expression(void)
             switch ((SInt8)operand->rtype->type) {
                 case TYPEINT:
                 case TYPEENUM:
-                    return forceintegral(operand);
+                    return integralpromote(operand);
                 case TYPEFLOAT:
                 case TYPEPOINTER:
                 case TYPEARRAY:
@@ -2906,7 +2930,7 @@ ENode *unary_expression(void)
                             CError_ASSERT(3283, operand != 0);
                         }
                     }
-                    promoted = forceintegral(operand);
+                    promoted = integralpromote(operand);
                     if (promoted->type == EINTCONST) {
                         promoted->data.intval = CMach_CalcIntMonadic(promoted->rtype, 0x7e, promoted->data.intval);
                         value = promoted;
@@ -3001,7 +3025,7 @@ ENode *CExpr_New_EMONMIN_Node(ENode *ene)
     switch ((SInt8)TYPE(node->rtype)->type) {
         case TYPEINT:
         case TYPEENUM:
-            node = forceintegral(node);
+            node = integralpromote(node);
             if (node->type == EINTCONST) {
                 node->data.intval = CMach_CalcIntMonadic(node->rtype, 0x2d, node->data.intval);
                 return node;
@@ -3044,10 +3068,14 @@ ENode *CExpr_New_ELOGNOT_Node(ENode *expr)
 
     switch ((SInt8)node->rtype->type) {
         case TYPEENUM:
-            node = CExpr_ConvertToIntegral(node);
+            node = forceintegral(node);
             break;
         case TYPEMEMBERPOINTER:
+#if VERSION >= VERSION_GC_1_3
+            node = CExpr_ConvertToCondition(node);
+#else
             node = CExpr2_ConvertScalarOperand(node, 0, 0);
+#endif
             break;
         default:
             CError_ReportError(ERR_ILLEGAL_OPERAND);
@@ -5013,7 +5041,7 @@ ENode *CExpr_New_EBINNOT_Node(ENode *node)
                 CError_FATAL(3283);
         }
     }
-    expression = forceintegral(operand);
+    expression = integralpromote(operand);
     if (expression->type == EINTCONST) {
         expression->data.intval = CMach_CalcIntMonadic(expression->rtype, 0x7e, expression->data.intval);
         return expression;
@@ -5404,7 +5432,7 @@ ENode *convert_to_stunsignedlong_size(ENode *node)
     Boolean isunsigned2;
 
     if (node->rtype->type != TYPEINT) {
-        node = CExpr_ConvertToIntegral(node);
+        node = forceintegral(node);
     }
     if (node->rtype->size != stunsignedlong.size) {
         targettype = (Type *)&stunsignedlong;
