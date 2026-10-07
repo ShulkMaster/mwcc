@@ -78,6 +78,9 @@ typedef enum ENodeType {
     ELOCOBJ,
     ETEMPX,
     ELABEL,
+#if VERSION >= VERSION_GC_1_3
+    EUNKNOWN66, /* added in 1.3; not referenced by any recovered code */
+#endif
     ESETCONST,
     ENEWEXCEPTION,
     ENEWEXCEPTIONARRAY,
