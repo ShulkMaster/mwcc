@@ -12157,9 +12157,10 @@
     "size": 58
   },
   {
-    "name": "fn_004beb30",
+    "name": "nullnode",
     "address": "0x004beb30",
-    "size": 35
+    "size": 35,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "CExpr2_NewENEWEXCEPTIONARRAYNode",
@@ -12168,9 +12169,10 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004beb90",
+    "name": "CExpr_NewENode",
     "address": "0x004beb90",
-    "size": 31
+    "size": 31,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bebb0",

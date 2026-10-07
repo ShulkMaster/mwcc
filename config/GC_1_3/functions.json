@@ -11454,9 +11454,10 @@
     "size": 58
   },
   {
-    "name": "fn_004bd960",
+    "name": "nullnode",
     "address": "0x004bd960",
-    "size": 35
+    "size": 35,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bd990",
@@ -11464,9 +11465,10 @@
     "size": 42
   },
   {
-    "name": "fn_004bd9c0",
+    "name": "CExpr_NewENode",
     "address": "0x004bd9c0",
-    "size": 31
+    "size": 31,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bd9e0",
