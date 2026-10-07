@@ -3,6 +3,7 @@
 
 #include "compiler/common.h"
 #include "compiler/CompilerTools.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -110,21 +111,20 @@ struct DwarfNode {
 struct DwarfRef {
     UInt16 tag;
     SInt32 num;
+#if VERSION >= VERSION_GC_2_7
+    struct BE_SymNode *symbol;
+#endif
     struct QualNode *qualifiers;
     UInt8 valid;
-    UInt8 fB;
     struct DWInfo *typeInfo;
 };
 #pragma options align = reset
-/* Type cache entry (find_or_create_dwinfo): the type, its reference and the hash chain link; galloc'd 30 bytes. */
 #pragma options align = mac68k
 struct DWInfo {
     Type *type;
     DwarfRef rec;
     struct DWInfo *next;
     UInt8 marked;
-    UInt8
-        typeNodeAlignmentPadding; /* 0x19: DWARF.c uses marked at 0x18 and typeNode at 0x1a; unused byte aligns typeNode to the two-byte boundary. */
     struct DwarfNode *typeNode;
 };
 #pragma options align = reset
@@ -166,7 +166,11 @@ extern void DWARF_ReplaceTrailingLongWordLong(unsigned int firstValue, unsigned 
 extern void emit_compile_unit(struct ObjGenSection *file, UInt8 flag);
 extern SInt32 emit_entry_header(SInt16 value);
 extern struct DWInfo *find_or_create_dwinfo(struct Type *type);
-extern DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 a, Boolean b);
+#if VERSION >= VERSION_GC_2_7
+extern DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 qual, Boolean declarationOnly, struct BE_SymNode *symbol);
+#else
+extern DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 qual, Boolean declarationOnly);
+#endif
 extern int emit_location_attribute(DwarfLocationOperand *op, UInt16 attribute, unsigned char dereference);
 extern UInt16 get_integral_type_code(Type *type);
 extern unsigned int DWARF_RestoreFunctionState(void);

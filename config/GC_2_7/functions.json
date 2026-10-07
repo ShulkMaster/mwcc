@@ -20223,7 +20223,8 @@
   {
     "name": "fn_00548810",
     "address": "0x00548810",
-    "size": 204
+    "size": 204,
+    "source": "src/backend/DWARF.c"
   },
   {
     "name": "fn_005488e0",
@@ -20361,14 +20362,16 @@
     "source": "src/backend/DWARF.c"
   },
   {
-    "name": "fn_0054bc90",
+    "name": "create_type_dwarf_ref",
     "address": "0x0054bc90",
-    "size": 640
+    "size": 640,
+    "source": "src/backend/DWARF.c"
   },
   {
-    "name": "fn_0054bf10",
+    "name": "get_integral_type_code",
     "address": "0x0054bf10",
-    "size": 131
+    "size": 131,
+    "source": "src/backend/DWARF.c"
   },
   {
     "name": "emit_member_pointer_type",

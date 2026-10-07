@@ -2,6 +2,7 @@
 #define COMPILER_BE_SYMBOL_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +33,9 @@ struct BE_SymNode {
     struct InterruptGenerationRecord *interruptInfo;
 };
 #pragma options align = reset
+#if VERSION >= VERSION_GC_2_7
+extern BE_SymNode *fn_004d1650(HashNameNode *name, SInt16 kind);
+#endif
 extern BE_SymNode *BE_symbol_SetupObjectSymbol(Object *object, int size, ObjGenSection *section);
 extern Boolean BE_symbol_004913b0(Object *obj);
 extern Object *BE_symbol_GetFunctionSymbolLinkData(Object *func);

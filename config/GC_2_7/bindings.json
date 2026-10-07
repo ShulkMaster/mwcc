@@ -1677,5 +1677,7 @@
   "_bitvectorunion": "0x0057dea0",
   "_bitvectorcopy": "0x0057e060",
   "_compiler_linker_callbacks": "0x005a557c",
-  "_CDecl_MakeCopyCtorType": "0x00534980"
+  "_CDecl_MakeCopyCtorType": "0x00534980",
+  "_fn_004d1650": "0x004d1650",
+  "_currentDwarfFunctionState": "0x005ea614"
 }

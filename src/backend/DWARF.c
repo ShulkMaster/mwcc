@@ -40,6 +40,7 @@
 #include "driver/Files.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #include "compiler/Objects.h"
 
@@ -474,7 +475,11 @@ void emit_variable_entry(struct DwarfSym *sym, Object *obj, DWInfo *arg)
     sym->fixups = fixup;
     sym->offset = offset;
 
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(arg, obj->qual, 1, NULL);
+#else
     get_type_dwarf_ref(arg, obj->qual, 1);
+#endif
     size = emit_entry_header(CParser_HasInternalLinkage(obj) ? 12 : 7);
     AppendGListWord(dwarf_info_buffer, 0x38);
     size += 2;
@@ -551,6 +556,35 @@ void DWARF_AddVar(Object *record, SInt32 offset)
     }
     node->u.var.name = record->name;
 }
+#if VERSION >= VERSION_GC_2_7
+static BE_SymNode *fn_00548810(HashNameNode *name, SInt16 kind, UInt32 tag, SInt32 offset)
+{
+    char tagName[64];
+    char uniqueName[16];
+    HashNameNode *symbolName;
+    BE_SymNode *symbol;
+
+    data_00583548.size = 0;
+    sprintf(tagName, "%04x.", tag);
+    CompilerTools_AppendGListString(&data_00583548, ".dwarf.");
+    CompilerTools_AppendGListString(&data_00583548, tagName);
+    if (name == NULL) {
+        uniqueName[0] = '.';
+        CParser_PrintUniqueID(uniqueName + 1);
+        AppendGListName(&data_00583548, uniqueName);
+        kind = 0x102;
+    } else {
+        AppendGListName(&data_00583548, name->name);
+    }
+    fn_00443190(data_00583548.data);
+    symbolName = GetHashNameNode(*data_00583548.data);
+    fn_004431b0(data_00583548.data);
+    symbol = fn_004d1650(symbolName, kind);
+    symbol->offset = offset;
+    return symbol;
+}
+#endif
+
 void DWARF_004ad260(DWInfo *ptype, union DwarfNodePayload *info)
 {
     Type *type = ptype->type;
@@ -570,7 +604,11 @@ void DWARF_004ad260(DWInfo *ptype, union DwarfNodePayload *info)
     name = info->var.name;
     entryOffset = dwarf_info_buffer->size;
 
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(ptype, info->var.flags, 1, NULL);
+#else
     get_type_dwarf_ref(ptype, info->var.flags, 1);
+#endif
     length = emit_entry_header(5);
     AppendGListWord(dwarf_info_buffer, 0x38);
     length += 2;
@@ -649,7 +687,11 @@ void DWARF_004ad570(DWInfo *ptype, union DwarfNodePayload *info)
     name = info->var.name;
     entryOffset = dwarf_info_buffer->size;
 
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(ptype, info->var.flags, 1, NULL);
+#else
     get_type_dwarf_ref(ptype, info->var.flags, 1);
+#endif
     len = emit_entry_header(12);
     AppendGListWord(dwarf_info_buffer, 0x38);
     len += 2;
@@ -953,7 +995,11 @@ void DWARF_WriteDebugInfo(void)
                             break;
                         case 0x13:
                             if (entryData->marked != 0) {
+#if VERSION >= VERSION_GC_2_7
+                                get_type_dwarf_ref(entryData, node->u.var.flags, 0, NULL);
+#else
                                 get_type_dwarf_ref(entryData, node->u.var.flags, 0);
+#endif
                             }
                             break;
                         case 0x4081:
@@ -1156,7 +1202,11 @@ SInt32 emit_function_entry(Object *func, SInt32 code_size, SInt32 code_offset,
         DWInfo *symbol;
         AppendGListWord(dwarf_info_buffer, 0x142);
         symbol = find_or_create_dwinfo((Type *)TYPE_METHOD(func->type)->theclass);
+#if VERSION >= VERSION_GC_2_7
+        class_reference = get_type_dwarf_ref(symbol, 0, 1, NULL);
+#else
         class_reference = get_type_dwarf_ref(symbol, 0, 1);
+#endif
         reference = BE_elf_AddRelocation(dwarf_section, dwarf_info_buffer->size, NULL, dwarf_section,
                                          class_reference.num, currentDwarfFunctionState->offset);
         if (class_reference.valid == 0) {
@@ -1174,7 +1224,11 @@ SInt32 emit_function_entry(Object *func, SInt32 code_size, SInt32 code_offset,
     if (return_type_location->kind != 0) {
         DWInfo *symbol;
         symbol = find_or_create_dwinfo(return_type_location->metadata.type);
+#if VERSION >= VERSION_GC_2_7
+        get_type_dwarf_ref(symbol, 0, 1, NULL);
+#else
         get_type_dwarf_ref(symbol, 0, 1);
+#endif
         if (return_type_location->kind == 5 || return_type_location->kind == 0xa)
             entry_size += emit_location_attribute(return_type_location, 0x2a3, 1);
         entry_size += emit_dwarf_ref(symbol);
@@ -1254,6 +1308,9 @@ SInt32 emit_function_entry(Object *func, SInt32 code_size, SInt32 code_offset,
 
 void emit_member_pointer_type(DwarfFixup **references, DWInfo *type)
 {
+#if VERSION >= VERSION_GC_2_7
+    BE_SymNode *symbol;
+#endif
     TypeMemberPointer *entry;
     DwarfFixup *reference;
     SInt32 offset;
@@ -1263,6 +1320,9 @@ void emit_member_pointer_type(DwarfFixup **references, DWInfo *type)
 
     entry = (TypeMemberPointer *)type->type;
     offset = dwarf_info_buffer->size;
+#if VERSION >= VERSION_GC_2_7
+    symbol = fn_00548810(NULL, 0x102, 0x1f, offset + currentDwarfFunctionState->offset);
+#endif
     reference = *references;
     while (reference != NULL) {
         if (copts.fd5 != 0) {
@@ -1273,16 +1333,28 @@ void emit_member_pointer_type(DwarfFixup **references, DWInfo *type)
         reference = reference->next;
     }
     *references = reference;
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(type, 0, 0, symbol);
+#else
     get_type_dwarf_ref(type, 0, 0);
+#endif
     size = emit_entry_header(0x1f);
     if (entry->memberType != NULL) {
         record = find_or_create_dwinfo(entry->memberType);
+#if VERSION >= VERSION_GC_2_7
+        get_type_dwarf_ref(record, 0, 1, NULL);
+#else
         get_type_dwarf_ref(record, 0, 1);
+#endif
         size += emit_dwarf_ref(record);
     }
     if (entry->owner.type != NULL) {
         record = find_or_create_dwinfo(entry->owner.type);
+#if VERSION >= VERSION_GC_2_7
+        get_type_dwarf_ref(record, 0, 1, NULL);
+#else
         get_type_dwarf_ref(record, 0, 1);
+#endif
         saved = record->rec;
         record->rec.tag = 0x1d2;
         size += emit_dwarf_ref(record);
@@ -1296,6 +1368,9 @@ void emit_member_pointer_type(DwarfFixup **references, DWInfo *type)
 
 void emit_function_type(DwarfFixup **fixups, DWInfo *function)
 {
+#if VERSION >= VERSION_GC_2_7
+    BE_SymNode *symbol;
+#endif
     TypeFunc *type;
     DwarfFixup *fixup;
     FuncArg *argument;
@@ -1306,6 +1381,9 @@ void emit_function_type(DwarfFixup **fixups, DWInfo *function)
 
     type = TYPE_FUNC(function->type);
     offset = dwarf_info_buffer->size;
+#if VERSION >= VERSION_GC_2_7
+    symbol = fn_00548810(NULL, 0x102, 0x15, offset + currentDwarfFunctionState->offset);
+#endif
     for (fixup = *fixups; fixup != NULL; fixup = fixup->next) {
         if (copts.fd5 != 0) {
             BE_elf_SetRelocationValue(fixup->reference, offset);
@@ -1314,11 +1392,19 @@ void emit_function_type(DwarfFixup **fixups, DWInfo *function)
         }
     }
     *fixups = fixup;
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(function, 0, 0, symbol);
+#else
     get_type_dwarf_ref(function, 0, 0);
+#endif
     size = emit_entry_header(0x15);
     if (type->functype != NULL) {
         typeRecord = find_or_create_dwinfo(type->functype);
+#if VERSION >= VERSION_GC_2_7
+        get_type_dwarf_ref(typeRecord, 0, 1, NULL);
+#else
         get_type_dwarf_ref(typeRecord, 0, 1);
+#endif
         size += emit_dwarf_ref(typeRecord);
     }
     CError_ASSERT(1230, function->typeNode != NULL);
@@ -1345,7 +1431,11 @@ void emit_function_type(DwarfFixup **fixups, DWInfo *function)
             offset = dwarf_info_buffer->size;
             size = emit_entry_header(5);
             typeRecord = find_or_create_dwinfo(argument->type);
+#if VERSION >= VERSION_GC_2_7
+            get_type_dwarf_ref(typeRecord, 0, 1, NULL);
+#else
             get_type_dwarf_ref(typeRecord, 0, 1);
+#endif
             size += emit_dwarf_ref(typeRecord);
             *(SInt32 *)(*dwarf_info_buffer->data + offset) = size;
         }
@@ -1665,7 +1755,11 @@ int emit_location_attribute(DwarfLocationOperand *location, UInt16 attribute, un
     return attributeSize;
 }
 
+#if VERSION >= VERSION_GC_2_7
+DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 a, Boolean b, BE_SymNode *symbol)
+#else
 DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 a, Boolean b)
+#endif
 {
     Type *t;
 
@@ -1684,6 +1778,15 @@ DwarfRef get_type_dwarf_ref(DWInfo *info, UInt16 a, Boolean b)
         info->rec.tag = 0x55;
         info->rec.num = 0x14;
         info->rec.valid = 1;
+#if VERSION >= VERSION_GC_2_7
+    } else if (t->type == TYPEFUNC || t->type == TYPEMEMBERPOINTER) {
+        info->rec.tag = 0x72;
+        if (!b) {
+            info->rec.num = dwarf_info_buffer->size + currentDwarfFunctionState->offset;
+            info->rec.symbol = symbol;
+            info->rec.valid = 1;
+        }
+#endif
     } else {
         set_type_dwarf_ref(t, a, b, &info->rec);
     }
@@ -1826,6 +1929,9 @@ DwarfRef create_type_dwarf_ref(Type *type, UInt16 qual, Boolean isArgument)
     QualNode *head;
     UInt16 pointerQual;
 
+#if VERSION >= VERSION_GC_2_7
+    memclrw(&result, sizeof(result));
+#endif
     head = (QualNode *)galloc(6);
     result.qualifiers = tail = head;
     head->next = NULL;
@@ -1879,9 +1985,17 @@ DwarfRef create_type_dwarf_ref(Type *type, UInt16 qual, Boolean isArgument)
     }
     {
         DWInfo *info = find_or_create_dwinfo(type);
+#if VERSION >= VERSION_GC_2_7
+        memclrw(&typeRef, sizeof(typeRef));
+        typeRef = get_type_dwarf_ref(info, 0, isArgument, NULL);
+#else
         typeRef = get_type_dwarf_ref(info, 0, isArgument);
+#endif
         result.typeInfo = info;
         result.num = typeRef.num;
+#if VERSION >= VERSION_GC_2_7
+        result.symbol = typeRef.symbol;
+#endif
     }
     return result;
 }
@@ -1922,6 +2036,10 @@ UInt16 get_integral_type_code(Type *type)
             return 15U;
         case IT_LONGDOUBLE:
             return 15U;
+#if VERSION >= VERSION_GC_2_7
+        case 19:
+            return 0xac00U;
+#endif
         case IT_WCHAR_T:
         default:
             return 0U;
@@ -2051,7 +2169,11 @@ void emit_array_type(Type *type)
     }
     arrayInfo->typeNode->u.fixups = fixup;
 
+#if VERSION >= VERSION_GC_2_7
+    get_type_dwarf_ref(elementInfo, 0, 1, NULL);
+#else
     get_type_dwarf_ref(elementInfo, 0, 1);
+#endif
     entrySize = emit_entry_header(1);
     AppendGListWord(dwarf_info_buffer, 0xa3);
     entrySize += 2;
@@ -2173,7 +2295,11 @@ void emit_class_dwarf(TypeClass *cls)
             memberName = base->base->classname->name;
             memberLength += EmitName(memberName);
             baseType = find_or_create_dwinfo((Type *)base->base);
+#if VERSION >= VERSION_GC_2_7
+            get_type_dwarf_ref(baseType, 0, 1, NULL);
+#else
             get_type_dwarf_ref(baseType, 0, 1);
+#endif
             memberLength += emit_dwarf_ref(baseType);
             switch (base->access) {
                 case ACCESSPUBLIC:
@@ -2213,7 +2339,11 @@ void emit_class_dwarf(TypeClass *cls)
             typeInfo = find_or_create_dwinfo(member->type);
             bitfield = NULL;
         }
+#if VERSION >= VERSION_GC_2_7
+        get_type_dwarf_ref(typeInfo, member->qual, 1, NULL);
+#else
         get_type_dwarf_ref(typeInfo, member->qual, 1);
+#endif
         memberPos = dwarf_info_buffer->size;
         memberLength = emit_entry_header(0xd);
         AppendGListWord(dwarf_info_buffer, 0x38);
@@ -2297,7 +2427,11 @@ void emit_class_dwarf(TypeClass *cls)
                 location.metadata.value = cls->vtable->offset;
                 memberLength += emit_location_attribute(&location, (cls->flags & CLASS_ABSTRACT) ? 0x293 : 0x303, 0);
             }
+#if VERSION >= VERSION_GC_2_7
+            get_type_dwarf_ref(typeInfo, entry->qual, 1, NULL);
+#else
             get_type_dwarf_ref(typeInfo, entry->qual, 1);
+#endif
             memberLength += emit_dwarf_ref(typeInfo);
             PatchDwarfLength(memberPos, memberLength);
         } else if (entry->datatype == DDATA) {
@@ -2309,7 +2443,11 @@ void emit_class_dwarf(TypeClass *cls)
             memberName = entry->name->name;
             memberLength += EmitName(memberName);
             typeInfo = find_or_create_dwinfo(entry->type);
+#if VERSION >= VERSION_GC_2_7
+            get_type_dwarf_ref(typeInfo, entry->qual, 1, NULL);
+#else
             get_type_dwarf_ref(typeInfo, entry->qual, 1);
+#endif
             memberLength += emit_dwarf_ref(typeInfo);
             PatchDwarfLength(memberPos, memberLength);
         }
@@ -2407,7 +2545,11 @@ void DWARF_004b0a80(TypeStruct *type)
                 memberInfo = find_or_create_dwinfo(memberType);
                 bitfield = NULL;
             }
+#if VERSION >= VERSION_GC_2_7
+            get_type_dwarf_ref(memberInfo, member->qual, 1, NULL);
+#else
             get_type_dwarf_ref(memberInfo, member->qual, 1);
+#endif
             entryOffset = dwarf_info_buffer->size;
             length = emit_entry_header(0xd);
             AppendGListWord(dwarf_info_buffer, 0x38);
