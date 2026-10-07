@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/MemUtils.h"
 #include "driver/CLBrowser.h"
@@ -12,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if VERSION >= VERSION_GC_2_7
+#if VERSION >= VERSION_GC_1_3
 void *__stdcall xmalloc(const char *what, int size)
 {
     void *memory;

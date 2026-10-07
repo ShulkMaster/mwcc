@@ -1672,5 +1672,6 @@
   "_SpillCode_BuildLocalLiveness": "0x0057bea0",
   "_bitvectorinitialize": "0x0057dff0",
   "_bitvectorunion": "0x0057dea0",
-  "_bitvectorcopy": "0x0057e060"
+  "_bitvectorcopy": "0x0057e060",
+  "_compiler_linker_callbacks": "0x005a557c"
 }

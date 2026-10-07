@@ -1,5 +1,7 @@
 #include "compiler/common.h"
 #include "driver/CLCompilerLinkerDropin_V10.h"
+#include "compiler/CPrep.h"
+#include "driver/Files.h"
 #ifndef MWCC_PLUGINS_H
 #define MWCC_PLUGINS_H
 
@@ -42,32 +44,50 @@ public:
     void *dataReference;          /* 0x134 */
 };
 
+struct CWTargetInfoV7 {
+    CWFileSpec outfile;
+    CWFileSpec symfile;
+    SInt16 linkType;
+    Boolean canRun;
+    Boolean canDebug;
+    Boolean useRunHelperApp;
+    char reserved1;
+    UInt32 debuggerCreator;
+    UInt32 runHelperCreator;
+    SInt32 reserved2[2];
+};
+struct CWEnvVarInfo;
+
 class PluginC : public PluginA {
 public:
     PluginC();
-    SInt32 initialValue;          /* 0x108 */
-    UInt8 initialStorage[0x46];   /* 0x10c */
-    SInt32 value1;                /* 0x152 */
-    SInt32 value2;                /* 0x156 */
-    UInt8 byte1;                  /* 0x15a */
-    UInt8 byte2;
-    UInt8 byte3;
-    UInt8 byte4;
-    UInt8 byte5;
-    UInt8 opaqueByte;
-    UInt16 shortValue;            /* 0x160 */
-    UInt8 shortStorage[0x10];     /* 0x162 */
-    UInt16 opaqueShort;           /* 0x172 */
-    SInt32 value3;                /* 0x174 */
-    SInt32 value4;
-    SInt32 value5;
-    SInt32 value6;
-    UInt8 opaqueMiddle[0x1c];     /* 0x184 */
-    SInt32 value7;                /* 0x1a0 */
-    UInt8 trailingStorage[0xa2];  /* 0x1a4 */
-    InitializationAuxiliaryState *auxiliary; /* 0x246 */
-    UInt8 opaqueTail[0x1c];       /* 0x24a */
-    char *sharedValue;            /* 0x266 */
+    SInt32 whichfile;                      /* 0x108 */
+    CWFileSpec sourcefile;                 /* 0x10c */
+    const char *sourcetext;                /* 0x152 */
+    SInt32 sourcetextsize;
+    Boolean precompile;                   /* 0x15a */
+    Boolean autoprecompile;
+    Boolean preprocess;
+    Boolean cachingPCH;
+    Boolean debuginfo;
+    SInt16 fileID;                         /* 0x160 */
+    BrowseOptions browseoptions;          /* 0x162 */
+    Boolean recordbrowseinfo;
+    void *reserved;                       /* 0x174 */
+    SInt32 sequenceID;
+    PluginC *parentPB;
+    void *targetStorage;
+    SInt32 reservedcompiler[7];            /* 0x184 */
+    StorageHandle *texthandle;             /* 0x1a0 */
+    CWTargetInfoV7 targetinfo_V7;  /* 0x1a4 */
+    TgtRec *targetinfo;                    /* 0x246 */
+    const char *commandLineArgs;
+    CWFileSpec *workingDirectorySpec;
+    SInt32 numEnvironmentVariables;
+    CWEnvVarInfo *environmentVariables;
+    SInt32 workingDirectoryError;
+    SInt32 reservedlinker[2];
+    ObjectCallbackContext *callbacks;     /* 0x266 */
 };
 #pragma options align=reset
 

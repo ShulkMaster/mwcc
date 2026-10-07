@@ -1,6 +1,7 @@
 #define CERROR_FILE "CLCompilerLinkerDropin_V10.c"
 #pragma bool off
 
+#include "version.h"
 #include "compiler/common.h"
 #include "driver/StringExtras.h"
 #include "driver/CLCompilerLinkerDropin_V10.h"
@@ -24,6 +25,8 @@
 #include "driver/Files.h"
 #include "driver/MacSpecs.h"
 #include "driver/Memory.h"
+#include "driver/MemUtils.h"
+#include "driver/CLPluginRequests.h"
 #include "driver/MsDos.h"
 #include "driver/TargetOptimizer-ppc-eabi.h"
 extern "C" {
@@ -655,32 +658,36 @@ extern "C" {
 PluginC::PluginC() : PluginA(plugin_type, sizeof(PluginC))
 {
     CLTarget *globals;
-    auxiliary = new InitializationAuxiliaryState;
-    memset(auxiliary, 0, 0x136);
+#if VERSION >= VERSION_GC_1_3
+    targetinfo = static_cast<TgtRec *>(xmalloc("context", sizeof(TgtRec)));
+#else
+    targetinfo = new TgtRec;
+#endif
+    memset(targetinfo, 0, sizeof(*targetinfo));
 
     if (default_target != 0) {
         globals = default_target;
-        auxiliary->defaultValue1 = globals->cpu;
+        targetinfo->head.platformCodes[0] = globals->cpu;
         globals = default_target;
-        auxiliary->defaultValue2 = globals->os;
+        targetinfo->head.platformCodes[1] = globals->os;
     } else {
-        auxiliary->defaultValue1 = auxiliary->defaultValue2 = 0x2a2a2a2a;
+        targetinfo->head.platformCodes[0] = targetinfo->head.platformCodes[1] = 0x2a2a2a2a;
     }
 
-    initialValue = 0;
-    memset(&initialStorage, 0, 0x46);
-    value1 = 0;
-    value2 = 0;
-    byte1 = byte2 = byte3 = 0;
-    byte4 = 0;
-    byte5 = 0;
-    shortValue = 0;
-    memset(&shortStorage, 0, 0x10);
-    value3 = 0;
-    value4 = 0;
-    value5 = 0;
-    value6 = 0;
-    value7 = 0;
-    memset(&trailingStorage, 0, 0xa2);
-    sharedValue = "p[B";
+    whichfile = 0;
+    memset(&sourcefile, 0, sizeof(sourcefile));
+    sourcetext = 0;
+    sourcetextsize = 0;
+    precompile = autoprecompile = preprocess = 0;
+    cachingPCH = 0;
+    debuginfo = 0;
+    fileID = 0;
+    memset(&browseoptions, 0, sizeof(browseoptions));
+    reserved = 0;
+    sequenceID = 0;
+    parentPB = 0;
+    targetStorage = 0;
+    texthandle = 0;
+    memset(&targetinfo_V7, 0, sizeof(targetinfo_V7));
+    callbacks = &compiler_linker_callbacks;
 }

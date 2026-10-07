@@ -3356,24 +3356,28 @@
     "size": 6
   },
   {
-    "name": "fn_00417290",
+    "name": "xmalloc@8",
     "address": "0x00417290",
-    "size": 117
+    "size": 117,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_00417310",
+    "name": "xcalloc@8",
     "address": "0x00417310",
-    "size": 34
+    "size": 34,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_00417340",
+    "name": "xrealloc@12",
     "address": "0x00417340",
-    "size": 117
+    "size": 117,
+    "source": "src/driver/MemUtils.c"
   },
   {
-    "name": "fn_004173c0",
+    "name": "xstrdup@4",
     "address": "0x004173c0",
-    "size": 41
+    "size": 41,
+    "source": "src/driver/MemUtils.c"
   },
   {
     "name": "fn_004173f0",
@@ -5289,9 +5293,10 @@
     "size": 133
   },
   {
-    "name": "fn_004286a0",
+    "name": "??0PluginC@@QAE@XZ",
     "address": "0x004286a0",
-    "size": 444
+    "size": 444,
+    "source": "src/driver/CLCompilerLinkerDropin_V10.cpp"
   },
   {
     "name": "fn_0042885c",

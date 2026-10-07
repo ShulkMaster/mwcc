@@ -1598,5 +1598,7 @@
   "_forceintegral": "0x004bd8d0",
   "_CExpr_Convert": "0x0054ccd0",
   "_CExpr_ConversionIteratorNext": "0x004ba8c0",
-  "_memberpointercompare": "0x0053e620"
+  "_memberpointercompare": "0x0053e620",
+  "_compiler_linker_callbacks": "0x005a24bc",
+  "_realloc": "0x004047a0"
 }

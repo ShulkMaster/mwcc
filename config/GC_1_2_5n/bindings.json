@@ -6300,5 +6300,6 @@
   "_elf_header": "0x00587f1c",
   "_data_005374c4": "0x005374c4",
   "_integralpromote": "0x004738d0",
-  "_forceintegral": "0x00473ee0"
+  "_forceintegral": "0x00473ee0",
+  "_compiler_linker_callbacks": "0x0054d774"
 }

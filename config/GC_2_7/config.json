@@ -84,6 +84,7 @@
     "src/backend/RegisterInfo.c",
     "src/frontend/CException.c",
     "src/driver/cc-eabi-ppc.c",
-    "src/frontend/CompilerTools.c"
+    "src/frontend/CompilerTools.c",
+    "src/driver/CLCompilerLinkerDropin_V10.cpp"
   ]
 }

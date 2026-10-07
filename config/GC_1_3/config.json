@@ -133,6 +133,8 @@
     "src/optimizer/IroDump.c",
     "src/frontend/CMangler.c",
     "src/driver/CLDropinCallbacks_V10.cpp",
-    "src/frontend/CException.c"
+    "src/frontend/CException.c",
+    "src/driver/CLCompilerLinkerDropin_V10.cpp",
+    "src/driver/MemUtils.c"
   ]
 }
