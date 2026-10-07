@@ -1692,7 +1692,11 @@ void parse_friend_declaration(TypeClassTemplate *cls)
             CError_ReportError(ERR_ILLEGAL_FRIEND_DECLARATION);
         if (decl.dtype->type == TYPECLASS) {
             if ((((TypeClass *)decl.dtype)->flags & CLASS_IS_TEMPL) == 0 ||
+#if VERSION >= VERSION_GC_2_7
+                CParser_CheckTemplateClassScope(decl.dtype, 1) != 0) {
+#else
                 CParser_CheckTemplateClassScope(decl.dtype) != 0) {
+#endif
                 if (!isTemplateClass)
                     CDecl_AddFriend(&cls->base, NULL, decl.dtype);
                 else
@@ -4209,7 +4213,11 @@ void conversion_type_name(DeclInfo *result)
         case TK_IDENTIFIER:
         case TK_COLON_COLON: {
             NameSpace *object;
+#if VERSION >= VERSION_GC_2_7
+            if (CScope_ParseQualifiedScope(&lookup, 0, 0)) {
+#else
             if (CScope_ParseQualifiedScope(&lookup, 0)) {
+#endif
                 object = lookup.nspace;
                 if (object != NULL && object->theclass != NULL && tk == '*')
                     CDecl_ScanPointer(&declaration, object, 0);
@@ -4246,7 +4254,11 @@ void CDecl_ParseDeclarator(DeclInfo *decl)
                 break;
             /* fall through */
         case TK_COLON_COLON:
+#if VERSION >= VERSION_GC_2_7
+            if (CScope_ParseQualifiedScope(&info, 1, 0)) {
+#else
             if (CScope_ParseQualifiedScope(&info, 1)) {
+#endif
                 nspace = info.nspace;
                 if (info.nspace != NULL) {
                     if (info.nspace->theclass != NULL && tk == '*')
@@ -4346,7 +4358,11 @@ void CDecl_ScanPointer(DeclInfo *declarator, NameSpace *nspace, char finish)
                     break;
                 }
             case TK_COLON_COLON:
+#if VERSION >= VERSION_GC_2_7
+                if (!CScope_ParseQualifiedScope(&lookup, 1, 0))
+#else
                 if (!CScope_ParseQualifiedScope(&lookup, 1))
+#endif
                     break;
                 nspace = lookup.nspace;
                 foundNamespace = nspace;
@@ -4446,7 +4462,11 @@ void parse_direct_declarator(DeclInfo *state, NameSpace *function)
                 if (state->parserOption != 0 && currentNameSpace->theclass != NULL) {
                     parserOption = 1;
                 }
+#if VERSION >= VERSION_GC_2_7
+                parsed = CParser_00490660(&state->operatorToken, parserOption, 0);
+#else
                 parsed = CParser_00490660(&state->operatorToken, parserOption);
+#endif
             }
             if (parsed == 0) {
                 CScope_RestoreScope(&save);
@@ -4488,7 +4508,11 @@ void parse_direct_declarator(DeclInfo *state, NameSpace *function)
                 if (state->parserOption != 0 && currentNameSpace->theclass != NULL) {
                     parserOption = 1;
                 }
+#if VERSION >= VERSION_GC_2_7
+                parsed = CParser_00490660(&state->operatorToken, parserOption, 0);
+#else
                 parsed = CParser_00490660(&state->operatorToken, parserOption);
+#endif
             }
             if (parsed == 0) {
                 return;

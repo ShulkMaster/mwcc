@@ -20,6 +20,7 @@
   "__CALLER_SP_": "0x005eecaa",
   "__FP_": "0x005ef090",
   "_assignable_registers": "0x005eebb0",
+  "_class_path_offset": "0x005e0b0a",
   "_coloring": "0x005ea638",
   "_compiler_plugin_target_name": "0x005de920",
   "_current_source_spec": "0x005deac4",

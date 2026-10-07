@@ -320,6 +320,8 @@ struct TemplParamID {
     Boolean type;
 };
 #pragma options align = reset
+#define TEMPLDEP_ARGUMENT 0
+#define TPT_TEMPLATE 2
 /* A template-dependent type (TYPETEMPLATE); dtype selects the union member: 0 argument, 1 qualified name, 2 template,
  * 3 array, 4 qualified template, 5 bitfield. */
 #pragma options align = mac68k

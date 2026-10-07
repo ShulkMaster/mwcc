@@ -78,6 +78,20 @@ extern Type stvoid;
 #define TK_ENUM 273
 #define TK_CLASS 274
 #define TK_UU_VECTOR 283
+#if VERSION >= VERSION_GC_2_7
+#define TK_BOOL 285
+#define TK_WCHAR_T 286
+#define TK__COMPLEX 287
+#define TK__IMAGINARY 288
+#define TK_TYPENAME 289
+#define TK_CONST 290
+#define TK_VOLATILE 291
+#define TK_PASCAL 292
+#define TK_UU_DECLSPEC 293
+#define TK_UU_STDCALL 294
+#define TK_UU_CDECL 295
+#define TK_UU_FASTCALL 296
+#else
 #define TK_BOOL 284
 #define TK_WCHAR_T 285
 #define TK__COMPLEX 286
@@ -91,6 +105,7 @@ extern Type stvoid;
 #define TK_UU_CDECL 294
 #define TK_UU_FASTCALL 295
 #define TK_UU_FLOATCALL 296
+#endif
 #define TK_UU_FAR 297
 #define TK_EXPLICIT 298
 #define TK_MUTABLE 299
@@ -180,7 +195,11 @@ extern void CParser_CheckAnonymousUnion(DeclInfo *context, char flag);
 extern Boolean CParser_IsAnonymousClass(Type **ptype, Boolean flag);
 extern void CParser_Cleanup(void);
 extern void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject);
+#if VERSION >= VERSION_GC_2_7
+extern unsigned char CParser_CheckTemplateClassScope(Type *type, Boolean reportError);
+#else
 extern unsigned char CParser_CheckTemplateClassScope(Type *type);
+#endif
 extern int parse_dtype_specifiers(DeclInfo *state);
 extern void CParser_ParseDeclSpec(DeclInfo *st, int arg2);
 extern void CParser_ParseAttribute(Type *type, DeclInfo *function);
@@ -212,7 +231,11 @@ extern SInt32 CParser_GetUniqueID(void);
 extern Type *CParser_GetWCharType(void);
 extern Type *CParser_GetBoolType(void);
 extern FuncArg *CParser_NewFuncArg(void);
+#if VERSION >= VERSION_GC_2_7
+extern Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion, Boolean parseConversionType);
+#else
 extern Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion);
+#endif
 extern void fn_004908d0(void);
 extern unsigned int CParser_PrependClassTypeLink(TypeClass *type);
 extern void CParser_NewCallBackAction(Object *object, TypeClass *theclass);

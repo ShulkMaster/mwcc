@@ -370,9 +370,11 @@ int classify_identifier_token(void)
     if (memcmp("__fastcall", data_00587fa0->name, 11) == 0) {
         return TK_UU_FASTCALL;
     }
+#if VERSION < VERSION_GC_2_7
     if (memcmp("__floatcall", data_00587fa0->name, 12) == 0) {
         return TK_UU_FLOATCALL;
     }
+#endif
     if (memcmp("__declspec", data_00587fa0->name, 11) == 0) {
         return TK_UU_DECLSPEC;
     }

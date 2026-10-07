@@ -3,6 +3,7 @@
 
 #include <setjmp.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -324,6 +325,18 @@ enum {
     ERR_EXPRESSION_NO_SIDE_EFFECT = 369,          /* expression has no side effect */
     ERR_RESULT_FUNCTION_CALL_NOT_USED = 370,      /* result of function call is not used */
     ERR_ILLEGAL_NON_TYPE_TEMPLATE_ARGUMENT = 371, /* illegal non-type template argument */
+#if VERSION >= VERSION_GC_2_7
+    ERR_ILLEGAL_USE_ABSTRACT_CLASS_TYPE = 372,    /* illegal use of abstract class ('%t') */
+    ERR_ILLEGAL_USE_TEMPLATE_PREFIX = 373,        /* illegal use of 'template' prefix */
+    ERR_TEMPLATE_ARGUMENT_LIST_MISMATCH = 374,    /* template parameter/argument list mismatch */
+    ERR_NO_MATCHING_DEALLOCATION_FUNCTION = 375,  /* cannot find matching deallocation function for '%t' */
+    ERR_ILLEGAL_OPERAND_TYPE = 376,               /* illegal operand '%t' */
+    ERR_ILLEGAL_OPERANDS_TYPES = 377,             /* illegal operands '%t' %u '%t' */
+    ERR_ILLEGAL_USE_DEFAULT_TEMPLATE_ARGUMENT = 378, /* illegal use of default template-argument */
+    ERR_ILLEGAL_UUID_SYNTAX = 379,                /* illegal UUID syntax */
+    ERR_UUIDOF_NOT_SUPPORTED_FOR_SOM = 380,       /* __uuidof() is not supported for SOM classes */
+    ERR_ILLEGAL_ACCESS_TO_PROTECTED_PRIVATE_MEMBER = 381, /* illegal access from '%t' to protected/private member '%o' */
+#endif
 };
 
 extern void CError_Warning(SInt32 code, ...);

@@ -2,6 +2,7 @@
 #define COMPILER_CSCOPE_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +37,7 @@ struct CScopeParseResult {
     Boolean isambig;
     Boolean x1F;
     Boolean is_type;
-    Boolean
-        alignmentPadding; /* 0x21: CScope_AddClassUsingDeclaration clears sizeof(result); unused trailing byte rounds the result to two-byte alignment. */
+    Boolean is_operator; /* 0x21: CScope_ParseDeclName marks an operator function name */
 };
 #pragma options align = reset
 struct LookupCtx {
@@ -65,11 +65,19 @@ extern int CScope_InitScopeSearch(ScopeSearch *save, NameSpace *obj);
 extern Boolean CScope_PossibleTypeName(HashNameNode *arg);
 extern NameSpaceObjectList *CScope_FindObjectList(CScopeParseResult *result, HashNameNode *arg);
 extern Boolean CScope_ParseElaborateName(CScopeParseResult *s);
+#if VERSION >= VERSION_GC_2_7
+extern Boolean CScope_ParseQualifiedScope(CScopeParseResult *result, Boolean flag1, Boolean flag2);
+#else
 extern Boolean CScope_ParseQualifiedScope(CScopeParseResult *result, SInt32 flag);
+#endif
 extern Boolean CScope_ParseDeclName(CScopeParseResult *lookup);
 extern Boolean CScope_ParseExprName(CScopeParseResult *scope);
 extern Boolean parse_name_in_namespace(CScopeParseResult *scope, NameSpace *ns);
+#if VERSION >= VERSION_GC_2_7
+extern Boolean parse_qualified_templdep_type(CScopeParseResult *context, Type *qualifier, Boolean flag1, Boolean flag2);
+#else
 extern Boolean parse_qualified_templdep_type(CScopeParseResult *context, Type *qualifier, Boolean allowToken328);
+#endif
 extern Type *CScope_FindTagType(NameSpace *nspace, HashNameNode *name);
 extern Type *CScope_GetType(NameSpace *nspace, HashNameNode *name, UInt32 *qual);
 extern Boolean find_type_name_in_scope(CScopeParseResult *out, NameSpace *scope, HashNameNode *name);

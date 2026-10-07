@@ -955,15 +955,21 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
     }
 }
 
+#if VERSION >= VERSION_GC_2_7
+unsigned char CParser_CheckTemplateClassScope(Type *type, Boolean reportError)
+#else
 unsigned char CParser_CheckTemplateClassScope(Type *type)
+#endif
 {
     NameSpace *space;
-    TypeClassTemplate *classType = (TypeClassTemplate *)type;
-    if (classType->templateParameters != NULL) {
+    if (((TypeClassTemplate *)type)->templateParameters != NULL) {
         space = currentNameSpace;
         for (;;) {
             if (space == NULL) {
-                CError_ReportError(230U);
+#if VERSION >= VERSION_GC_2_7
+                if (reportError)
+#endif
+                    CError_ReportError(230U);
                 return 0;
             }
             if (space->theclass == TYPE_CLASS(type))
@@ -2560,7 +2566,11 @@ FuncArg *CParser_NewFuncArg(void)
 
 /* Workspace filled by conversion_type_name for operator-name construction. */
 
+#if VERSION >= VERSION_GC_2_7
+Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion, Boolean parseConversionType)
+#else
 Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion)
+#endif
 {
     HashNameNode *name;
     DeclInfo nameData;
@@ -2602,9 +2612,17 @@ Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion)
         return 1;
     }
     if (allowConversion) {
+#if VERSION >= VERSION_GC_2_7
+        if (parseConversionType) {
+            memclrw(&nameData, sizeof(nameData));
+            conversion_type_name(&nameData);
+            data_00587fa0 = CMangler_ConversionFuncName(nameData.dtype, nameData.qual);
+        }
+#else
         memclrw(&nameData, sizeof(nameData));
         conversion_type_name(&nameData);
         data_00587fa0 = CMangler_ConversionFuncName(nameData.dtype, nameData.qual);
+#endif
         if (operatorToken != NULL)
             *operatorToken = 0;
         return 1;

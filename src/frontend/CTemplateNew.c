@@ -736,7 +736,12 @@ void parse_explicit_template_instantiation(void)
             CError_ReportError(ERR_IDENTIFIER_EXPECTED);
             return;
         }
+#if VERSION >= VERSION_GC_2_7
+        /* TODO: GC 2.7 never calls CParser_00490660 (0x4e9630) from explicit instantiation; recover its 2.7 shape. */
+        if (!CParser_00490660(NULL, 1, 1))
+#else
         if (!CParser_00490660(NULL, 1))
+#endif
             return;
         hasQualifiedName = 1;
     } else

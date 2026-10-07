@@ -7,6 +7,7 @@
 #include "compiler/types.h"
 #include "compiler/CInline.h"
 #include "compiler/CPrep.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -158,6 +159,9 @@ extern void CTemplateNew_InsertRegisterBinding(const char *key, unsigned int att
                                                Object *object);
 extern ENode *parse_non_type_template_argument(Type *targetType, unsigned int qualifiers);
 extern Type *CTemplTool_GetSelfRefTemplate(struct TypeClassTemplate *record);
+#if VERSION >= VERSION_GC_2_7
+extern Type *CTempl_ParseTemplTemplParam(struct TypeTemplDep *param);
+#endif
 extern struct CTStateElem *CTemplateNew_ParseTemplateArguments(struct TemplateParameterRecord *arg, char flag);
 extern void skip_balanced_angle_tokens(void);
 extern struct InlineAsmRegisterEntry *fn_004f06d0(char *name);

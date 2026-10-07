@@ -9590,10 +9590,9 @@
     "size": 340
   },
   {
-    "name": "build_usings_scope_list",
+    "name": "fn_0046f050",
     "address": "0x0046f050",
-    "size": 344,
-    "source": "src/frontend/CScope.c"
+    "size": 344
   },
   {
     "name": "fn_0046f1b0",
@@ -13063,10 +13062,9 @@
     "size": 91
   },
   {
-    "name": "CScope_NewListNameSpace",
+    "name": "fn_004d1290",
     "address": "0x004d1290",
-    "size": 136,
-    "source": "src/frontend/CScope.c"
+    "size": 136
   },
   {
     "name": "fn_004d1320",
@@ -13594,9 +13592,10 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d7b60",
+    "name": "CScope_GetTagType",
     "address": "0x004d7b60",
-    "size": 89
+    "size": 89,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "CScope_DefineTypeTag",
@@ -13605,19 +13604,22 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d7c10",
+    "name": "CScope_NextNameSpaceObjectList",
     "address": "0x004d7c10",
-    "size": 64
+    "size": 64,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d7c50",
+    "name": "CScope_NextObject",
     "address": "0x004d7c50",
-    "size": 112
+    "size": 112,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d7cc0",
+    "name": "CScope_InitScopeSearch",
     "address": "0x004d7cc0",
-    "size": 46
+    "size": 46,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "CScope_FindClassMemberObject",
@@ -13626,15 +13628,16 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "CScope_FindObjectList",
+    "name": "CScope_PossibleTypeName",
     "address": "0x004d7d50",
     "size": 257,
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d7e60",
+    "name": "CScope_FindObjectList",
     "address": "0x004d7e60",
-    "size": 261
+    "size": 261,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "CScope_FindObject",
@@ -13673,9 +13676,10 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d9290",
+    "name": "CScope_CheckDtorName",
     "address": "0x004d9290",
-    "size": 216
+    "size": 216,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "parse_qualified_templdep_type",
@@ -13684,14 +13688,16 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d95b0",
+    "name": "CScope_FindTagType",
     "address": "0x004d95b0",
-    "size": 226
+    "size": 226,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004d96a0",
+    "name": "CScope_GetType",
     "address": "0x004d96a0",
-    "size": 275
+    "size": 275,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "find_type_name_in_scope",
@@ -13760,9 +13766,10 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004da760",
+    "name": "build_usings_scope_list",
     "address": "0x004da760",
-    "size": 414
+    "size": 414,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "build_namespace_scope_rec",
@@ -13783,34 +13790,40 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dad20",
+    "name": "CScope_MergeNameSpace",
     "address": "0x004dad20",
-    "size": 73
+    "size": 73,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dad70",
+    "name": "CScope_IsEmptyNameSpace",
     "address": "0x004dad70",
-    "size": 40
+    "size": 40,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dada0",
+    "name": "CScope_FindGlobalNS",
     "address": "0x004dada0",
-    "size": 44
+    "size": 44,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dadd0",
+    "name": "CScope_FindNonClassNonTemplNameSpace",
     "address": "0x004dadd0",
-    "size": 33
+    "size": 33,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dae00",
+    "name": "CScope_NewListNameSpace",
     "address": "0x004dae00",
-    "size": 58
+    "size": 58,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004dae40",
+    "name": "CScope_NewHashNameSpace",
     "address": "0x004dae40",
-    "size": 71
+    "size": 71,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "CScope_ArgumentDependentNameLookup",
@@ -13843,19 +13856,22 @@
     "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004db210",
+    "name": "CScope_FindNameSpaceName",
     "address": "0x004db210",
-    "size": 81
+    "size": 81,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004db270",
+    "name": "CScope_FindName",
     "address": "0x004db270",
-    "size": 90
+    "size": 90,
+    "source": "src/frontend/CScope.c"
   },
   {
-    "name": "fn_004db2d0",
+    "name": "CScope_IsInLocalNameSpace",
     "address": "0x004db2d0",
-    "size": 32
+    "size": 32,
+    "source": "src/frontend/CScope.c"
   },
   {
     "name": "CScope_IsEmptySymTable",
@@ -15002,9 +15018,10 @@
     "source": "src/frontend/CParser.c"
   },
   {
-    "name": "fn_004e9630",
+    "name": "CParser_00490660",
     "address": "0x004e9630",
-    "size": 393
+    "size": 393,
+    "source": "src/frontend/CParser.c"
   },
   {
     "name": "GetPrec",
@@ -18994,10 +19011,9 @@
     "source": "src/frontend/CTemplateNew.c"
   },
   {
-    "name": "CScope_PossibleTypeName",
+    "name": "fn_005311d0",
     "address": "0x005311d0",
-    "size": 220,
-    "source": "src/frontend/CScope.c"
+    "size": 220
   },
   {
     "name": "CTemplateNew_ParseTemplateDeclaration",
@@ -19055,7 +19071,7 @@
     "source": "src/frontend/CTemplateNew.c"
   },
   {
-    "name": "fn_00532ad0",
+    "name": "CTempl_ParseTemplTemplParam",
     "address": "0x00532ad0",
     "size": 68
   },
@@ -19066,7 +19082,7 @@
     "source": "src/frontend/CTemplateNew.c"
   },
   {
-    "name": "fn_00532f30",
+    "name": "CTemplateNew_ParseTemplateArguments",
     "address": "0x00532f30",
     "size": 112
   },

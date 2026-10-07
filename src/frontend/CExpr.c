@@ -4532,7 +4532,11 @@ ENode *scan_explicit_conversion(Type *type, SInt32 qualifiers)
     ENode *result;
 
     if (type->type == TYPECLASS && (TYPE_CLASS(type)->flags & Q_VIRTUAL) != 0 &&
+#if VERSION >= VERSION_GC_2_7
+        CParser_CheckTemplateClassScope(type, 1) == 0)
+#else
         CParser_CheckTemplateClassScope(type) == 0)
+#endif
         type = (Type *)&stsignedint;
 
     if (tk == '(')
