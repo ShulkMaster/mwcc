@@ -183,7 +183,7 @@ extern void CInline_005130b0(ENode *node, Boolean flag);
 extern ENode *CInline_00513240(ENode *e);
 extern ENodeList *copy_enode_list(ENodeList *values);
 extern Boolean CInline_00513910(ENode *expr);
-extern unsigned int CInline_GetObjectIndex(void *object);
+extern unsigned int CInline_GetObjectIndex(struct Object *object);
 extern ENode *fold_constants(ENode *node);
 extern ENode *setup_inline_locals_and_arguments(Object *function, CInlineInfo *inlineInfo, ENodeList *arguments);
 extern void CInline_ReconstructFunction(Object *unused, CInlineInfo *rec, Statement *out);

@@ -2514,8 +2514,6 @@ unsigned char fn_0050ebc0(void)
     return 1;
 }
 
-/* Linked entries visited by the inline traversal. */
-
 void add_undefined_exception_function_objects(CException *entry)
 {
     if (entry != NULL) {
@@ -2531,30 +2529,30 @@ void add_undefined_exception_function_objects(CException *entry)
                     add_undefined_function_object(entry->data.local.dtor);
                     break;
                 case 4:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.local_pointer.dtor);
                     break;
                 case 5:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.member_array.dtor);
                     break;
                 case 6:
-                    add_undefined_function_object((Object *)entry->data.slots[2]);
+                    add_undefined_function_object(entry->data.operands[2].object);
                     break;
                 case 7:
                 case 17:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.member.dtor);
                     break;
                 case 8:
-                    add_undefined_function_object((Object *)entry->data.slots[2]);
+                    add_undefined_function_object(entry->data.member_cond.dtor);
                     break;
                 case 9:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.member_array.dtor);
                     break;
                 case 10:
                 case 11:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.delete_pointer.deletefunc);
                     break;
                 case 12:
-                    add_undefined_function_object((Object *)entry->data.slots[1]);
+                    add_undefined_function_object(entry->data.delete_pointer_cond.deletefunc);
                     break;
                 case 13:
                 case 14:
@@ -2562,21 +2560,28 @@ void add_undefined_exception_function_objects(CException *entry)
                 case 16:
                     break;
                 default:
+#if VERSION >= VERSION_GC_2_7
+                    CError_FATAL(4307);
+#else
                     CError_FATAL(3597);
+#endif
             }
             entry = entry->next;
         } while (entry != NULL);
     }
 }
 
-/* Objects queued for inline processing. */
-
 void add_undefined_function_object(Object *object)
 {
     InlineObjectEntry *entry;
     InlineObjectEntry *newEntry;
     if (!(((object->datatype == DFUNC) || (object->datatype == DVFUNC)) && ((object->flags & OBJECT_DEFINED) == 0) &&
-          ((object->type->type != TYPEFUNC) || ((((TypeFunc *)object->type)->flags & 0x400) == 0)))) {
+          ((object->type->type != TYPEFUNC) ||
+#if VERSION >= VERSION_GC_2_7
+           ((TYPE_FUNC(object->type)->flags & 0x100000) == 0)))) {
+#else
+           ((TYPE_FUNC(object->type)->flags & 0x400) == 0)))) {
+#endif
         return;
     }
     entry = undefined_function_objects;
@@ -3324,7 +3329,7 @@ ENodeList *copy_enode_list(ENodeList *values)
     return head;
 }
 
-static inline int FindInlineObjectIndex(void *object)
+static inline int FindInlineObjectIndex(Object *object)
 {
     ObjectList *candidate;
     int index;
@@ -3453,7 +3458,7 @@ Boolean CInline_00513910(ENode *expr)
     }
 }
 
-unsigned int CInline_GetObjectIndex(void *object)
+unsigned int CInline_GetObjectIndex(Object *object)
 {
     ObjectList *entry;
     int index;
@@ -3470,7 +3475,11 @@ unsigned int CInline_GetObjectIndex(void *object)
 
         index = FindInlineObjectIndex(object);
         if (index < 0)
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(465);
+#else
             CError_FATAL(455);
+#endif
         data_00582462[index].used = 1;
         return index + 1;
     }

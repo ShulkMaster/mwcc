@@ -1643,5 +1643,8 @@
   "_virtual_register_definitions": "0x005e3bb0",
   "_gUsedVirtualRegistersGPR": "0x005eaa3c",
   "_gUsedVirtualRegistersFPR": "0x005eaa38",
-  "_gUsedVirtualRegistersVR": "0x005eaa34"
+  "_gUsedVirtualRegistersVR": "0x005eaa34",
+  "_undefined_function_objects": "0x005e3af4",
+  "_data_0058245e": "0x005e3b54",
+  "_data_00582462": "0x005e3b50"
 }
