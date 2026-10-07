@@ -1,4 +1,8 @@
 {
+  "_ClientGlue_InitializeAndParseCommandLine": "0x00405310",
+  "_data_0053600c": "0x0058200c",
+  "_data_0053601c": "0x0058201c",
+  "_fn_004052c0@4": "0x004052a0",
   "_ustrcmp@8": "0x00417490",
   "??3@YAXPAX@Z": "0x00403de0",
   "??_7bad_exception@std@@6B@": "0x00582214",

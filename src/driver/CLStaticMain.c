@@ -2,6 +2,7 @@
 #include "compiler/common.h"
 #include "driver/CLStaticMain.h"
 #include "compiler/win32.h"
+#include "version.h"
 #include "driver/CLMain.h"
 #include "driver/CLStaticPlugins.h"
 #include "driver/CLToolExec.h"
@@ -197,8 +198,12 @@ int main(int argc, char **argv)
             fprintf(stderr, "\r\nErrors caused tool to abort.\r\n");
     }
     fn_00405340(result);
+#if VERSION >= VERSION_GC_1_3
+    return result;
+#else
     exit(result);
     return 0;
+#endif
 }
 #pragma exceptions reset
 
