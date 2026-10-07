@@ -20879,9 +20879,10 @@
     "source": "src/frontend/CABI.c"
   },
   {
-    "name": "fn_00557cb0",
+    "name": "CABI_GetDestructorObject",
     "address": "0x00557cb0",
-    "size": 5
+    "size": 5,
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "fn_00557cc0",
