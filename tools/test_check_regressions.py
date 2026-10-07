@@ -63,6 +63,23 @@ class RowGateTests(unittest.TestCase):
                          [instruction(0), instruction(2), instruction(1)])
         self.assertTrue(any("insertion" in e for e in regressions(before, after)))
 
+    def test_existing_extra_row_can_change_an_unmatched_operand(self):
+        rows = [instruction(0), {"diff_kind": "DIFF_INSERT"}, instruction(1, "DIFF_REPLACE")]
+        right = [instruction(0), instruction(2), instruction(1, "DIFF_REPLACE")]
+        before = snapshot(rows, right)
+        right = copy.deepcopy(right)
+        right[1]["instruction"]["parts"][2] = {"arg": {"opaque": "ecx"}}
+        after = snapshot(rows, right)
+        self.assertFalse(regressions(before, after))
+
+    def test_existing_extra_row_does_not_allow_insertion_growth(self):
+        before = snapshot([instruction(0), {"diff_kind": "DIFF_INSERT"}, instruction(1, "DIFF_REPLACE")],
+                          [instruction(0), instruction(2), instruction(1, "DIFF_REPLACE")])
+        after = snapshot([instruction(0), {"diff_kind": "DIFF_INSERT"}, {"diff_kind": "DIFF_INSERT"},
+                          instruction(1, "DIFF_REPLACE")],
+                         [instruction(0), instruction(2), instruction(3), instruction(1, "DIFF_REPLACE")])
+        self.assertTrue(any("insertion" in e for e in regressions(before, after)))
+
     def test_exact_bytes_and_data_preservation(self):
         before = snapshot([instruction(0)])
         after = copy.deepcopy(before)

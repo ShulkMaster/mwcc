@@ -234,6 +234,21 @@ def capture(root, version):
             "units": units}
 
 
+def insertion_counts(insertions):
+    """Count extra rows between target addresses; their operands never matched.
+
+    Keep payload fingerprints in snapshots for inspection, but changing an
+    already-extra row's operand does not introduce another unmatched row.
+    """
+    counts = collections.Counter()
+    for fingerprint, count in insertions.items():
+        anchor = json.loads(fingerprint)
+        if not isinstance(anchor, list) or len(anchor) != 3:
+            raise ValueError("invalid insertion anchor")
+        counts[tuple(anchor[:2])] += count
+    return counts
+
+
 def regressions(before, after):
     if before.get("schema") != SCHEMA or after.get("schema") != SCHEMA:
         raise ValueError("unavailable or incompatible row baseline")
@@ -278,8 +293,9 @@ def regressions(before, after):
                 for index, matched in enumerate(row["args"]):
                     if matched and (index >= len(now["args"]) or not now["args"][index]):
                         errors.append(f"{label}@{address}: matched argument {index} lost")
-            for anchor, count in current["insertions"].items():
-                if count > previous["insertions"].get(anchor, 0):
+            old_insertions = insertion_counts(previous["insertions"])
+            for anchor, count in insertion_counts(current["insertions"]).items():
+                if count > old_insertions.get(anchor, 0):
                     errors.append(f"{label}: new/grown insertion at {anchor}")
     return errors
 

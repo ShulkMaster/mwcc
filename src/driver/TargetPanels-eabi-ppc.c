@@ -408,8 +408,10 @@ void TargetPanels_eabi_ppc_LoadCompilerOptions(void)
     copts.smallBSSLimit = settings.smallBSSLimit;
     copts.smallDataLimit = settings.smallDataLimit;
     copts.f27 = settings.unk37;
+#if VERSION < VERSION_GC_2_7
     copts.f1e = 0;
     copts.fd3 = 0;
+#endif
     copts.fd5 = 1;
     copts.fd4 = 1;
     copts.f20 = options.unk0d;
