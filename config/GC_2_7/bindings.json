@@ -1665,5 +1665,12 @@
   "_fn_0042c910": "0x0042dd00",
   "_fn_0042c920": "0x0042dd10",
   "_mm_extension": "0x005a2214",
-  "_uppercase_m_extension": "0x005a2218"
+  "_uppercase_m_extension": "0x005a2218",
+  "_gReturnBlock": "0x005ea7e0",
+  "_gPCodeBlockLiveness": "0x005ea798",
+  "_coloring_class": "0x005ef2cf",
+  "_SpillCode_BuildLocalLiveness": "0x0057bea0",
+  "_bitvectorinitialize": "0x0057dff0",
+  "_bitvectorunion": "0x0057dea0",
+  "_bitvectorcopy": "0x0057e060"
 }

@@ -3,10 +3,12 @@
 
 #include <stddef.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 enum PCodeOperandFlags { PCodeOperand_Use = 0x01, PCodeOperand_Definition = 0x02, PCodeOperand_LastUse = 0x04 };
 enum Kind { K0, K1, K2, K3, K4, K5 };

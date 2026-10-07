@@ -1,4 +1,5 @@
 #define CERROR_FILE "SpillCode.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/LiveVariables.h"
 #include "compiler/enode.h"
@@ -18,6 +19,8 @@
 #include "compiler/CTemplateFunc.h"
 #include "compiler/CTemplateTools.h"
 #include "compiler/CodeGen.h"
+#include "compiler/Coloring.h"
+#include "compiler/InstrSelection.h"
 #include "compiler/CompilerTools.h"
 #include "compiler/DWARF.h"
 #include "compiler/IROUseDef.h"
@@ -88,57 +91,127 @@ SInt32 SpillCode_IsDeadInstruction(PCodeInstruction *instruction, SInt16 regClas
 
 /* TYPESTRUCT record with the byte classification field at 0x0e. */
 
-void SpillCode_InitializeLiveness(Object *func, SInt32 mode, UInt32 nbits)
+#if VERSION >= VERSION_GC_2_7
+void SpillCode_InitializeLiveness(Object *func)
+#else
+void SpillCode_InitializeLiveness(Object *func, SInt32 coloring_class, UInt32 nbits)
+#endif
 {
     Type *returnType;
     int blockIndex;
     PCodeLiveness *liveness;
+#if VERSION >= VERSION_GC_2_7
+    UInt32 nbits;
+    PCodeBlock *block;
+    GlobalRegisterVariable *variable;
+#endif
 
     returnType = ((TypeFunc *)func->type)->functype;
 
     SpillCode_BuildBlockOrder();
-    gPCodeBlockLiveness = (PCodeLiveness *)CompilerTools_AllocatePoolMemory(gPCodeBlockCount * sizeof(PCodeLiveness));
+#if VERSION >= VERSION_GC_2_7
+    nbits = used_virtual_registers[coloring_class];
+#endif
+    gPCodeBlockLiveness = CompilerTools_AllocatePoolMemory(gPCodeBlockCount * sizeof(PCodeLiveness));
     liveness = gPCodeBlockLiveness;
 
     for (blockIndex = 0; blockIndex < gPCodeBlockCount; blockIndex++) {
-        CRTTI_FillWords(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) << 2), nbits, 0);
-        CRTTI_FillWords(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) << 2), nbits, 0);
-        CRTTI_FillWords(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) << 2), nbits, 0);
-        CRTTI_FillWords(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) << 2), nbits, 0);
+#if VERSION >= VERSION_GC_2_7
+        bitvectorinitialize(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                            nbits, 0);
+#else
+        CRTTI_FillWords(liveness->use = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits,
+                        0);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        bitvectorinitialize(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                            nbits, 0);
+#else
+        CRTTI_FillWords(liveness->def = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)), nbits,
+                        0);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        bitvectorinitialize(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                            nbits, 0);
+#else
+        CRTTI_FillWords(liveness->livein = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                        nbits, 0);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        bitvectorinitialize(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                            nbits, 0);
+#else
+        CRTTI_FillWords(liveness->liveout = CompilerTools_AllocatePoolMemory(((nbits + 31) >> 5) * sizeof(UInt32)),
+                        nbits, 0);
+#endif
         liveness++;
     }
 
-    SpillCode_BuildLocalLiveness(mode);
+#if VERSION >= VERSION_GC_2_7
+    SpillCode_BuildLocalLiveness();
+    blockIndex = gPCodeBlockCount;
+    do {
+        block = gPCodeBlockOrder[--blockIndex];
+    } while (block == NULL);
+    for (variable = gGlobalRegisterVariables; variable != NULL; variable = variable->next) {
+        if (coloring_class == variable->rclass && variable->object != NULL)
+            gPCodeBlockLiveness[block->index].use[variable->reg >> 5] |= 1U << (variable->reg & 31);
+    }
+#else
+    SpillCode_BuildLocalLiveness(coloring_class);
+#endif
 
-    if (mode == 0 && (returnType->type == TYPEINT || returnType->type == TYPEENUM || returnType->type == TYPEPOINTER ||
-                      (returnType->type == TYPEMEMBERPOINTER && returnType->size == 4))) {
+    if (coloring_class == RegClass_GPR &&
+        (returnType->type == TYPEINT || returnType->type == TYPEENUM || returnType->type == TYPEPOINTER ||
+         (returnType->type == TYPEMEMBERPOINTER && returnType->size == 4))) {
         gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 8;
         if ((returnType->type == TYPEINT || returnType->type == TYPEENUM) && returnType->size == 8) {
             gPCodeBlockLiveness[gCurrentBlock->index].use[0] |= 0x10;
         }
-    } else if (mode == 0 && (returnType->type == TYPESTRUCT || returnType->type == TYPECLASS) &&
+    } else if (coloring_class == RegClass_GPR && (returnType->type == TYPESTRUCT || returnType->type == TYPECLASS) &&
                !Type_RequiresMemoryReturn(returnType)) {
         gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 8;
         if (returnType->size > 4) {
             gPCodeBlockLiveness[gCurrentBlock->index].use[0] |= 0x10;
         }
-    } else if (mode == 0 && copts.operandsDebug && returnType->type == TYPEFLOAT) {
+    } else if (coloring_class == RegClass_GPR && copts.operandsDebug && returnType->type == TYPEFLOAT
+#if VERSION >= VERSION_GC_2_7
+               && !(returnType->type == TYPEFLOAT && ((TypeIntegral *)returnType)->integral == IT_19)
+#endif
+    ) {
         gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 8;
         if (returnType->size == 8) {
             gPCodeBlockLiveness[gCurrentBlock->index].use[0] |= 0x10;
         }
-    } else if (mode == 1 && returnType->type == TYPEFLOAT) {
+    } else if (coloring_class == RegClass_FPR && returnType->type == TYPEFLOAT
+#if VERSION >= VERSION_GC_2_7
+               && !(returnType->type == TYPEFLOAT && ((TypeIntegral *)returnType)->integral == IT_19)
+#endif
+    ) {
         gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 2;
-    } else if (mode == 9 && returnType->type == TYPESTRUCT) {
+#if VERSION >= VERSION_GC_2_7
+    } else if (coloring_class == RegClass_FPR && returnType->type == TYPEFLOAT &&
+               ((TypeIntegral *)returnType)->integral == IT_19) {
+        gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 2;
+#endif
+    } else if (coloring_class == RegClass_VR && returnType->type == TYPESTRUCT) {
         SInt32 structKind = ((TypeStruct *)returnType)->stype;
         if (structKind >= 4 && structKind <= 0xe) {
             gPCodeBlockLiveness[gReturnBlock->index].use[0] |= 4;
         }
     }
 
+#if VERSION >= VERSION_GC_2_7
+    SpillCode_SolveLiveness();
+#else
     SpillCode_SolveLiveness(nbits);
+#endif
 }
+#if VERSION >= VERSION_GC_2_7
+void SpillCode_SolveLiveness(void)
+#else
 void SpillCode_SolveLiveness(UInt32 nbits)
+#endif
 {
     PCodeBlockLink *successor;
     PCodeLiveness *live;
@@ -152,6 +225,9 @@ void SpillCode_SolveLiveness(UInt32 nbits)
     SInt32 nwords;
     SInt32 count;
     PCodeBlock *block;
+#if VERSION >= VERSION_GC_2_7
+    UInt32 nbits = used_virtual_registers[coloring_class];
+#endif
 
     nwords = (nbits + 31) >> 5;
     do {
@@ -164,9 +240,18 @@ void SpillCode_SolveLiveness(UInt32 nbits)
             live = &gPCodeBlockLiveness[block->index];
             if ((successor = block->successors) != NULL) {
                 live_out = live->liveout;
-                CodeMotion_AllocateBits(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
+#if VERSION >= VERSION_GC_2_7
+                bitvectorcopy(
+#else
+                CodeMotion_AllocateBits(
+#endif
+                    live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
                 for (successor = successor->next; successor != NULL; successor = successor->next)
+#if VERSION >= VERSION_GC_2_7
+                    bitvectorunion(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
+#else
                     CRTTI_OrBitVector(live_out, gPCodeBlockLiveness[successor->payload.block->index].livein, nbits);
+#endif
             }
             live_out = live->liveout;
             live_in = live->livein;
@@ -187,6 +272,7 @@ void SpillCode_SolveLiveness(UInt32 nbits)
     } while (changed);
 }
 
+#if VERSION < VERSION_GC_2_7
 void SpillCode_BuildLocalLiveness(int reg_class)
 {
     PCodeBlock *block;
@@ -229,3 +315,5 @@ void SpillCode_BuildLocalLiveness(int reg_class)
         }
     }
 }
+
+#endif

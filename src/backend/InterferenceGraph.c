@@ -1,4 +1,5 @@
 #define CERROR_FILE "SpillCode.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/InterferenceGraph.h"
 #include "compiler/enode.h"
@@ -76,7 +77,11 @@ static const char *SpillCode_RegisterFormat(int reg_class)
 /* TYPESTRUCT record with the byte classification field at 0x0e. */
 void SpillCode_BuildInterference(Object *function, int reg_class, int register_count)
 {
+#if VERSION >= VERSION_GC_2_7
+    SpillCode_InitializeLiveness(function);
+#else
     SpillCode_InitializeLiveness(function, reg_class, register_count);
+#endif
     SpillCode_MarkLastUses(reg_class, register_count);
     SpillCode_ConstructInterference(reg_class, register_count);
     if (copts.cOptimizerDumpEnabled) {

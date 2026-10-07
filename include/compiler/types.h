@@ -78,7 +78,8 @@ enum {
     IT_FLOAT,
     IT_SHORTDOUBLE,
     IT_DOUBLE,
-    IT_LONGDOUBLE
+    IT_LONGDOUBLE,
+    IT_19 = 19
 };
 enum {
     CLASS_HANDLEOBJECT = 1,

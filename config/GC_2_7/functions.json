@@ -22917,12 +22917,13 @@
     "source": "src/backend/LiveVariables.c"
   },
   {
-    "name": "fn_0057bd70",
+    "name": "SpillCode_SolveLiveness",
     "address": "0x0057bd70",
-    "size": 289
+    "size": 289,
+    "source": "src/backend/LiveVariables.c"
   },
   {
-    "name": "fn_0057bea0",
+    "name": "SpillCode_BuildLocalLiveness",
     "address": "0x0057bea0",
     "size": 262
   },
@@ -23020,7 +23021,7 @@
     "size": 66
   },
   {
-    "name": "fn_0057dea0",
+    "name": "bitvectorunion",
     "address": "0x0057dea0",
     "size": 49
   },
@@ -23040,7 +23041,7 @@
     "size": 125
   },
   {
-    "name": "fn_0057dff0",
+    "name": "bitvectorinitialize",
     "address": "0x0057dff0",
     "size": 44
   },
@@ -23050,7 +23051,7 @@
     "size": 59
   },
   {
-    "name": "fn_0057e060",
+    "name": "bitvectorcopy",
     "address": "0x0057e060",
     "size": 49
   },

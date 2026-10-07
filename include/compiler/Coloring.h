@@ -19,6 +19,7 @@ enum RegisterClass {
     RegClass_GPR = 4,
     RegClassMax = 5
 };
+extern enum RegisterClass coloring_class;
 #else
 enum RegisterClass { RegClass_GPR = 0, RegClass_FPR = 1, RegClass_VR = 9 };
 #endif
