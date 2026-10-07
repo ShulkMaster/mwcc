@@ -265,6 +265,7 @@ __declspec(dllimport) DWORD __stdcall GetLastError(void);
 __declspec(dllimport) void __stdcall GetLocalTime(LPSYSTEMTIME lpSystemTime);
 __declspec(dllimport) HMODULE __stdcall GetModuleHandleA(LPCSTR lpModuleName);
 __declspec(dllimport) HANDLE __stdcall GetStdHandle(DWORD nStdHandle);
+__declspec(dllimport) DWORD __stdcall GetSystemDefaultLangID(void);
 __declspec(dllimport) UINT __stdcall GetSystemDirectoryA(LPSTR lpBuffer, UINT uSize);
 __declspec(dllimport) void __stdcall GetSystemTime(LPSYSTEMTIME lpSystemTime);
 __declspec(dllimport) DWORD __stdcall GetTickCount(void);

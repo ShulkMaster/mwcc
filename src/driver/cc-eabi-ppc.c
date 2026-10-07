@@ -24,6 +24,13 @@ void cc_eabi_ppc_ReportCompilingFunction(char *name)
     fn_0041b8d0(compiler_plugin_cu.context, buf, &data_0054c408);
 }
 
+#if VERSION >= VERSION_GC_2_7
+static Boolean IsJapaneseLanguage(void)
+{
+    return GetSystemDefaultLangID() == 0x411;
+}
+#endif
+
 int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input)
 {
     long firstValue;
@@ -31,7 +38,6 @@ int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input)
     int status;
     UInt8 prepResult;
     long secondValue;
-    int value;
     long classification;
     struct ValuePairState output;
     status = 0;
@@ -54,8 +60,15 @@ int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input)
         case 0:
             initialize_compiler_plugin_cu(input);
             if (data_00588258 == 0) {
-                CWPluginsPrivate_InvokeCallback40(compiler_plugin_cu.context, "Win32_Plugins_PPC_Nintendo", "1", 0, 0,
-                                                  &data_00588258);
+#if VERSION >= VERSION_GC_2_7
+                data_005ef387 = 0;
+                if (IsJapaneseLanguage())
+                    CWPluginsPrivate_InvokeCallback40(compiler_plugin_cu.context, "Win32_Plugins_PPC_Nintendo", "2", 0,
+                                                      0, &data_00588258);
+                else
+#endif
+                    CWPluginsPrivate_InvokeCallback40(compiler_plugin_cu.context, "Win32_Plugins_PPC_Nintendo", "1", 0,
+                                                      0, &data_00588258);
                 data_0057f486 = 1;
             }
             if (data_00588258 != 0) {
@@ -78,9 +91,8 @@ int __stdcall dispatch_compiler_plugin_request(CWPluginPrivateContext *input)
                     if (compiler_plugin_cu.preprocessOnly != 0) {
                         if (compiler_plugin_cu.objectData != 0) {
                             memset(&output, 0, 10);
-                            value = compiler_plugin_cu.objectData;
+                            output.secondValue = compiler_plugin_cu.objectData;
                             compiler_plugin_cu.objectData = 0;
-                            output.secondValue = value;
                             result = CWPluginsPrivate_CallValuePairCallback(compiler_plugin_cu.context, &output);
                         }
                     } else {
@@ -117,8 +129,8 @@ void initialize_copts(CPrepCU *source)
 
     copts.nativeByteOrder = 0;
     copts.cplusplus = 1;
-    extension[0] = 0;
     copts.f5c = data_0057f448.tail[1];
+    extension[0] = 0;
 
     for (dotPosition = source->mainFile.fileData.file.name[0]; source->mainFile.fileData.file.name[dotPosition] != '.';
          dotPosition--)
@@ -167,6 +179,10 @@ void initialize_copts(CPrepCU *source)
     copts.f7f = data_0057f448.options[2];
     copts.f5b = data_0057f448.tail[0];
     copts.f71 = data_0057f448.tail[2];
+#if VERSION >= VERSION_GC_2_7
+    copts.inlineMaxSize = 0x200;
+    copts.inlineMaxTotalSize = 7000;
+#endif
 
     DropInCompilerLinkerPrivate_CallArgumentValue(compiler_plugin_cu.context, "C/C++ Warnings",
                                                   &settingsHandle.language);
@@ -188,6 +204,9 @@ void initialize_copts(CPrepCU *source)
     symbolSettings = **settingsHandle.symbols;
     copts.deleteDeadInstructions = symbolSettings.deleteDeadInstructions;
     copts.uniformSpillBlockWeight = (symbolSettings.spillBlockWeightMode == 1);
+#if VERSION >= VERSION_GC_2_7
+    copts.limit_optimization_level = data_005ef387;
+#endif
     copts.unrollOption = 8;
     copts.fd1 = 100;
     copts.filesyminfo = source->filesyminfo;

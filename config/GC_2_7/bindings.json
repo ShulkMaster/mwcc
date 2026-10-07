@@ -1651,5 +1651,19 @@
   "_cexcept_uniqueobjs": "0x005e308e",
   "_data_00581c30": "0x005e308c",
   "_data_005884fa": "0x005ef2d0",
-  "_CExcept_CanThrowException": "0x00522dd0"
+  "_CExcept_CanThrowException": "0x00522dd0",
+  "_CodeGen_SetIROptimizationEnabled": "0x0042f9a0",
+  "_TargetPanels_eabi_ppc_LoadCompilerOptions": "0x0042d590",
+  "___lower_map": "0x0058d3a0",
+  "__imp__GetSystemDefaultLangID@0": "0x005d9248",
+  "_c_extension": "0x005a2200",
+  "_data_0054c474": "0x005a222c",
+  "_data_0057f448": "0x005de8e2",
+  "_data_0057f486": "0x005de8e0",
+  "_data_00588258": "0x005eec1c",
+  "_data_005ef387": "0x005ef387",
+  "_fn_0042c910": "0x0042dd00",
+  "_fn_0042c920": "0x0042dd10",
+  "_mm_extension": "0x005a2214",
+  "_uppercase_m_extension": "0x005a2218"
 }

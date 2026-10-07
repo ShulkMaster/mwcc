@@ -243,7 +243,7 @@ struct COpts {
     SInt8 deleteDeadInstructions;                        /* 0xe8 */
     UInt8 uniformSpillBlockWeight;                       /* 0xe9: optimize_for_size */
     UInt8 fc3;                                           /* 0xea */
-    UInt8 field_0xeb;                                    /* 0xeb */
+    UInt8 limit_optimization_level;                      /* 0xeb: optimization_level pragma clamps to 1 and warns */
     UInt8 irCommonSubexpressionElimination;              /* 0xec: opt_common_subs */
     UInt8 fc5;                                           /* 0xed: opt_loop_invariants */
     UInt8 irCopyPropagation;                             /* 0xee: opt_propagation */

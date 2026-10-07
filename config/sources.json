@@ -818,6 +818,8 @@
     "compiler": "pro53",
     "flags": [
       "-O4,p",
+      "-inline",
+      "off",
       "-sym",
       "off",
       "-Cpp_exceptions",
@@ -1201,6 +1203,8 @@
     "compiler": "pro53",
     "flags": [
       "-O4,p",
+      "-inline",
+      "off",
       "-sym",
       "off",
       "-Cpp_exceptions",

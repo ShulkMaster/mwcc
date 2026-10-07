@@ -32,6 +32,7 @@ extern struct DriverSettings {
 } data_0057f448;
 extern char data_0057f486;
 extern int data_00588258;
+extern unsigned char data_005ef387;
 extern struct CPrepCU compiler_plugin_cu;
 extern char compiler_plugin_target_name[128];
 extern char mm_extension[], c_extension[], uppercase_m_extension[];

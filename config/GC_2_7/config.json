@@ -82,6 +82,8 @@
     "src/optimizer/GlobalOptimizer.c",
     "src/backend/CMachine.c",
     "src/backend/RegisterInfo.c",
-    "src/frontend/CException.c"
+    "src/frontend/CException.c",
+    "src/driver/cc-eabi-ppc.c",
+    "src/frontend/CompilerTools.c"
   ]
 }

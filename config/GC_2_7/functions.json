@@ -4499,14 +4499,16 @@
     "source": "src/driver/cc-eabi-ppc.c"
   },
   {
-    "name": "fn_0041f210",
+    "name": "dispatch_compiler_plugin_request",
     "address": "0x0041f210",
-    "size": 485
+    "size": 485,
+    "source": "src/driver/cc-eabi-ppc.c"
   },
   {
-    "name": "fn_0041f400",
+    "name": "initialize_copts",
     "address": "0x0041f400",
-    "size": 1016
+    "size": 1016,
+    "source": "src/driver/cc-eabi-ppc.c"
   },
   {
     "name": "initialize_compiler_plugin_cu",
