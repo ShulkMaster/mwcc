@@ -660,6 +660,7 @@
   "__imp__GetLastError@0": "0x005d91a4",
   "__imp__GetLocalTime@4": "0x005d924c",
   "__imp__GetModuleHandleA@4": "0x005d9218",
+  "__imp__GetStdHandle@4": "0x005d9164",
   "__imp__GetSystemTime@4": "0x005d9204",
   "__imp__GetTimeZoneInformation@4": "0x005d9250",
   "__imp__GlobalAlloc@8": "0x005d91bc",
