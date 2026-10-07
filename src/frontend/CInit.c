@@ -158,7 +158,11 @@ void CInit_RewriteString(ENode *node, SInt32 flag_arg)
     if (cprep_cu[0xe0] == 1)
         CError_ReportError(ERR_ILLEGAL_USE_PRECOMPILED_HEADER);
 
+#if VERSION >= VERSION_GC_2_7
+    CError_ASSERT(4229, node->rtype->type == TYPEPOINTER);
+#else
     CError_ASSERT(4019, node->rtype->type == TYPEPOINTER);
+#endif
 
     flag = (TPTR_TARGET(node->rtype)->size != 1);
 
@@ -739,9 +743,15 @@ void fn_004cfc50(Object *object)
     if (initData.entries != NULL) {
         entry = initData.entries;
         for (expr = NULL; entry != NULL; entry = entry->next) {
-            expr = build_init_assignment(expr, objectExpr, entry->offset, entry->type, entry->expression);
+#if VERSION >= VERSION_GC_2_7
+            if (entry->expression->type != EVECTOR128CONST)
+#endif
+                expr = build_init_assignment(expr, objectExpr, entry->offset, entry->type, entry->expression);
         }
-        InitExpr_Register(expr, object);
+#if VERSION >= VERSION_GC_2_7
+        if (expr != NULL)
+#endif
+            InitExpr_Register(expr, object);
     }
 }
 
@@ -1178,7 +1188,7 @@ void CInit_ExportConst(Object *obj)
     unsigned char buf[64];
     if (obj->flags & OBJECT_DEFINED)
         return;
-    switch (*(SInt8 *)obj->type) {
+    switch ((SInt8)obj->type->type) {
         case TYPEINT:
             CMach_InitIntMem(obj->type, obj->u.data.u.intconst, buf);
             break;
@@ -1192,7 +1202,11 @@ void CInit_ExportConst(Object *obj)
             CMach_InitFloatMem(obj->type, *(Float *)obj->u.data.u.string, buf);
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(2810);
+#else
             CError_FATAL(2735);
+#endif
             break;
     }
     if (is_const_object(obj))
@@ -1558,7 +1572,11 @@ void initialize_data_by_type(Type *node, UInt32 mode, Boolean flag)
             return;
 
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(2482);
+#else
             CError_FATAL(2411);
+#endif
             return;
     }
 }

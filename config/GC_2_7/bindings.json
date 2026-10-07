@@ -1546,5 +1546,6 @@
   "_xstrdup@4": "0x004173b0",
   "_cint64_min": "0x005b1cc8",
   "_CMach_GetMemberAlignment": "0x004c0960",
-  "_xfree@4": "0x004173e0"
+  "_xfree@4": "0x004173e0",
+  "_data_0058757c": "0x005ea564"
 }
