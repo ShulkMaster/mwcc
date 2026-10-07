@@ -78,7 +78,9 @@ extern Type stvoid;
 #define TK_ENUM 273
 #define TK_CLASS 274
 #define TK_UU_VECTOR 283
-#if VERSION >= VERSION_GC_2_7
+#if VERSION >= VERSION_GC_1_3
+#define TK_UNK_115 277
+#define TK_UU_TYPEOF_UU 284
 #define TK_BOOL 285
 #define TK_WCHAR_T 286
 #define TK__COMPLEX 287
@@ -186,8 +188,14 @@ extern Type stvoid;
 #define TK_AT_SELECTOR 381
 #define TK_AT_ENCODE 382
 #define TK_AT_DEFS 383
+#if VERSION >= VERSION_GC_1_3
+#define TK_UU_ALIGNOF_UU 388
+#define TK_RESTRICT 389
+#define TK_UU_ATTRIBUTE 390
+#else
 #define TK_RESTRICT 388
 #define TK_UU_ATTRIBUTE 389
+#endif
 extern SInt16 tk;
 extern NameSpaceName *runtime_operator_namespace_name;
 extern NameSpaceName *data_00588008;

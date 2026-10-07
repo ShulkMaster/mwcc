@@ -1,4 +1,5 @@
 #define CERROR_FILE "unknown.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CPrepTokenizer.h"
 #include "compiler/CParser.h"
@@ -370,7 +371,7 @@ int classify_identifier_token(void)
     if (memcmp("__fastcall", data_00587fa0->name, 11) == 0) {
         return TK_UU_FASTCALL;
     }
-#if VERSION < VERSION_GC_2_7
+#if VERSION < VERSION_GC_1_3
     if (memcmp("__floatcall", data_00587fa0->name, 12) == 0) {
         return TK_UU_FLOATCALL;
     }
@@ -393,12 +394,25 @@ int classify_identifier_token(void)
     if (memcmp("__restrict", data_00587fa0->name, 11) == 0) {
         return TK_RESTRICT;
     }
+#if VERSION >= VERSION_GC_1_3
+    if (memcmp("__restrict__", data_00587fa0->name, 13) == 0) {
+        return TK_RESTRICT;
+    }
+#endif
     if (memcmp("__attribute__", data_00587fa0->name, 14) == 0) {
         return TK_UU_ATTRIBUTE;
     }
     if (memcmp("__far", data_00587fa0->name, 6) == 0) {
         return TK_UU_FAR;
     }
+#if VERSION >= VERSION_GC_1_3
+    if (memcmp("__alignof__", data_00587fa0->name, 12) == 0) {
+        return TK_UU_ALIGNOF_UU;
+    }
+    if (memcmp("__typeof__", data_00587fa0->name, 11) == 0) {
+        return TK_UU_TYPEOF_UU;
+    }
+#endif
     if (copts.f90 != '\0') {
         if (memcmp("_Bool", data_00587fa0->name, 6) == 0) {
             return TK_BOOL;
@@ -410,6 +424,11 @@ int classify_identifier_token(void)
             return TK__IMAGINARY;
         }
     }
+#if VERSION >= VERSION_GC_1_3
+    if (memcmp("__vec2x32float__", data_00587fa0->name, 17) == 0) {
+        return TK_UNK_115;
+    }
+#endif
     if (copts.altivecModel != '\0') {
         if (memcmp("__vector", data_00587fa0->name, 9) == 0) {
             return TK_UU_VECTOR;

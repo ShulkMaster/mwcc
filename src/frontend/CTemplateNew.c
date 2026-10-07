@@ -504,7 +504,7 @@ void CTemplateNew_ParseTemplateDeclaration(TypeClass *templateClass)
                     case 58:
                     case 59:
                     case 123:
-                    case 292:
+                    case TK_UU_DECLSPEC:
                     case 335:
                         CPrep_SetPosition(tokenState);
                         if (isSpecialization != 0)
@@ -1398,7 +1398,7 @@ TemplateParameterRecord *parse_template_parameter(NameSpace *owner, TemplatePara
     declaration->index = memberValue;
     switch (declaration->depth = memberByte, tk) {
         case 0x112:
-        case 0x120:
+        case TK_TYPENAME:
             tk = CPrepTokenizer_GetNextToken();
             if (tk == TK_IDENTIFIER) {
                 declaration->name = data_00587fa0;

@@ -502,7 +502,7 @@ static inline Boolean CheckVectorKeyword(void)
         case 0x10b:
         case 0x10d:
         case 0x10e:
-        case 0x11c:
+        case TK_BOOL:
             bVar3 = 1;
             break;
         case -3:
@@ -730,7 +730,7 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                 if (tk == TK_UU_ATTRIBUTE)
                     CParser_ParseAttribute(state->dtype, NULL);
                 if ((tokenValue = tk) == TK_CONST || tokenValue == TK_VOLATILE || tokenValue == TK_UU_FAR ||
-                    tokenValue == 0x124) {
+                    tokenValue == TK_UU_DECLSPEC) {
                     typeToken = -1;
                     continue;
                 }
@@ -743,7 +743,7 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                 if (tk == TK_UU_ATTRIBUTE)
                     CParser_ParseAttribute(state->dtype, NULL);
                 if ((tokenValue = tk) == TK_CONST || tokenValue == TK_VOLATILE || tokenValue == TK_UU_FAR ||
-                    tokenValue == 0x124) {
+                    tokenValue == TK_UU_DECLSPEC) {
                     typeToken = -1;
                     continue;
                 }
@@ -756,7 +756,7 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                 if (tk == TK_UU_ATTRIBUTE)
                     CParser_ParseAttribute(state->dtype, NULL);
                 if ((tokenValue = tk) == TK_CONST || tokenValue == TK_VOLATILE || tokenValue == TK_UU_FAR ||
-                    tokenValue == 0x124) {
+                    tokenValue == TK_UU_DECLSPEC) {
                     typeToken = -1;
                     continue;
                 }
@@ -769,7 +769,7 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                 if (tk == TK_UU_ATTRIBUTE)
                     CParser_ParseAttribute(state->dtype, NULL);
                 if ((tokenValue = tk) == TK_CONST || tokenValue == TK_VOLATILE || tokenValue == TK_UU_FAR ||
-                    tokenValue == 0x124) {
+                    tokenValue == TK_UU_DECLSPEC) {
                     typeToken = -1;
                     continue;
                 }
@@ -1694,9 +1694,9 @@ TypeIntegral *select_builtin_type(SInt16 token, SInt16 lengthModifier, SInt16 si
                 default:
                     return &stsignedint;
             }
-        case 0x11c:
+        case TK_BOOL:
             return &stbool;
-        case 0x11d:
+        case TK_WCHAR_T:
             return &stwchar;
         case 0x107:
             switch (signModifier) {
@@ -1884,8 +1884,8 @@ unsigned char test_declaration(Boolean parseDeclaration, Boolean requireValue, B
         case 280:
         case 281:
         case 282:
-        case 284:
-        case 285:
+        case TK_BOOL:
+        case TK_WCHAR_T:
             if (CPrepTokenizer_GetNextTokenAndRestorePosition() == 40) {
                 break;
             }

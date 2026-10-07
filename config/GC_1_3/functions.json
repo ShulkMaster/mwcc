@@ -12401,9 +12401,10 @@
     "size": 12
   },
   {
-    "name": "fn_004d10e0",
+    "name": "classify_identifier_token",
     "address": "0x004d10e0",
-    "size": 972
+    "size": 972,
+    "source": "src/frontend/CPrepTokenizer.c"
   },
   {
     "name": "fn_004d14b0",

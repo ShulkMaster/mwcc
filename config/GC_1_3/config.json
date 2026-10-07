@@ -136,6 +136,7 @@
     "src/frontend/CException.c",
     "src/driver/CLCompilerLinkerDropin_V10.cpp",
     "src/driver/MemUtils.c",
-    "src/backend/CMachine.c"
+    "src/backend/CMachine.c",
+    "src/frontend/CPrepTokenizer.c"
   ]
 }

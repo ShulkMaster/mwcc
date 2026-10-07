@@ -5347,10 +5347,10 @@ void CDecl_MakePTMFuncType(TypeFunc *func)
     arg->type = (Type *)tp;
     for (;;) {
         q = tk;
-        if (q == 0x121) {
+        if (q == TK_CONST) {
             tk = CPrepTokenizer_GetNextToken();
             arg->qual |= Q_CONST;
-        } else if (q == 0x122) {
+        } else if (q == TK_VOLATILE) {
             tk = CPrepTokenizer_GetNextToken();
             arg->qual |= Q_VOLATILE;
         } else {
@@ -5380,10 +5380,10 @@ void prepend_class_pointer_argument(TypeFunc *owner, TypeClass *classType, char 
     argument->name = this_arg_name;
     if (parseModifiers != '\0') {
         while (1) {
-            if ((token = tk) == 0x121) {
+            if ((token = tk) == TK_CONST) {
                 tk = CPrepTokenizer_GetNextToken();
                 argument->qual |= Q_CONST;
-            } else if (token == 0x122) {
+            } else if (token == TK_VOLATILE) {
                 tk = CPrepTokenizer_GetNextToken();
                 argument->qual |= Q_VOLATILE;
             } else {
