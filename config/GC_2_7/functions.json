@@ -5573,9 +5573,10 @@
     "source": "src/driver/CLSegs.c"
   },
   {
-    "name": "fn_00428c00",
+    "name": "free_if_not_null",
     "address": "0x00428c00",
-    "size": 15
+    "size": 15,
+    "source": "src/driver/CLSegs.c"
   },
   {
     "name": "CLSegs_InitSegments",

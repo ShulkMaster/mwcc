@@ -29,7 +29,11 @@ struct PayloadWithValue *CLSegs_CreatePayloadWithValue(const char *source, UInt1
 void free_if_not_null(void *ptr)
 {
     if (ptr != NULL) {
+#if VERSION >= VERSION_GC_2_7
+        xfree(ptr);
+#else
         free(ptr);
+#endif
     }
 }
 
@@ -123,7 +127,11 @@ unsigned char CLSegs_FreeValues(AccessPathValueTable *array)
             free_if_not_null(entries[index]);
             index++;
         }
+#if VERSION >= VERSION_GC_2_7
+        xfree(array->values);
+#else
         free(array->values);
+#endif
     }
     array->values = NULL;
     return 1;
