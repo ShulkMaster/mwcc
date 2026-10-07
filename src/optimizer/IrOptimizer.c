@@ -982,6 +982,24 @@ ENode *IrOptimizer_0042eb40(IROLinear *e)
                 p->cost = 200;
             p->rtype = e->rtype;
             break;
+#if VERSION >= VERSION_GC_1_3
+        case IROLinearOp3Arg:
+            p = NewNode(e->nodetype);
+            p->flags = e->nodeflags;
+            p->data.cond.cond = IrOptimizer_0042eb40(e->u.args3.a);
+            p->data.cond.expr1 = IrOptimizer_0042eb40(e->u.args3.b);
+            p->data.cond.expr2 = IrOptimizer_0042eb40(e->u.args3.c);
+            p->rtype = e->rtype;
+            p->cost = p->data.cond.cond->cost;
+            if (p->data.cond.expr1->cost > p->cost)
+                p->cost = p->data.cond.expr1->cost;
+            if (p->data.cond.expr2->cost > p->cost)
+                p->cost = p->data.cond.expr2->cost;
+            p->cost += 1;
+            if (p->cost > 200)
+                p->cost = 200;
+            break;
+#endif
         case IROLinearFunccall: {
             UInt8 ty;
             ENodeList *l;
@@ -1013,9 +1031,16 @@ ENode *IrOptimizer_0042eb40(IROLinear *e)
             break;
         default:
             IroDump_Print("Oh, oh, bad expression type in BuildExpr at: %d\n", e->index);
+#if VERSION >= VERSION_GC_2_7
+            CError_Internal("IroLinearForm.c", 2393);
+#else
             CError_FATAL(2274);
+#endif
             break;
     }
+#if VERSION >= VERSION_GC_1_3
+    p->unk0A = e->pointsToFunction;
+#endif
     return p;
 }
 
