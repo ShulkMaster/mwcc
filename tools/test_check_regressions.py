@@ -163,6 +163,100 @@ class RowGateTests(unittest.TestCase):
         self.assertTrue(any(second in e and "matched instruction lost" in e for e in errors))
         self.assertFalse(any(first in e for e in errors))
 
+    def test_retired_alias_requires_one_fully_preserving_view(self):
+        before = snapshot([instruction(0), instruction(1, "DIFF_REPLACE")])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:2:frontend/conversion": state,
+                           "004fe050:2:frontend/rtti": copy.deepcopy(state)}
+        after = snapshot([instruction(0), instruction(1)])
+        after["units"] = {"004fe050:2": after["units"]["unit"]}
+        self.assertEqual(regressions(before, after), [])
+
+    def test_retired_alias_keeps_every_row_and_unit_obligation(self):
+        before = snapshot([instruction(0)])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:1:frontend/alias": state}
+        for loss in ("target", "base", "complete", "mapped", "function", "row", "full", "opcode", "arg", "insertion"):
+            after = copy.deepcopy(before)
+            candidate = after["units"].pop("004fe050:1:frontend/alias")
+            function = next(iter(candidate["functions"].values()))
+            if loss in ("target", "base"):
+                candidate[loss] = "changed"
+            elif loss in ("complete", "mapped"):
+                candidate[loss] = False
+            elif loss == "function":
+                candidate["functions"] = {}
+            elif loss == "row":
+                function["rows"] = {}
+            elif loss == "arg":
+                function["rows"]["0"]["args"][0] = False
+            elif loss == "insertion":
+                function["insertions"]['["START", "0", "extra"]'] = 1
+            else:
+                function["rows"]["0"][loss] = False
+            after["units"] = {"004fe050:1": candidate}
+            with self.subTest(loss=loss):
+                self.assertTrue(regressions(before, after))
+
+    def test_retired_alias_preserves_non_code_bytes(self):
+        before = snapshot([instruction(0, "DIFF_REPLACE")])
+        state = before["units"].pop("unit")
+        state["data"] = "original-data"
+        before["units"] = {"004fe050:1:frontend/alias": state}
+        for field in ("data", "base"):
+            after = copy.deepcopy(before)
+            candidate = after["units"].pop("004fe050:1:frontend/alias")
+            candidate[field] = "changed"
+            after["units"] = {"004fe050:1": candidate}
+            with self.subTest(field=field):
+                self.assertTrue(regressions(before, after))
+
+    def test_retired_alias_cannot_borrow_from_other_address_or_size(self):
+        before = snapshot([instruction(0)])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:1:frontend/alias": state}
+        for identity in ("004fe051:1", "004fe050:2", "not-an-original-extent"):
+            after = copy.deepcopy(before)
+            after["units"] = {identity: after["units"].pop("004fe050:1:frontend/alias")}
+            with self.subTest(identity=identity):
+                self.assertTrue(regressions(before, after))
+
+    def test_retired_alias_cannot_combine_partial_views(self):
+        before = snapshot([instruction(0), instruction(1)])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:2:frontend/alias": state}
+        after = copy.deepcopy(before)
+        first = snapshot([instruction(0), instruction(1, "DIFF_REPLACE")])["units"]["unit"]
+        second = snapshot([instruction(0, "DIFF_REPLACE"), instruction(1)])["units"]["unit"]
+        after["units"] = {"004fe050:2:frontend/one": first, "004fe050:2:frontend/two": second}
+        self.assertTrue(regressions(before, after))
+
+    def test_existing_alias_cannot_hide_loss_in_a_surviving_view(self):
+        before = snapshot([instruction(0)])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:1:frontend/alias": state}
+        after = copy.deepcopy(before)
+        after["units"]["004fe050:1"] = copy.deepcopy(state)
+        next(iter(after["units"]["004fe050:1:frontend/alias"]["functions"].values()))["rows"]["0"]["args"][0] = False
+        self.assertTrue(regressions(before, after))
+
+    def test_retired_alias_still_checks_external_call_destinations(self):
+        before = snapshot([branch(0, 28272)])
+        state = before["units"].pop("unit")
+        before["units"] = {"004fe050:5:frontend/alias": state}
+        after = snapshot([branch(0, 28272)], [branch(0, 27808)])
+        after["units"] = {"004fe050:5": after["units"]["unit"]}
+        self.assertTrue(regressions(before, after))
+
+    def test_each_retired_alias_must_be_preserved_independently(self):
+        first = snapshot([instruction(0), instruction(1, "DIFF_REPLACE")])["units"]["unit"]
+        second = snapshot([instruction(0, "DIFF_REPLACE"), instruction(1)])["units"]["unit"]
+        before = {"schema": SCHEMA, "version": "GC_2_7", "units": {
+            "004fe050:2:frontend/one": first, "004fe050:2:frontend/two": second}}
+        after = copy.deepcopy(before)
+        after["units"] = {"004fe050:2": copy.deepcopy(first)}
+        self.assertTrue(regressions(before, after))
+
 
 if __name__ == "__main__":
     unittest.main()

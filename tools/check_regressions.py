@@ -272,54 +272,76 @@ def insertion_counts(insertions):
     return counts
 
 
+def unit_regressions(name, old, new):
+    """Preserve every obligation for one compiled view of original bytes."""
+    errors = []
+    if old["target"] != new["target"]:
+        errors.append(f"{name}: original target changed")
+        return errors
+    if old["complete"] and not new["complete"]:
+        errors.append(f"{name}: linked/complete status lost")
+    if old["mapped"] and not new["mapped"]:
+        errors.append(f"{name}: base mapping lost")
+    if old["data"] and old["data"] != new["data"]:
+        errors.append(f"{name}: data coverage changed")
+    if old["data"] and old.get("base") != new.get("base"):
+        errors.append(f"{name}: non-code base bytes changed (strict data gate)")
+    for function, previous in old["functions"].items():
+        label = f"{name}:{function}"
+        current = new["functions"].get(function)
+        if current is None:
+            errors.append(f"{label}: function lost")
+            continue
+        if previous["mapped"] and not current["mapped"]:
+            errors.append(f"{label}: function mapping lost")
+        if previous["exact"] and old.get("base") != new.get("base"):
+            errors.append(f"{label}: exact base object bytes changed")
+        for address, row in previous["rows"].items():
+            now = current["rows"].get(address)
+            if now is None:
+                errors.append(f"{label}@{address}: target row lost")
+                continue
+            if row["full"] and not now["full"]:
+                errors.append(f"{label}@{address}: matched instruction lost")
+            if row["opcode"] and not now["opcode"]:
+                errors.append(f"{label}@{address}: matched opcode lost")
+            for index, matched in enumerate(row["args"]):
+                if matched and (index >= len(now["args"]) or not now["args"][index]):
+                    errors.append(f"{label}@{address}: matched argument {index} lost")
+        old_insertions = insertion_counts(previous["insertions"])
+        for anchor, count in insertion_counts(current["insertions"]).items():
+            if count > old_insertions.get(anchor, 0):
+                errors.append(f"{label}: new/grown insertion at {anchor}")
+    return errors
+
+
+def original_extent(identity):
+    match = re.fullmatch(r"([0-9a-f]{8}):([0-9]+)(?::.+)?", identity)
+    return (int(match[1], 16), int(match[2])) if match else None
+
+
 def regressions(before, after):
     if before.get("schema") != SCHEMA or after.get("schema") != SCHEMA:
         raise ValueError("unavailable or incompatible row baseline")
     if before["version"] != after["version"]:
         raise ValueError("baseline version mismatch")
+    by_extent = collections.defaultdict(list)
+    for name, state in after["units"].items():
+        extent = original_extent(name)
+        if extent is not None:
+            by_extent[extent].append(state)
     errors = []
     for name, old in before["units"].items():
         new = after["units"].get(name)
-        if new is None:
-            errors.append(f"{name}: unit lost")
+        if new is not None:
+            errors.extend(unit_regressions(name, old, new))
             continue
-        if old["target"] != new["target"]:
-            errors.append(f"{name}: original target changed")
-            continue
-        if old["complete"] and not new["complete"]:
-            errors.append(f"{name}: linked/complete status lost")
-        if old["mapped"] and not new["mapped"]:
-            errors.append(f"{name}: base mapping lost")
-        if old["data"] and old["data"] != new["data"]:
-            errors.append(f"{name}: data coverage changed")
-        if old["data"] and old.get("base") != new.get("base"):
-            errors.append(f"{name}: non-code base bytes changed (strict data gate)")
-        for function, previous in old["functions"].items():
-            label = f"{name}:{function}"
-            current = new["functions"].get(function)
-            if current is None:
-                errors.append(f"{label}: function lost")
-                continue
-            if previous["mapped"] and not current["mapped"]:
-                errors.append(f"{label}: function mapping lost")
-            if previous["exact"] and old.get("base") != new.get("base"):
-                errors.append(f"{label}: exact base object bytes changed")
-            for address, row in previous["rows"].items():
-                now = current["rows"].get(address)
-                if now is None:
-                    errors.append(f"{label}@{address}: target row lost")
-                    continue
-                if row["full"] and not now["full"]:
-                    errors.append(f"{label}@{address}: matched instruction lost")
-                if row["opcode"] and not now["opcode"]:
-                    errors.append(f"{label}@{address}: matched opcode lost")
-                for index, matched in enumerate(row["args"]):
-                    if matched and (index >= len(now["args"]) or not now["args"][index]):
-                        errors.append(f"{label}@{address}: matched argument {index} lost")
-            old_insertions = insertion_counts(previous["insertions"])
-            for anchor, count in insertion_counts(current["insertions"]).items():
-                if count > old_insertions.get(anchor, 0):
-                    errors.append(f"{label}: new/grown insertion at {anchor}")
+        # Correcting aliased ownership can retire a spelling of a function.
+        # One surviving view must preserve all of that view's obligations;
+        # partial matches from different candidates cannot be combined.
+        candidates = by_extent.get(original_extent(name), [])
+        if not any(not unit_regressions(name, old, candidate) for candidate in candidates):
+            errors.append(f"{name}: unit lost without a fully preserving view of the same original address and size")
     return errors
 
 
