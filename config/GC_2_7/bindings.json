@@ -45,6 +45,7 @@
   "_high_offset": "0x005ef278",
   "_high_reg": "0x005ef1d2",
   "_high_reg2": "0x005ef27a",
+  "_hprintf_buffer": "0x005dcc28",
   "_last_exception_register": "0x005ef1e4",
   "_last_temporary_register": "0x005ea640",
   "_low_offset": "0x005ef088",

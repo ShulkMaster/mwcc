@@ -2179,14 +2179,16 @@
     "source": "src/driver/StringUtils.c"
   },
   {
-    "name": "fn_0040ecb0",
+    "name": "c2pstrcpy",
     "address": "0x0040ecb0",
-    "size": 62
+    "size": 62,
+    "source": "src/driver/StringUtils.c"
   },
   {
-    "name": "fn_0040ecf0",
+    "name": "p2cstrcpy",
     "address": "0x0040ecf0",
-    "size": 39
+    "size": 39,
+    "source": "src/driver/StringUtils.c"
   },
   {
     "name": "mvprintf",
@@ -2195,9 +2197,10 @@
     "source": "src/driver/StringUtils.c"
   },
   {
-    "name": "fn_0040ee00",
+    "name": "mprintf",
     "address": "0x0040ee00",
-    "size": 56
+    "size": 56,
+    "source": "src/driver/StringUtils.c"
   },
   {
     "name": "HPrintF",

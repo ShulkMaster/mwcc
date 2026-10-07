@@ -8,10 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define va_start(ap, last)                                                                                             \
-    ((ap) = (char *)&(last) + (((int)((char *)&(last) + sizeof(last)) - (int)(char *)&(last) + 3) / 4) * 4)
-typedef char *(*TextFormatFunction)(char *buffer, unsigned int capacity, const char *format, va_list arguments);
+#include <stdarg.h>
+#include "version.h"
 
 UInt8 *_pstrcpy(UInt8 *destination, UInt8 *string)
 {
@@ -73,7 +71,11 @@ char *mvprintf(char *buffer, unsigned int size, const char *format, va_list args
     int length;
 
     if (buffer == NULL)
+#if VERSION >= VERSION_GC_2_7
+        CLIO_ReportAssertionFailure("mybuf != NULL", "StringUtils.c", 134U);
+#else
         CLIO_ReportAssertionFailure("mybuf != NULL", "StringUtils.c", 135U);
+#endif
 
     capacity = size - 1;
     result = buffer;
@@ -100,8 +102,12 @@ char *mvprintf(char *buffer, unsigned int size, const char *format, va_list args
 
 char *mprintf(char *buffer, int size, char *format, ...)
 {
-    va_list args = (va_list)&format + (((va_list)(&format + 1) - (va_list)&format + 3) / 4) * 4;
-    char *result = mvprintf(buffer, size, format, args);
+    va_list args;
+    char *result;
+
+    va_start(args, format);
+    result = mvprintf(buffer, size, format, args);
+    va_end(args);
     return result;
 }
 

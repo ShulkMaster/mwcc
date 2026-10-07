@@ -20,6 +20,7 @@
     "src/driver/ParserGlue-eabi-ppc-cc.c",
     "src/driver/ResourceStrings.c",
     "src/driver/StaticParserGlue.c",
+    "src/driver/StringUtils.c",
     "src/driver/Utils.c",
     "src/driver/cc-eabi-ppc-mw.c",
     "src/frontend/CObjCModern.c",
