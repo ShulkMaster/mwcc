@@ -1741,5 +1741,14 @@
   "_create_replacement_temp_assignment": "0x0046aa00",
   "_IrOptimizer_NewLinear": "0x0046fbe0",
   "_IroUtil_InsertLinearRangeAfter": "0x004692d0",
-  "_linear_index_counter": "0x005e9f08"
+  "_linear_index_counter": "0x005e9f08",
+  "_BE_symbol_Init": "0x004d1950",
+  "_BE_symbol_GetOrCreateFunctionObjectSymbol": "0x004d1610",
+  "_BE_symbol_GetSymbolOrderTail": "0x004d1940",
+  "_be_symbol_hash": "0x005eaa4c",
+  "_be_symbol_list": "0x005eea4c",
+  "_symbol_tail": "0x005eea50",
+  "_symbol_order_tail": "0x005eea54",
+  "_data_005884aa": "0x005ef232",
+  "_data_0055da80": "0x005e0af8"
 }

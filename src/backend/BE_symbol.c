@@ -229,9 +229,12 @@ BE_SymNode *BE_symbol_GetOrCreateFunctionObjectSymbol(Object *arg)
 {
     HashNameNode *func;
     SInt16 kind;
+
+#if VERSION < VERSION_GC_2_7
     UInt8 flag;
     BE_SymNode *found;
     BE_SymNode *node;
+#endif
 
     func = COptimizer_GetFunctionObject(arg);
     if (CParser_HasInternalLinkage(arg))
@@ -239,6 +242,9 @@ BE_SymNode *BE_symbol_GetOrCreateFunctionObjectSymbol(Object *arg)
     else
         kind = 0x103;
 
+#if VERSION >= VERSION_GC_2_7
+    return fn_004d1650(func, kind);
+#else
     found = FindFuncNode(func, kind);
 
     if (found)
@@ -260,6 +266,7 @@ BE_SymNode *BE_symbol_GetOrCreateFunctionObjectSymbol(Object *arg)
     node->kind = kind;
     node->sectionData.section = data_005884aa;
     return node;
+#endif
 }
 struct BE_SymNode *BE_symbol_GetSymbolOrderTail(void)
 {
@@ -602,7 +609,14 @@ BE_SymNode *BE_symbol_AdvanceSymbolTail(void)
 
 void BE_symbol_Init(void)
 {
+#if VERSION >= VERSION_GC_2_7
+    memset(be_symbol_hash, 0, sizeof(be_symbol_hash));
+    be_symbol_list = NULL;
+    symbol_tail = NULL;
+    symbol_order_tail = NULL;
+#else
     memset(&be_symbol_list, 0, 12U);
+#endif
     data_0055da80 = NULL;
 }
 /* Prefix of a 50-byte symbol record; the remaining fields are not used here. */

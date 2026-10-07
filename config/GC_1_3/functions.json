@@ -12302,14 +12302,16 @@
     "source": "src/backend/BE_symbol.c"
   },
   {
-    "name": "fn_004d04c0",
+    "name": "BE_symbol_GetSymbolOrderTail",
     "address": "0x004d04c0",
-    "size": 6
+    "size": 6,
+    "source": "src/backend/BE_symbol.c"
   },
   {
-    "name": "fn_004d04d0",
+    "name": "BE_symbol_Init",
     "address": "0x004d04d0",
-    "size": 23
+    "size": 23,
+    "source": "src/backend/BE_symbol.c"
   },
   {
     "name": "BE_symbol_CreateSymNode",

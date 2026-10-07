@@ -13080,9 +13080,10 @@
     "source": "src/backend/BE_symbol.c"
   },
   {
-    "name": "fn_004d1610",
+    "name": "BE_symbol_GetOrCreateFunctionObjectSymbol",
     "address": "0x004d1610",
-    "size": 50
+    "size": 50,
+    "source": "src/backend/BE_symbol.c"
   },
   {
     "name": "fn_004d1650",
@@ -13090,14 +13091,16 @@
     "size": 750
   },
   {
-    "name": "fn_004d1940",
+    "name": "BE_symbol_GetSymbolOrderTail",
     "address": "0x004d1940",
-    "size": 6
+    "size": 6,
+    "source": "src/backend/BE_symbol.c"
   },
   {
-    "name": "fn_004d1950",
+    "name": "BE_symbol_Init",
     "address": "0x004d1950",
-    "size": 27
+    "size": 27,
+    "source": "src/backend/BE_symbol.c"
   },
   {
     "name": "fn_004d1970",

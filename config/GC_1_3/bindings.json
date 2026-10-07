@@ -1623,5 +1623,9 @@
   "_IrOptimizer_NewLinear": "0x0046ece0",
   "_IroUtil_InsertLinearRangeAfter": "0x00468410",
   "_linear_index_counter": "0x005e5f78",
-  "_IroCSE_0044e560": "0x00467880"
+  "_IroCSE_0044e560": "0x00467880",
+  "_BE_symbol_Init": "0x004d04d0",
+  "_BE_symbol_GetSymbolOrderTail": "0x004d04c0",
+  "_symbol_order_tail": "0x005e6aa4",
+  "_data_0055da80": "0x005dca98"
 }
