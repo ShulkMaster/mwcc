@@ -3,6 +3,7 @@
 #include "compiler/IroBitVect.h"
 #include "compiler/CError.h"
 #include "compiler/CompilerTools.h"
+#include "version.h"
 #include <string.h>
 
 unsigned int is_bitvector_empty(struct BitVector *values)
@@ -117,7 +118,11 @@ void IroBitVect_ClearBit(UInt32 bit, BitVector *vector)
     if (bit >> 5 < vector->size) {
         vector->bits[bit >> 5] &= ~(1U << (bit & 0x1f));
     } else {
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(73);
+#else
         CError_FATAL(64);
+#endif
     }
 }
 
