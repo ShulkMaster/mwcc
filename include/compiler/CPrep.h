@@ -57,218 +57,218 @@ struct CNameRef {
 #pragma options align = mac68k
 struct COpts {
 #if VERSION >= VERSION_GC_2_7
-    UInt8 nativeByteOrder;                              /* 0x00: little_endian */
-    UInt8 field_0x01;                                   /* 0x01 */
-    SInt16 processor;                                   /* 0x02 */
-    SInt8 processorModel;                               /* 0x04 */
-    UInt8 instructionSchedulingMode;                    /* 0x05 */
-    unsigned char cOptimizerDumpEnabled;                /* 0x06: debug_listing */
-    UInt8 fba;                                          /* 0x07: profile */
-    char emitExtraAssemblyData;                         /* 0x08 */
-    Boolean f08;                                        /* 0x09: disable_registers */
-    char debugOptions;                                  /* 0x0a: fp_contract */
-    UInt8 no_register_save_helpers;                     /* 0x0b: no_register_save_helpers */
-    Boolean ppcUnrollSpeculative;                       /* 0x0c */
-    UInt8 field_0x0d;                                   /* 0x0d */
-    SInt16 ppcUnrollInstructionsLimit;                  /* 0x0e */
-    SInt16 ppcUnrollFactorLimit;                        /* 0x10 */
-    UInt8 altivecModel;                                 /* 0x12 */
-    UInt8 altivecVrsave;                                /* 0x13 */
-    UInt8 codeAlignment;                                /* 0x14 */
-    char emitSerializedAssemblyFormat;                  /* 0x15: cats */
-    char f14;                                           /* 0x16: force_cats */
-    UInt8 field_0x17;                                   /* 0x17 */
-    SInt32 smallDataLimit;                              /* 0x18 */
-    int smallBSSLimit;                                  /* 0x1c */
-    UInt8 reuseSectionSymbols;                          /* 0x20: pool_data */
-    UInt8 f20;                                          /* 0x21 */
-    char debugEnabled;                                  /* 0x22 */
-    Boolean operandsDebug;                              /* 0x23 */
-    UInt8 f25;                                          /* 0x24 */
-    UInt8 f26;                                          /* 0x25 */
-    char f27;                                           /* 0x26 */
-    SInt8 rel109Offset;                                 /* 0x27 */
-    struct ObjGenSection *textSection;                  /* 0x28 */
-    struct ObjGenSection *dataSection;                  /* 0x2c */
-    struct ObjGenSection *bssSection;                   /* 0x30 */
-    struct ObjGenSection *smallDataSection;             /* 0x34 */
-    struct ObjGenSection *smallBSSSection;              /* 0x38 */
-    SInt32 sectionHeaderTableSize;                      /* 0x3c */
-    struct SectionSymbolAttributes **sectionHeaderTable;  /* 0x40 */
-    struct InterruptList *interruptList;                /* 0x44 */
-    struct InterruptGenerationRecord *interruptOptions; /* 0x48 */
-    UInt8 f4e;                                          /* 0x4c: incompatible_return_small_structs */
-    Boolean emitMainFileObject;                         /* 0x4d: create_file_object */
-    UInt8 returnStructsInMemory;                        /* 0x4e: incompatible_sfpe_double_params */
-    UInt8 ibm_stackframe;                               /* 0x4f: ibm_stackframe */
-    UInt8 field_0x50;                                   /* 0x50 */
-    UInt8 field_0x51;                                   /* 0x51 */
-    UInt8 gecko_float_typecons;                         /* 0x52: gecko_float_typecons */
-    UInt8 disable_vector_frame;                         /* 0x53: disable_vector_frame */
-    UInt8 ppc_opt_bclr_bcctr;                           /* 0x54: ppc_opt_bclr_bcctr */
-    UInt8 useRegisterSaveHelpers;                       /* 0x55: use_lmw_stmw */
-    UInt8 field_0x56;                                   /* 0x56 */
-    UInt8 misaligned_mem_access;                        /* 0x57: misaligned_mem_access */
-    UInt8 switch_tables;                                /* 0x58: switch_tables */
-    UInt8 prepare_compress;                             /* 0x59: prepare_compress */
-    UInt8 field_0x5a;                                   /* 0x5a */
-    UInt8 unsafe_global_reg_vars;                       /* 0x5b: unsafe_global_reg_vars */
-    UInt8 ignore_global_reg_vars;                       /* 0x5c: ignore_global_reg_vars */
-    UInt8 field_0x5d;                                   /* 0x5d */
-    UInt32 field_0x5e;                                  /* 0x5e */
-    UInt8 gprfloatcopy;                                 /* 0x62: gprfloatcopy */
-    UInt8 old_style_bitfields;                          /* 0x63: old_style_bitfields */
-    UInt8 asmsemicolcomment;                            /* 0x64: asmsemicolcomment */
-    UInt8 asmpoundcomment;                              /* 0x65: asmpoundcomment */
-    UInt8 field_0x66;                                   /* 0x66 */
-    UInt8 field_0x67;                                   /* 0x67 */
-    char *f54;                                          /* 0x68 */
-    SInt16 inlineLimit;                                 /* 0x6c */
-    SInt32 inlineMaxSize;                               /* 0x6e */
-    SInt32 inlineMaxTotalSize;                          /* 0x72 */
-    UInt8 inline_bottom_up;                             /* 0x76: inline_bottom_up */
-    UInt8 cplusplus;                                    /* 0x77: cplusplus */
-    UInt8 f5b;                                          /* 0x78: ecplusplus */
-    UInt8 f5c;                                          /* 0x79: objective_c */
-    SInt8 f5d;                                          /* 0x7a: objc_strict */
-    char f5e;                                           /* 0x7b: ARM_conform */
-    char f5f;                                           /* 0x7c: ARM_scoping */
-    Boolean f60;                                        /* 0x7d: require_prototypes */
-    char trigraphs;                                     /* 0x7e: trigraphs */
-    UInt8 f62;                                          /* 0x7f: only_std_keywords */
-    UInt8 f63;                                          /* 0x80: enumsalwaysint */
-    UInt8 rejectZeroLengthArrayMembers;                 /* 0x81: ANSI_strict */
-    UInt8 f65;                                          /* 0x82: mpwc_relax */
-    UInt8 f66;                                          /* 0x83: mpwc_newline */
-    Boolean f67;                                        /* 0x84: ignore_oldstyle */
-    Boolean f68;                                        /* 0x85: cpp_extensions */
-    UInt8 f69;                                          /* 0x86: pointercast_lvalue */
-    char rttiEnabled;                                   /* 0x87: RTTI */
-    UInt8 f6b;                                          /* 0x88: delete_exception */
-    UInt8 field_0x89;                                   /* 0x89 */
-    UInt8 oldalignment;                                 /* 0x8a: oldalignment */
-    UInt8 unsignedChar;                                 /* 0x8b: unsigned_char */
-    char f6f;                                           /* 0x8c: multibyteaware */
-    UInt8 f70;                                          /* 0x8d: auto_inline */
-    UInt8 f71;                                          /* 0x8e: defer_codegen */
-    UInt8 f72;                                          /* 0x8f: direct_to_som */
-    UInt8 f73;                                          /* 0x90: SOMCheckEnvironment */
-    UInt8 f74;                                          /* 0x91: SOMCallOptimization */
-    UInt8 f75;                                          /* 0x92: bool */
-    UInt8 old_enum_mangler;                             /* 0x93: old_enum_mangler */
-    UInt8 f77;                                          /* 0x94: longlong */
-    UInt8 f78;                                          /* 0x95: longlong_enums */
-    UInt8 no_tfuncinline;                               /* 0x96: no_tfuncinline */
-    UInt8 f7a;                                          /* 0x97 */
-    char f7b;                                           /* 0x98: flat_include */
-    char f7c;                                           /* 0x99: syspath_once */
-    char f7d;                                           /* 0x9a: always_import */
-    UInt8 f7e;                                          /* 0x9b: simple_class_byval */
-    char f7f;                                           /* 0x9c: wchar_type */
-    UInt8 f80;                                          /* 0x9d: vbase_ctor_offset */
-    char f81;                                           /* 0x9e: vbase_abi_v2 */
-    char f82;                                           /* 0x9f: def_inherited */
-    UInt8 f83;                                          /* 0xa0: template_patch */
-    UInt8 f84;                                          /* 0xa1: template_friends */
-    Boolean f85;                                        /* 0xa2: faster_pch_gen */
-    UInt8 f86;                                          /* 0xa3: array_new_delete */
-    UInt8 f87;                                          /* 0xa4: dollar_identifiers */
-    UInt8 def_inline_tfuncs;                            /* 0xa5: def_inline_tfuncs */
-    UInt8 f89;                                          /* 0xa6: arg_dep_lookup */
-    char f8a;                                           /* 0xa7: simple_prepdump */
-    char f8b;                                           /* 0xa8: line_prepdump */
-    UInt8 f8c;                                          /* 0xa9: fullpath_prepdump */
-    UInt8 old_mtemplparser;                             /* 0xaa: old_mtemplparser */
-    UInt8 f8e;                                          /* 0xab: suppress_init_code */
-    Boolean f8f;                                        /* 0xac: reverse_bitfields */
-    UInt8 f90;                                          /* 0xad: c9x */
-    Boolean f91;                                        /* 0xae: float_constants */
-    Boolean f92;                                        /* 0xaf: no_static_dtors */
-    Boolean f93;                                        /* 0xb0: longlong_prepeval */
-    UInt8 f94;                                          /* 0xb1: const_strings */
-    UInt8 dumpir;                                       /* 0xb2: dumpir */
-    UInt8 f96;                                          /* 0xb3: experimental */
-    UInt8 f97;                                          /* 0xb4: gcc_extensions */
-    UInt8 stdc_fp_contract;                             /* 0xb5: stdc_fp_contract */
-    UInt8 stdc_fenv_access;                             /* 0xb6: stdc_fenv_access */
-    UInt8 stdc_cx_limitedr;                             /* 0xb7: stdc_cx_limitedr */
-    UInt8 old_argmatch;                                 /* 0xb8: old_argmatch */
-    UInt8 optEH;                                        /* 0xb9: optEH */
-    UInt8 optEH2;                                       /* 0xba: optEH2 */
-    UInt8 new_mangler;                                  /* 0xbb: new_mangler */
-    UInt8 fullpath_file;                                /* 0xbc: fullpath_file */
-    UInt8 microsoft_exceptions;                         /* 0xbd: microsoft_exceptions */
-    UInt8 stdc_libfuncname_redefined;                   /* 0xbe: stdc_libfuncname_redefined */
-    char f9c;                                           /* 0xbf: warning_errors */
-    char f9d;                                           /* 0xc0: extended_errorcheck */
-    UInt8 f9e;                                          /* 0xc1: check_header_flags */
-    UInt8 supress_warnings;                             /* 0xc2: supress_warnings */
-    Boolean f9f;                                        /* 0xc3: warn_illpragma */
-    UInt8 fa0;                                          /* 0xc4: warn_emptydecl */
-    Boolean fa1;                                        /* 0xc5: warn_possunwant */
-    char fa2;                                           /* 0xc6: warn_unusedvar */
-    char fa3;                                           /* 0xc7: warn_unusedarg */
-    UInt8 fa4;                                          /* 0xc8: warn_extracomma */
-    Boolean fa5;                                        /* 0xc9: warn_hidevirtual */
-    char fa6;                                           /* 0xca: warn_largeargs */
-    Boolean fa7;                                        /* 0xcb: warn_implicitconv */
-    UInt8 fa8;                                          /* 0xcc: warn_notinlined */
-    SInt8 fa9;                                          /* 0xcd: warn_structclass */
-    Boolean faa;                                        /* 0xce: warn_padding */
-    Boolean fab;                                        /* 0xcf: warn_no_side_effect */
-    Boolean fac;                                        /* 0xd0: warn_resultnotused */
-    UInt8 warn_ptr_int_conv;                            /* 0xd1: warn_ptr_int_conv */
-    UInt8 warn_uninitializedvar;                        /* 0xd2: warn_uninitializedvar */
-    signed char structalignment;                        /* 0xd3 */
-    UInt8 arrayAlignment;                               /* 0xd4: align_array_members */
-    SInt8 faf;                                          /* 0xd5: dont_reuse_strings */
-    UInt8 fb0;                                          /* 0xd6: pool_strings */
-    UInt8 fb1;                                          /* 0xd7: explicit_zero_data */
-    UInt8 fb2;                                          /* 0xd8: readonly_strings */
-    UInt8 fb3;                                          /* 0xd9: exceptions */
-    UInt8 field_0xda;                                   /* 0xda */
-    UInt8 disableInlining;                              /* 0xdb: dont_inline */
-    UInt8 fb6;                                          /* 0xdc: always_inline */
-    char peepholeOptimizationEnabled;                   /* 0xdd: peephole */
-    Boolean irOptimizationEnabled;                      /* 0xde: global_optimizer */
-    unsigned char fb9;                                  /* 0xdf: side_effects */
-    UInt8 fbb;                                          /* 0xe0: internal */
-    UInt8 fbc;                                          /* 0xe1: import */
-    UInt8 fbd;                                          /* 0xe2: export */
-    UInt8 fbe;                                          /* 0xe3: lib_export */
-    char fbf;                                           /* 0xe4: nosyminline */
-    char fc0;                                           /* 0xe5: force_active */
-    UInt8 block_assign;                                 /* 0xe6: block_assign */
-    UInt8 has8bytebitfields;                            /* 0xe7: has8bytebitfields */
-    SInt8 deleteDeadInstructions;                       /* 0xe8 */
-    UInt8 uniformSpillBlockWeight;                      /* 0xe9: optimize_for_size */
-    UInt8 fc3;                                          /* 0xea */
-    UInt8 field_0xeb;                                   /* 0xeb */
-    UInt8 irCommonSubexpressionElimination;             /* 0xec: opt_common_subs */
-    UInt8 fc5;                                          /* 0xed: opt_loop_invariants */
-    UInt8 irCopyPropagation;                            /* 0xee: opt_propagation */
-    UInt8 irEliminateUnused;                            /* 0xef: opt_dead_assignments */
-    UInt8 fc8;                                          /* 0xf0: opt_strength_reduction */
-    UInt8 fc9;                                          /* 0xf1: opt_strength_reduction_strict */
-    UInt8 irRemoveUnreachable;                          /* 0xf2: opt_dead_code */
-    UInt8 fcb;                                          /* 0xf3: opt_lifetimes */
-    UInt8 field_0xf4;                                   /* 0xf4 */
-    UInt8 irLoopUnrolling;                              /* 0xf5: opt_unroll_loops */
-    Boolean fce;                                        /* 0xf6: opt_vectorize_loops */
-    UInt8 irSecondOptimizationPass;                     /* 0xf7 */
-    UInt8 opt_pointer_analysis;                         /* 0xf8: opt_pointer_analysis */
-    UInt8 field_0xf9;                                   /* 0xf9 */
-    signed char unrollOption;                           /* 0xfa */
-    SInt8 fd1;                                          /* 0xfb */
-    UInt8 filesyminfo;                                  /* 0xfc: sym */
-    UInt8 field_0xfd;                                   /* 0xfd */
-    char fd4;                                           /* 0xfe */
-    UInt8 fd5;                                          /* 0xff */
-    Boolean fd6;                                        /* 0x100 */
-    UInt8 field_0x101;                                  /* 0x101 */
-    int precompiledHeaderCreator;                       /* 0x102 */
-    UInt32 precompiledHeaderFileTypes[2];               /* 0x106 */
-    HashNameNode *fe4;                                  /* 0x10e */
+    UInt8 nativeByteOrder;                               /* 0x00: little_endian */
+    UInt8 field_0x01;                                    /* 0x01 */
+    SInt16 processor;                                    /* 0x02 */
+    SInt8 processorModel;                                /* 0x04 */
+    UInt8 instructionSchedulingMode;                     /* 0x05 */
+    unsigned char cOptimizerDumpEnabled;                 /* 0x06: debug_listing */
+    UInt8 fba;                                           /* 0x07: profile */
+    char emitExtraAssemblyData;                          /* 0x08 */
+    Boolean f08;                                         /* 0x09: disable_registers */
+    char debugOptions;                                   /* 0x0a: fp_contract */
+    UInt8 no_register_save_helpers;                      /* 0x0b: no_register_save_helpers */
+    Boolean ppcUnrollSpeculative;                        /* 0x0c */
+    UInt8 field_0x0d;                                    /* 0x0d */
+    SInt16 ppcUnrollInstructionsLimit;                   /* 0x0e */
+    SInt16 ppcUnrollFactorLimit;                         /* 0x10 */
+    UInt8 altivecModel;                                  /* 0x12 */
+    UInt8 altivecVrsave;                                 /* 0x13 */
+    UInt8 codeAlignment;                                 /* 0x14 */
+    char emitSerializedAssemblyFormat;                   /* 0x15: cats */
+    char f14;                                            /* 0x16: force_cats */
+    UInt8 field_0x17;                                    /* 0x17 */
+    SInt32 smallDataLimit;                               /* 0x18 */
+    int smallBSSLimit;                                   /* 0x1c */
+    UInt8 reuseSectionSymbols;                           /* 0x20: pool_data */
+    UInt8 f20;                                           /* 0x21 */
+    char debugEnabled;                                   /* 0x22 */
+    Boolean operandsDebug;                               /* 0x23 */
+    UInt8 f25;                                           /* 0x24 */
+    UInt8 f26;                                           /* 0x25 */
+    char f27;                                            /* 0x26 */
+    SInt8 rel109Offset;                                  /* 0x27 */
+    struct ObjGenSection *textSection;                   /* 0x28 */
+    struct ObjGenSection *dataSection;                   /* 0x2c */
+    struct ObjGenSection *bssSection;                    /* 0x30 */
+    struct ObjGenSection *smallDataSection;              /* 0x34 */
+    struct ObjGenSection *smallBSSSection;               /* 0x38 */
+    SInt32 sectionHeaderTableSize;                       /* 0x3c */
+    struct SectionSymbolAttributes **sectionHeaderTable; /* 0x40 */
+    struct InterruptList *interruptList;                 /* 0x44 */
+    struct InterruptGenerationRecord *interruptOptions;  /* 0x48 */
+    UInt8 f4e;                                           /* 0x4c: incompatible_return_small_structs */
+    Boolean emitMainFileObject;                          /* 0x4d: create_file_object */
+    UInt8 returnStructsInMemory;                         /* 0x4e: incompatible_sfpe_double_params */
+    UInt8 ibm_stackframe;                                /* 0x4f: ibm_stackframe */
+    UInt8 field_0x50;                                    /* 0x50 */
+    UInt8 field_0x51;                                    /* 0x51 */
+    UInt8 gecko_float_typecons;                          /* 0x52: gecko_float_typecons */
+    UInt8 disable_vector_frame;                          /* 0x53: disable_vector_frame */
+    UInt8 ppc_opt_bclr_bcctr;                            /* 0x54: ppc_opt_bclr_bcctr */
+    UInt8 useRegisterSaveHelpers;                        /* 0x55: use_lmw_stmw */
+    UInt8 field_0x56;                                    /* 0x56 */
+    UInt8 misaligned_mem_access;                         /* 0x57: misaligned_mem_access */
+    UInt8 switch_tables;                                 /* 0x58: switch_tables */
+    UInt8 prepare_compress;                              /* 0x59: prepare_compress */
+    UInt8 field_0x5a;                                    /* 0x5a */
+    UInt8 unsafe_global_reg_vars;                        /* 0x5b: unsafe_global_reg_vars */
+    UInt8 ignore_global_reg_vars;                        /* 0x5c: ignore_global_reg_vars */
+    UInt8 field_0x5d;                                    /* 0x5d */
+    UInt32 field_0x5e;                                   /* 0x5e */
+    UInt8 gprfloatcopy;                                  /* 0x62: gprfloatcopy */
+    UInt8 old_style_bitfields;                           /* 0x63: old_style_bitfields */
+    UInt8 asmsemicolcomment;                             /* 0x64: asmsemicolcomment */
+    UInt8 asmpoundcomment;                               /* 0x65: asmpoundcomment */
+    UInt8 field_0x66;                                    /* 0x66 */
+    UInt8 field_0x67;                                    /* 0x67 */
+    char *f54;                                           /* 0x68 */
+    SInt16 inlineLimit;                                  /* 0x6c */
+    SInt32 inlineMaxSize;                                /* 0x6e */
+    SInt32 inlineMaxTotalSize;                           /* 0x72 */
+    UInt8 inline_bottom_up;                              /* 0x76: inline_bottom_up */
+    UInt8 cplusplus;                                     /* 0x77: cplusplus */
+    UInt8 f5b;                                           /* 0x78: ecplusplus */
+    UInt8 f5c;                                           /* 0x79: objective_c */
+    SInt8 f5d;                                           /* 0x7a: objc_strict */
+    char f5e;                                            /* 0x7b: ARM_conform */
+    char f5f;                                            /* 0x7c: ARM_scoping */
+    Boolean f60;                                         /* 0x7d: require_prototypes */
+    char trigraphs;                                      /* 0x7e: trigraphs */
+    UInt8 f62;                                           /* 0x7f: only_std_keywords */
+    UInt8 f63;                                           /* 0x80: enumsalwaysint */
+    UInt8 rejectZeroLengthArrayMembers;                  /* 0x81: ANSI_strict */
+    UInt8 f65;                                           /* 0x82: mpwc_relax */
+    UInt8 f66;                                           /* 0x83: mpwc_newline */
+    Boolean f67;                                         /* 0x84: ignore_oldstyle */
+    Boolean f68;                                         /* 0x85: cpp_extensions */
+    UInt8 f69;                                           /* 0x86: pointercast_lvalue */
+    char rttiEnabled;                                    /* 0x87: RTTI */
+    UInt8 f6b;                                           /* 0x88: delete_exception */
+    UInt8 field_0x89;                                    /* 0x89 */
+    UInt8 oldalignment;                                  /* 0x8a: oldalignment */
+    UInt8 unsignedChar;                                  /* 0x8b: unsigned_char */
+    char f6f;                                            /* 0x8c: multibyteaware */
+    UInt8 f70;                                           /* 0x8d: auto_inline */
+    UInt8 f71;                                           /* 0x8e: defer_codegen */
+    UInt8 f72;                                           /* 0x8f: direct_to_som */
+    UInt8 f73;                                           /* 0x90: SOMCheckEnvironment */
+    UInt8 f74;                                           /* 0x91: SOMCallOptimization */
+    UInt8 f75;                                           /* 0x92: bool */
+    UInt8 old_enum_mangler;                              /* 0x93: old_enum_mangler */
+    UInt8 f77;                                           /* 0x94: longlong */
+    UInt8 f78;                                           /* 0x95: longlong_enums */
+    UInt8 no_tfuncinline;                                /* 0x96: no_tfuncinline */
+    UInt8 f7a;                                           /* 0x97 */
+    char f7b;                                            /* 0x98: flat_include */
+    char f7c;                                            /* 0x99: syspath_once */
+    char f7d;                                            /* 0x9a: always_import */
+    UInt8 f7e;                                           /* 0x9b: simple_class_byval */
+    char f7f;                                            /* 0x9c: wchar_type */
+    UInt8 f80;                                           /* 0x9d: vbase_ctor_offset */
+    char f81;                                            /* 0x9e: vbase_abi_v2 */
+    char f82;                                            /* 0x9f: def_inherited */
+    UInt8 f83;                                           /* 0xa0: template_patch */
+    UInt8 f84;                                           /* 0xa1: template_friends */
+    Boolean f85;                                         /* 0xa2: faster_pch_gen */
+    UInt8 f86;                                           /* 0xa3: array_new_delete */
+    UInt8 f87;                                           /* 0xa4: dollar_identifiers */
+    UInt8 def_inline_tfuncs;                             /* 0xa5: def_inline_tfuncs */
+    UInt8 f89;                                           /* 0xa6: arg_dep_lookup */
+    char f8a;                                            /* 0xa7: simple_prepdump */
+    char f8b;                                            /* 0xa8: line_prepdump */
+    UInt8 f8c;                                           /* 0xa9: fullpath_prepdump */
+    UInt8 old_mtemplparser;                              /* 0xaa: old_mtemplparser */
+    UInt8 f8e;                                           /* 0xab: suppress_init_code */
+    Boolean f8f;                                         /* 0xac: reverse_bitfields */
+    UInt8 f90;                                           /* 0xad: c9x */
+    Boolean f91;                                         /* 0xae: float_constants */
+    Boolean f92;                                         /* 0xaf: no_static_dtors */
+    Boolean f93;                                         /* 0xb0: longlong_prepeval */
+    UInt8 f94;                                           /* 0xb1: const_strings */
+    UInt8 dumpir;                                        /* 0xb2: dumpir */
+    UInt8 f96;                                           /* 0xb3: experimental */
+    UInt8 f97;                                           /* 0xb4: gcc_extensions */
+    UInt8 stdc_fp_contract;                              /* 0xb5: stdc_fp_contract */
+    UInt8 stdc_fenv_access;                              /* 0xb6: stdc_fenv_access */
+    UInt8 stdc_cx_limitedr;                              /* 0xb7: stdc_cx_limitedr */
+    UInt8 old_argmatch;                                  /* 0xb8: old_argmatch */
+    UInt8 optEH;                                         /* 0xb9: optEH */
+    UInt8 optEH2;                                        /* 0xba: optEH2 */
+    UInt8 new_mangler;                                   /* 0xbb: new_mangler */
+    UInt8 fullpath_file;                                 /* 0xbc: fullpath_file */
+    UInt8 microsoft_exceptions;                          /* 0xbd: microsoft_exceptions */
+    UInt8 stdc_libfuncname_redefined;                    /* 0xbe: stdc_libfuncname_redefined */
+    char f9c;                                            /* 0xbf: warning_errors */
+    char f9d;                                            /* 0xc0: extended_errorcheck */
+    UInt8 f9e;                                           /* 0xc1: check_header_flags */
+    UInt8 supress_warnings;                              /* 0xc2: supress_warnings */
+    Boolean f9f;                                         /* 0xc3: warn_illpragma */
+    UInt8 fa0;                                           /* 0xc4: warn_emptydecl */
+    Boolean fa1;                                         /* 0xc5: warn_possunwant */
+    char fa2;                                            /* 0xc6: warn_unusedvar */
+    char fa3;                                            /* 0xc7: warn_unusedarg */
+    UInt8 fa4;                                           /* 0xc8: warn_extracomma */
+    Boolean fa5;                                         /* 0xc9: warn_hidevirtual */
+    char fa6;                                            /* 0xca: warn_largeargs */
+    Boolean fa7;                                         /* 0xcb: warn_implicitconv */
+    UInt8 fa8;                                           /* 0xcc: warn_notinlined */
+    SInt8 fa9;                                           /* 0xcd: warn_structclass */
+    Boolean faa;                                         /* 0xce: warn_padding */
+    Boolean fab;                                         /* 0xcf: warn_no_side_effect */
+    Boolean fac;                                         /* 0xd0: warn_resultnotused */
+    UInt8 warn_ptr_int_conv;                             /* 0xd1: warn_ptr_int_conv */
+    UInt8 warn_uninitializedvar;                         /* 0xd2: warn_uninitializedvar */
+    signed char structalignment;                         /* 0xd3 */
+    UInt8 arrayAlignment;                                /* 0xd4: align_array_members */
+    SInt8 faf;                                           /* 0xd5: dont_reuse_strings */
+    UInt8 fb0;                                           /* 0xd6: pool_strings */
+    UInt8 fb1;                                           /* 0xd7: explicit_zero_data */
+    UInt8 fb2;                                           /* 0xd8: readonly_strings */
+    UInt8 fb3;                                           /* 0xd9: exceptions */
+    UInt8 field_0xda;                                    /* 0xda */
+    UInt8 disableInlining;                               /* 0xdb: dont_inline */
+    UInt8 fb6;                                           /* 0xdc: always_inline */
+    char peepholeOptimizationEnabled;                    /* 0xdd: peephole */
+    Boolean irOptimizationEnabled;                       /* 0xde: global_optimizer */
+    unsigned char fb9;                                   /* 0xdf: side_effects */
+    UInt8 fbb;                                           /* 0xe0: internal */
+    UInt8 fbc;                                           /* 0xe1: import */
+    UInt8 fbd;                                           /* 0xe2: export */
+    UInt8 fbe;                                           /* 0xe3: lib_export */
+    char fbf;                                            /* 0xe4: nosyminline */
+    char fc0;                                            /* 0xe5: force_active */
+    UInt8 block_assign;                                  /* 0xe6: block_assign */
+    UInt8 has8bytebitfields;                             /* 0xe7: has8bytebitfields */
+    SInt8 deleteDeadInstructions;                        /* 0xe8 */
+    UInt8 uniformSpillBlockWeight;                       /* 0xe9: optimize_for_size */
+    UInt8 fc3;                                           /* 0xea */
+    UInt8 field_0xeb;                                    /* 0xeb */
+    UInt8 irCommonSubexpressionElimination;              /* 0xec: opt_common_subs */
+    UInt8 fc5;                                           /* 0xed: opt_loop_invariants */
+    UInt8 irCopyPropagation;                             /* 0xee: opt_propagation */
+    UInt8 irEliminateUnused;                             /* 0xef: opt_dead_assignments */
+    UInt8 fc8;                                           /* 0xf0: opt_strength_reduction */
+    UInt8 fc9;                                           /* 0xf1: opt_strength_reduction_strict */
+    UInt8 irRemoveUnreachable;                           /* 0xf2: opt_dead_code */
+    UInt8 fcb;                                           /* 0xf3: opt_lifetimes */
+    UInt8 field_0xf4;                                    /* 0xf4 */
+    UInt8 irLoopUnrolling;                               /* 0xf5: opt_unroll_loops */
+    Boolean fce;                                         /* 0xf6: opt_vectorize_loops */
+    UInt8 irSecondOptimizationPass;                      /* 0xf7 */
+    UInt8 opt_pointer_analysis;                          /* 0xf8: opt_pointer_analysis */
+    UInt8 field_0xf9;                                    /* 0xf9 */
+    signed char unrollOption;                            /* 0xfa */
+    SInt8 fd1;                                           /* 0xfb */
+    UInt8 filesyminfo;                                   /* 0xfc: sym */
+    UInt8 field_0xfd;                                    /* 0xfd */
+    char fd4;                                            /* 0xfe */
+    UInt8 fd5;                                           /* 0xff */
+    Boolean fd6;                                         /* 0x100 */
+    UInt8 field_0x101;                                   /* 0x101 */
+    int precompiledHeaderCreator;                        /* 0x102 */
+    UInt32 precompiledHeaderFileTypes[2];                /* 0x106 */
+    HashNameNode *fe4;                                   /* 0x10e */
 #else
     UInt8 nativeByteOrder;
     UInt8 pad01[1];
@@ -311,7 +311,7 @@ struct COpts {
     struct ObjGenSection *smallDataSection; /* 0x36: ObjGen_PPC_EABI_SetObjectSection selects initialized small data */
     struct ObjGenSection *smallBSSSection; /* 0x3a: ObjGen_PPC_EABI_SetObjectSection selects uninitialized small data */
     SInt32 sectionHeaderTableSize;
-    SInt32 *sectionHeaderTable;
+    struct SectionSymbolAttributes **sectionHeaderTable;
     struct InterruptList *interruptList;
     struct InterruptGenerationRecord *interruptOptions; /* 0x4a: CodeGen_ParsePragma saves active interrupt options */
     UInt8 f4e;
@@ -447,20 +447,9 @@ struct COpts {
     UInt8 padd7[1];
     int precompiledHeaderCreator;
     UInt32 precompiledHeaderFileTypes[2];
-    SInt32 fe4;
+    HashNameNode *fe4;
 #endif
 };
-#if VERSION >= VERSION_GC_2_7 && defined(__MWERKS__)
-#include <stddef.h>
-typedef char COptsGC27SizeCheck[(sizeof(struct COpts) == 0x112) ? 1 : -1];
-typedef char COptsGC27PrefixCheck[(offsetof(struct COpts, f54) == 0x68) ? 1 : -1];
-typedef char COptsGC27LanguageCheck[(offsetof(struct COpts, cplusplus) == 0x77) ? 1 : -1];
-typedef char COptsGC27LineDumpCheck[(offsetof(struct COpts, f8b) == 0xa8) ? 1 : -1];
-typedef char COptsGC27PathDumpCheck[(offsetof(struct COpts, f8c) == 0xa9) ? 1 : -1];
-typedef char COptsGC27WarningCheck[(offsetof(struct COpts, fa1) == 0xc5) ? 1 : -1];
-typedef char COptsGC27FileSymbolsCheck[(offsetof(struct COpts, filesyminfo) == 0xfc) ? 1 : -1];
-#endif
-
 #pragma options align = reset
 #pragma options align = mac68k
 struct CPrepCU {
@@ -579,14 +568,6 @@ struct PFile {
     UInt8 unusedBytes[3]; /* 0x5b legacy, 0x67 GC 2.7: cleared with the whole PFile; no member reads or writes */
     Boolean isDefault;
 };
-#if VERSION >= VERSION_GC_2_7 && defined(__MWERKS__)
-typedef char PFileGC27SizeCheck[(sizeof(struct PFile) == 0x6c) ? 1 : -1];
-typedef char PFileGC27NameCheck[(offsetof(struct PFile, nameNode) == 0x46) ? 1 : -1];
-typedef char PFileGC27DateCheck[(offsetof(struct PFile, fileModDate) == 0x4a) ? 1 : -1];
-typedef char PFileGC27LineOffsetCheck[(offsetof(struct PFile, lineOffset) == 0x4e) ? 1 : -1];
-typedef char PFileGC27TextCheck[(offsetof(struct PFile, textstart) == 0x52) ? 1 : -1];
-typedef char PFileGC27FileIDCheck[(offsetof(struct PFile, fileID) == 0x64) ? 1 : -1];
-#endif
 #pragma options align = reset
 #pragma options align = mac68k
 struct PragmaNode {

@@ -2078,11 +2078,7 @@ void read_pragma_token(void)
             data_005884fd = saved;
         }
         token = GetHashNameNode(buffer);
-#if VERSION >= VERSION_GC_2_7
         copts.fe4 = token;
-#else
-        copts.fe4 = (SInt32)token;
-#endif
         fn_0048b1e0(token);
         return;
     }

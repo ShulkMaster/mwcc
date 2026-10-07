@@ -1,7 +1,6 @@
 #ifndef COMPILER_OBJGEN_PPC_EABI_H
 #define COMPILER_OBJGEN_PPC_EABI_H
 
-#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CompilerTools.h"
 #include "compiler/InlineAsmPPC.h"
@@ -236,11 +235,7 @@ extern UInt8 section_table_dirty;
 extern SInt32 uid_counter;
 extern SInt32 object_data_size;
 extern SInt32 data_00580da8;
-#if VERSION >= VERSION_GC_2_7
 extern SectionSymbolAttributes **data_00580db4;
-#else
-extern SInt32 *data_00580db4;
-#endif
 extern struct CNameNode *data_005870e8;
 extern struct ObjGenRelocation *relocation_list;
 extern struct CNameNode *data_00587ff8;

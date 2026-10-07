@@ -452,29 +452,17 @@ void CPreprocess_OutputPreprocessedText(void)
             case -4:
                 if (DAT_005882de != 0) {
                     CompilerTools_AppendGListData(&DAT_00586da8.list, &DAT_00563738, 3);
-#if VERSION >= VERSION_GC_2_7
-                    append_escaped_text((const UInt8 *)(string_token_data + 1), token_value_kind_or_string_length - 1);
-#else
-                    append_escaped_text(string_token_data + 1, token_value_kind_or_string_length - 1);
-#endif
+                    append_escaped_text((const UInt8 *)string_token_data + 1, token_value_kind_or_string_length - 1);
                 } else {
                     AppendGListByte(&DAT_00586da8.list, '"');
-#if VERSION >= VERSION_GC_2_7
-                    append_escaped_text((const UInt8 *)(string_token_data), token_value_kind_or_string_length - 1);
-#else
-                    append_escaped_text(string_token_data, token_value_kind_or_string_length - 1);
-#endif
+                    append_escaped_text((const UInt8 *)string_token_data, token_value_kind_or_string_length - 1);
                 }
                 AppendGListByte(&DAT_00586da8.list, '"');
                 break;
             case -5:
                 CompilerTools_AppendGListData(&DAT_00586da8.list, &DAT_0056373c, 2);
-#if VERSION >= VERSION_GC_2_7
                 output_escaped_wide_chars((UInt16 *)string_token_data,
                                           token_value_kind_or_string_length / wide_char_size - 1);
-#else
-                output_escaped_wide_chars(string_token_data, token_value_kind_or_string_length / wide_char_size - 1);
-#endif
                 AppendGListByte(&DAT_00586da8.list, '"');
                 break;
             default:
@@ -491,14 +479,8 @@ void CPreprocess_OutputPreprocessedText(void)
     }
     CPreprocess_FinishOutput();
 }
-#if VERSION >= VERSION_GC_2_7
 void append_escaped_text(const UInt8 *p, UInt16 n)
 {
-#else
-void append_escaped_text(const char *text, UInt16 n)
-{
-    const UInt8 *p = (const UInt8 *)text;
-#endif
     while (n--) {
         if (*p < 0x20) {
             AppendGListByte(&DAT_00586da8.list, '\\');
@@ -549,14 +531,8 @@ static void outchar(char ch)
     AppendGListByte(&DAT_00586da8.list, ch);
 }
 
-#if VERSION >= VERSION_GC_2_7
 void output_escaped_wide_chars(UInt16 *p, SInt16 count)
 {
-#else
-void output_escaped_wide_chars(char *data, SInt16 count)
-{
-    UInt16 *p = (UInt16 *)data;
-#endif
     SInt32 j, i;
 
     while (count--) {
@@ -600,13 +576,8 @@ void output_escaped_wide_chars(char *data, SInt16 count)
             i = 0;
             do {
                 outchar("0123456789ABCDEF"[(*p / j) % 16]);
-#if VERSION >= VERSION_GC_2_7
                 j /= 16;
                 i++;
-#else
-                i++;
-                j /= 16;
-#endif
             } while (i < 4);
         } else {
             switch (*p) {

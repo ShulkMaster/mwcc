@@ -14,16 +14,8 @@ struct NameBuf {
     char name[256];
 };
 extern void CPreprocess_OutputPreprocessedText(void);
-#if VERSION >= VERSION_GC_2_7
 extern void append_escaped_text(const UInt8 *text, UInt16 n);
-#else
-extern void append_escaped_text(const char *text, UInt16 n);
-#endif
-#if VERSION >= VERSION_GC_2_7
 extern void output_escaped_wide_chars(UInt16 *data, SInt16 count);
-#else
-extern void output_escaped_wide_chars(char *data, SInt16 count);
-#endif
 #if VERSION >= VERSION_GC_2_7
 extern void CPreprocess_EmitLineDirective(char emitNewline);
 #else

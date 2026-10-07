@@ -138,11 +138,7 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
     unsigned int length;
     unsigned int functionLength;
     char *memberSuffix;
-#if VERSION >= VERSION_GC_2_7
     unsigned int separatorLength;
-#else
-    int separatorLength;
-#endif
     unsigned int memberLength;
     jmp_buf state;
     MOutBuf identifierBuffer;
@@ -168,13 +164,8 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
     }
 
     if (_Setjmp(state) == 0) {
-#if VERSION >= VERSION_GC_2_7
         identifierBuffer.ptr = identifier;
         identifierBuffer.left = sizeof(identifier) - 1;
-#else
-        identifierBuffer.left = sizeof(identifier) - 1;
-        identifierBuffer.ptr = identifier;
-#endif
         outputBuffer.ptr = output;
         outputBuffer.left = outputSize - 1;
         if (*name != '_' || name[1] != '_' || (suffix = fn_004e8800(state, &identifierBuffer, name + 2)) == NULL) {
@@ -603,7 +594,6 @@ char *unmangle_vector_type(int *unused, MOutBuf *buf, char *s, void *loc)
 }
 
 /* Cursor and remaining capacity for the output buffer. */
-#if VERSION >= VERSION_GC_2_7
 char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *suffix, char marker)
 {
     char *argument = input;
@@ -621,103 +611,41 @@ char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *s
             if (suffix != NULL)
                 argument = suffix;
             return unmangle_function_type(context, output, kind, argument);
-    }
-    if (marker == 'M') {
-        input = unmangle_qualified_name(context, NULL, input + 1, 0, 0);
-        result = unmangle_type(context, output, input);
-        if (output != NULL) {
-            if (output != NULL && output->left != 0) {
-                *output->ptr++ = ' ';
-                output->left--;
-            }
-            unmangle_qualified_name(context, output, argument + 1, 0, 0);
-            if (output != NULL) {
-                count = 3;
-                if (output->left < count)
-                    count = output->left;
-                memcpy(output->ptr, "::*", count);
-                output->ptr += count;
-                output->left -= count;
-            }
-            if (suffix != NULL)
-                write_qualifiers(output, suffix);
-        }
-    } else {
-        result = unmangle_type(context, output, input + 1);
-        if (output != NULL) {
-            if (output != NULL && output->left != 0) {
-                *output->ptr++ = marker;
-                output->left--;
-            }
-            if (suffix != NULL)
-                write_qualifiers(output, suffix);
-        }
-    }
-    return result;
-}
-
-#else
-char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *suffix, char marker)
-{
-    char *argument = input;
-    char *kind;
-    char *result;
-    int count;
-
-    kind = unmangle_indirect_declarator(context, NULL, input);
-    switch (*kind) {
-        case 'A':
-            if (suffix != NULL) {
-                argument = suffix;
-            }
-            unmangle_array(context, output, kind, argument);
-            return;
-        case 'F':
-            if (suffix != NULL) {
-                argument = suffix;
-            }
-            unmangle_function_type(context, output, kind, argument);
-            return;
         default:
             if (marker == 'M') {
-                input = unmangle_qualified_name(context, NULL, (input + 1), 0, 0);
+                input = unmangle_qualified_name(context, NULL, input + 1, 0, 0);
                 result = unmangle_type(context, output, input);
                 if (output != NULL) {
                     if (output != NULL && output->left != 0) {
                         *output->ptr++ = ' ';
-                        output->left -= 1;
+                        output->left--;
                     }
-                    unmangle_qualified_name(context, output, (argument + 1), 0, 0);
+                    unmangle_qualified_name(context, output, argument + 1, 0, 0);
                     if (output != NULL) {
                         count = 3;
-                        if (output->left < 3u) {
+                        if (output->left < count)
                             count = output->left;
-                        }
                         memcpy(output->ptr, "::*", count);
                         output->ptr += count;
                         output->left -= count;
                     }
-                    if (suffix != NULL) {
+                    if (suffix != NULL)
                         write_qualifiers(output, suffix);
-                    }
                 }
             } else {
-                result = unmangle_type(context, output, (input + 1));
+                result = unmangle_type(context, output, input + 1);
                 if (output != NULL) {
                     if (output != NULL && output->left != 0) {
                         *output->ptr++ = marker;
-                        output->left -= 1;
+                        output->left--;
                     }
-                    if (suffix != NULL) {
+                    if (suffix != NULL)
                         write_qualifiers(output, suffix);
-                    }
                 }
             }
     }
     return result;
 }
-
-#endif
 
 char *unmangle_function_type(int *context, MOutBuf *output, char *cursor, char *suffix)
 {
@@ -1040,14 +968,8 @@ char *unmangle_qualified_name(int *context, MOutBuf *output, char *cursor, char 
     int componentCount;
     char *lastComponent;
     if (*cursor == 'Q') {
-        componentCount = (int)cursor[1];
-#if VERSION >= VERSION_GC_2_7
-        componentCount = componentCount - '0';
+        componentCount = cursor[1] - '0';
         cursor += 2;
-#else
-        cursor += 2;
-        componentCount = componentCount - '0';
-#endif
         if (componentCount < 1 || componentCount > 9) {
             fn_0041b390(context, 1);
         }
@@ -1071,13 +993,8 @@ char *unmangle_qualified_name(int *context, MOutBuf *output, char *cursor, char 
         lastComponent = cursor;
         lastLength = length;
         next = scan_component(context, output, cursor, length, output);
-#if VERSION >= VERSION_GC_2_7
         cursor = next;
-        component = component + 1;
-#else
-        component = component + 1;
-        cursor = next;
-#endif
+        component++;
     }
     if (append != 0 && output != NULL) {
         if (alternate != 0) {

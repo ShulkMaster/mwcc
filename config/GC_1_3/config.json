@@ -126,5 +126,8 @@
     "src/runtime/globdest.c",
     "src/runtime/maincrt.c",
     "src/runtime/stackall.c"
+  ],
+  "content_literal_sources": [
+    "src/frontend/Unmangle.c"
   ]
 }
