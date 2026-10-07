@@ -71,7 +71,11 @@ extern Boolean DAT_00587e58;
 extern unsigned int DAT_00587630;
 extern int DAT_00587e58;
 #endif
+#if VERSION >= VERSION_GC_1_3
+extern Boolean DAT_005880a4;
+#else
 extern SInt32 DAT_005880a4;
+#endif
 extern struct BitVector *data_00552b88;
 extern unsigned int expression_count;
 #if VERSION >= VERSION_GC_1_3

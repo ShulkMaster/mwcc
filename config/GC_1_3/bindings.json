@@ -1615,6 +1615,7 @@
   "_data_005870f8": "0x005dc1e0",
   "_DAT_00587e58": "0x005e73d2",
   "_DAT_00587630": "0x005e7374",
+  "_DAT_005880a4": "0x005e73ee",
   "_IRO_GetTemp": "0x00467850",
   "_create_temp_object": "0x004f4200",
   "_create_replacement_temp_assignment": "0x00469b40",
