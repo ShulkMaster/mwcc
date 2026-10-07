@@ -44,6 +44,7 @@
 
 /* 0x561a30, "CMangler.c" */
 
+/* TODO: [near miss] GC 2.7 ~99.98%: stale literal bindings await identity repair. */
 HashNameNode *COptimizer_GetFunctionObject(Object *obj)
 {
     while (obj->datatype == DALIAS)
@@ -65,7 +66,11 @@ HashNameNode *COptimizer_GetFunctionObject(Object *obj)
         case DUNUSED:
             return obj->name;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1110);
+#else
             CError_FATAL(1012);
+#endif
             return NULL;
     }
 }
@@ -477,6 +482,7 @@ void mangle_type(Type *type, UInt32 flags)
             return;
     }
 }
+/* TODO: [near miss] GC 2.7 ~99.99%: stale literal bindings await identity repair. */
 void mangle_qualified_name(NameSpace *nameSpace, const char *name)
 {
     NameSpace *scope;
@@ -487,8 +493,8 @@ void mangle_qualified_name(NameSpace *nameSpace, const char *name)
     const char *part;
 
     parts[0] = name;
-    count = 1;
     scope = nameSpace;
+    count = 1;
     if (nameSpace != NULL) {
         do {
             if (scope->name != NULL) {
@@ -606,6 +612,7 @@ HashNameNode *CMangler_TemplateInstanceName(HashNameNode *name, CTStateElem *lis
     fn_004431b0(data_00583548.data);
     return result;
 }
+/* TODO: [near miss] GC 2.7 ~99.97%: stale literal bindings await identity repair. */
 HashNameNode *CMangler_ThunkName(Object *input, int offset, int adjustment, int index)
 {
     Object *object = input;
@@ -614,30 +621,34 @@ HashNameNode *CMangler_ThunkName(Object *input, int offset, int adjustment, int 
     char **nameBuffer;
     HashNameNode *result;
     HashNameNode *name;
-    while ((type = object->datatype) == 6)
+    while ((type = object->datatype) == DALIAS)
         object = object->u.alias.object;
     switch (type) {
-        case 3:
-        case 4:
+        case DFUNC:
+        case DVFUNC:
             if (!object->u.func.linkname)
                 object->u.func.linkname = CMangler_GetLinkName(object);
             name = object->u.func.linkname;
             break;
-        case 0:
+        case DDATA:
             if (!object->u.data.linkname)
                 object->u.data.linkname = get_object_link_name(object);
             name = object->u.data.linkname;
             break;
-        case 5:
+        case DINLINEFUNC:
             name = CMangler_GetLinkName(object);
             break;
-        case 1:
-        case 2:
-        case 8:
+        case DLOCAL:
+        case DABSOLUTE:
+        case DUNUSED:
             name = object->name;
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1110);
+#else
             CError_FATAL(1012);
+#endif
             name = NULL;
             break;
     }
@@ -923,12 +934,10 @@ HashNameNode *CMangler_OperatorName(short token)
     return NULL;
 }
 
+/* TODO: [near miss] GC 2.7 ~99.92%: stale literal bindings await identity repair. */
 void CMangler_Setup(void)
-
 {
-    typedef UInt8 *NameString;
     constructor_name = GetHashNameNode("__ct");
     destructor_name = GetHashNameNode("__dt");
     assignment_operator_name = GetHashNameNode("__as");
-    return;
 }
