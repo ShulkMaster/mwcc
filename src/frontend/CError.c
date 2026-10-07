@@ -738,6 +738,10 @@ void append_instantiation_stack(StrBuf *buf)
             CError_BufferAppendString(buf, "')");
         }
     }
+#if VERSION >= VERSION_GC_2_7
+    if (!buf->avail)
+        CError_BufferGrow(buf, 1);
+#endif
     *buf->cursor = 0;
     buf->avail = 0;
 }
@@ -1249,6 +1253,9 @@ void append_function_args(StrBuf *buf, TypeMemberFunc *type, char skip)
     CError_BufferAppendChar(buf, '(');
     if ((arg = type->args) != NULL) {
         if (skip) {
+#if VERSION >= VERSION_GC_2_7
+            qual = arg->qual;
+#endif
             arg = arg->next;
             if (arg)
                 arg = arg->next;
@@ -1256,7 +1263,12 @@ void append_function_args(StrBuf *buf, TypeMemberFunc *type, char skip)
             if (((flags = type->flags) & 0x10) && !type->is_static) {
                 qual = arg->qual;
                 arg = arg->next;
+#if VERSION >= VERSION_GC_2_7
+                if (arg &&
+                    ((flags & FUNC_IS_DTOR) || ((flags & FUNC_IS_CTOR) && (type->theclass->flags & CLASS_HAS_VBASES))))
+#else
                 if (arg && ((flags & 0x4000) || ((flags & 0x2000) && (type->theclass->flags & CLASS_HAS_VBASES))))
+#endif
                     arg = arg->next;
             }
         }

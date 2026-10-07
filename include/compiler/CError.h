@@ -26,8 +26,8 @@ struct MessageContext {
 struct StrBuf {
     char *start;
     char *cursor;
-    SInt32 size;
-    SInt32 avail;
+    UInt32 size;
+    UInt32 avail;
 };
 /* The compiler's messages, by the numbers its message table (and every report) uses. */
 enum {

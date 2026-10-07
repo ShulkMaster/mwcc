@@ -72,6 +72,7 @@
     "src/optimizer/IroDump.c",
     "src/frontend/CMangler.c",
     "src/driver/MemUtils.c",
-    "src/driver/CLDependencies.c"
+    "src/driver/CLDependencies.c",
+    "src/frontend/CError.c"
   ]
 }
