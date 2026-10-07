@@ -15,6 +15,7 @@
     "src/driver/Memory.c",
     "src/driver/ParserGlue-eabi-ppc-cc.c",
     "src/driver/Utils.c",
+    "src/driver/cc-eabi-ppc-mw.c",
     "src/frontend/Unmangle.c",
     "src/msl/ansi_files.c",
     "src/msl/ansi_files_g.c",
