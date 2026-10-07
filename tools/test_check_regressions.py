@@ -2,7 +2,7 @@
 import copy
 import unittest
 
-from check_regressions import SCHEMA, diff_state, regressions
+from check_regressions import SCHEMA, diff_state, inventory_identities, regressions
 
 
 def instruction(address, kind=None, args=None):
@@ -88,6 +88,27 @@ class RowGateTests(unittest.TestCase):
         renamed = dict(left, name="CInt64_Sub")
         recovered = diff_state({"left": {"symbols": [renamed]}, "right": {"symbols": [renamed]}})
         self.assertEqual(original, recovered)
+
+    def test_original_alias_views_are_checked_independently(self):
+        inventory = [
+            {"name": "conversion", "address": "0x004fe050", "size": 104, "source": "src/frontend/CMangler.c"},
+            {"name": "rtti", "address": "0x004fe050", "size": 104, "source": "src/frontend/CMangler.c"},
+            {"name": "unique", "address": "0x004fe100", "size": 8, "source": "src/frontend/CMangler.c"},
+        ]
+        identities = inventory_identities(inventory)
+        self.assertEqual(identities["src/frontend/CMangler/unique"], "004fe100:8")
+        first = identities["src/frontend/CMangler/conversion"]
+        second = identities["src/frontend/CMangler/rtti"]
+        self.assertNotEqual(first, second)
+        before = snapshot([instruction(0), instruction(1, "DIFF_REPLACE")])
+        unit = before["units"].pop("unit")
+        before["units"] = {first: copy.deepcopy(unit), second: copy.deepcopy(unit)}
+        after = copy.deepcopy(before)
+        after["units"][first] = snapshot([instruction(0), instruction(1)])["units"]["unit"]
+        after["units"][second] = snapshot([instruction(0, "DIFF_REPLACE"), instruction(1)])["units"]["unit"]
+        errors = regressions(before, after)
+        self.assertTrue(any(second in e and "matched instruction lost" in e for e in errors))
+        self.assertFalse(any(first in e for e in errors))
 
 
 if __name__ == "__main__":

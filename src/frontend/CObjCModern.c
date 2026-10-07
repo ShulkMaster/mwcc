@@ -56,7 +56,7 @@ static HashEntry *FindHashNode(HashNameNode *name)
     return (HashEntry *)rec;
 }
 
-static Boolean SamePtr(void *x, void *y)
+static Boolean SamePtr(Type *x, Type *y)
 {
     if (copts.f5d == 0) {
         if (CObjC_IsIdCompatiblePointerPair(x, y))
@@ -88,14 +88,14 @@ void CObjCModern_GenerateSymbolTableAndModule(void)
         definition = class_type_entries;
         count1 = 0;
         while (definition != NULL) {
-            definition = definition->next;
             count1++;
+            definition = definition->next;
         }
         categoryDefinition = category_definitions;
         count2 = 0;
         while (categoryDefinition != NULL) {
-            categoryDefinition = categoryDefinition->next;
             count2++;
+            categoryDefinition = categoryDefinition->next;
         }
         size = (count1 + count2 - 1) * 4 + 16;
         symbols = (ObjCSymbolTable *)CompilerTools_AllocatePool(size);
@@ -198,7 +198,7 @@ Object *CObjCModern_GetSelectorReference(HashEntry *p)
 {
     Object *obj;
     Object *id;
-    SInt32 block[4];
+    RelocationList reference;
     char buf[32];
     SInt32 local14[2];
 
@@ -215,12 +215,16 @@ Object *CObjCModern_GetSelectorReference(HashEntry *p)
         else
             CScope_AddGlobalObject(obj);
         p->obj = obj;
+#if VERSION >= VERSION_GC_2_7
+        memclrw(local14, obj->type->size);
+#else
         memclrw(local14, 4);
-        block[0] = 0;
-        block[1] = (SInt32)id;
-        block[2] = 0;
-        block[3] = 0;
-        fn_004ceab0(obj, local14, block, obj->type->size);
+#endif
+        reference.next = NULL;
+        reference.object = id;
+        reference.offset = 0;
+        reference.addend = 0;
+        fn_004ceab0(obj, local14, &reference, obj->type->size);
     }
     return p->obj;
 }

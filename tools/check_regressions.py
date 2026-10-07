@@ -49,6 +49,22 @@ def section_digest(path):
     return digest(sections)
 
 
+def inventory_identities(inventory):
+    """Retain independent compiled views when the original inventory aliases code."""
+    counts = collections.Counter((int(f["address"], 0), f["size"]) for f in inventory)
+    identities = {}
+    for function in inventory:
+        owner = str(Path(function["source"]).with_suffix("")) if "source" in function else "unrecovered"
+        name = owner + "/" + function["name"]
+        address = int(function["address"], 0)
+        size = function["size"]
+        identity = f"{address:08x}:{size}"
+        if counts[address, size] > 1:
+            identity += ":" + name
+        identities[name] = identity
+    return identities
+
+
 def function_state(symbol, base_symbol):
     """Address keys belong to the immutable target, never to the rebuilt base."""
     left = symbol.get("instructions", [])
@@ -130,10 +146,7 @@ def capture(root, version):
     config_path = root / "objdiff.json"
     config = json.loads(config_path.read_text())
     inventory = json.loads((root / f"config/{version}/functions.json").read_text())
-    identities = {}
-    for function in inventory:
-        owner = str(Path(function["source"]).with_suffix("")) if "source" in function else "unrecovered"
-        identities[owner + "/" + function["name"]] = f"{int(function['address'], 0):08x}:{function['size']}"
+    identities = inventory_identities(inventory)
     cli = root / "build/tools/objdiff-cli"
     file_evidence(cli)
     headers = list((root / "include").rglob("*.h"))

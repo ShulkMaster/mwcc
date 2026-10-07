@@ -12612,14 +12612,16 @@
     "source": "src/frontend/CInt64.c"
   },
   {
-    "name": "fn_004c4410",
+    "name": "CInt64_Sub",
     "address": "0x004c4410",
-    "size": 92
+    "size": 92,
+    "source": "src/frontend/CInt64.c"
   },
   {
-    "name": "fn_004c4470",
+    "name": "CInt64_Inv",
     "address": "0x004c4470",
-    "size": 66
+    "size": 66,
+    "source": "src/frontend/CInt64.c"
   },
   {
     "name": "CInt64_Add",

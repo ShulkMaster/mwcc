@@ -477,10 +477,15 @@ void CInt64_DivMod(const CInt64 *lhs, const CInt64 *rhs, CInt64 *pDiv, CInt64 *p
         return;
 
     workF = 0;
+#if VERSION >= VERSION_GC_2_7
+    workE = 0;
+#endif
     workB = lhs->hi;
     workA = lhs->lo;
     workC = rhs->hi;
+#if VERSION < VERSION_GC_2_7
     workE = 0;
+#endif
     workD = rhs->lo;
     workG = 0;
     workH = 0;
@@ -565,12 +570,20 @@ CInt64 CInt64_MulU(CInt64 lhs, CInt64 rhs)
     UInt32 dddd;
     UInt32 eeee;
 
+#if VERSION >= VERSION_GC_2_7
+    eeee = rhs.lo;
+#else
     eeee = dddd = rhs.lo;
+#endif
     result.lo = 0;
     result.hi = 0;
     bbbb = lhs.lo;
     cccc = rhs.hi;
+#if VERSION >= VERSION_GC_2_7
+    for (dddd = eeee; bbbb != 0; dddd <<= 1, bbbb >>= 1) {
+#else
     while (bbbb != 0) {
+#endif
         if (bbbb & 1) {
             work1.hi = cccc;
             work1.lo = dddd;
@@ -579,8 +592,10 @@ CInt64 CInt64_MulU(CInt64 lhs, CInt64 rhs)
         cccc <<= 1;
         if (dddd & 0x80000000)
             cccc |= 1;
+#if VERSION < VERSION_GC_2_7
         bbbb >>= 1;
         dddd <<= 1;
+#endif
     }
     aaaa = lhs.hi;
     while (aaaa != 0 && eeee != 0) {
