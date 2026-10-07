@@ -7,23 +7,10 @@
 #include "driver/CLPlugins.h"
 #include "driver/CWPluginsPrivate.h"
 #include "driver/Memory.h"
-#include <string.h>
-
-/* Source and destination handles for a preference data copy. */
-#include <ctype.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <setjmp.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <setjmp.h>
 
 #if VERSION >= VERSION_GC_2_7
 void *__stdcall xmalloc(const char *what, int size)

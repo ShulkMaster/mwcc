@@ -13,6 +13,7 @@
     "src/driver/CWPluginsPrivate.c",
     "src/driver/DropInCompilerLinkerPrivate.c",
     "src/driver/Help.c",
+    "src/driver/MemUtils.c",
     "src/driver/Memory.c",
     "src/driver/ParserGlue-eabi-ppc-cc.c",
     "src/driver/ResourceStrings.c",
@@ -69,6 +70,7 @@
     "src/frontend/CObjCModern.c",
     "src/driver/CLAccessPaths.c",
     "src/optimizer/IroDump.c",
-    "src/frontend/CMangler.c"
+    "src/frontend/CMangler.c",
+    "src/driver/MemUtils.c"
   ]
 }

@@ -3561,9 +3561,10 @@
     "source": "src/driver/CLPrefs.c"
   },
   {
-    "name": "fn_004177f0",
+    "name": "MemUtils_CallPluginEntry",
     "address": "0x004177f0",
-    "size": 22
+    "size": 22,
+    "source": "src/driver/MemUtils.c"
   },
   {
     "name": "initialize_plugin_request",
