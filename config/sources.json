@@ -3159,6 +3159,8 @@
       "-O4,p",
       "-Cpp_exceptions",
       "off",
+      "-RTTI",
+      "off",
       "-sym",
       "off"
     ],
@@ -3223,6 +3225,8 @@
     "flags": [
       "-O4,p",
       "-Cpp_exceptions",
+      "off",
+      "-RTTI",
       "off",
       "-sym",
       "off"
@@ -3353,6 +3357,8 @@
     "flags": [
       "-O4,p",
       "-Cpp_exceptions",
+      "off",
+      "-RTTI",
       "off",
       "-sym",
       "off"
