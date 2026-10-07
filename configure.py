@@ -60,6 +60,10 @@ def main():
         "rule report",
         "  command = $python tools/compare.py report $version",
         "  description = REPORT $version",
+        "rule progress",
+        # (its output is never written, so `ninja progress` prints every time)
+        "  command = $python tools/progress.py $version",
+        "  description = PROGRESS $version",
         "rule configure",
         f"  command = $python configure.py --version {version}",
         "  generator = 1",
@@ -99,7 +103,7 @@ def main():
         f"build build/{version}/ok objdiff.json: compare | build/{version}/target/ok {' '.join(objects)}",
         f"build build/{version}/report.json: report | build/{version}/ok build/tools/objdiff-cli",
         f"build all_source: phony {' '.join(objects)}",
-        f"build progress: phony build/{version}/report.json",
+        f"build progress: progress | build/{version}/report.json tools/progress.py",
         # Function ownership and version-specific Matching status are configuration inputs too.
         f"build build.ninja: configure | configure.py {configs}",
         f"default build/{version}/ok",

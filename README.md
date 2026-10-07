@@ -53,6 +53,11 @@ The build downloads what it needs but this repository does not contain:
 Each function of the compiled sources is compared with the original's; `ninja` fails when a function of a Matching
 source differs. `python tools/verify.py` builds and checks every version.
 
+`ninja progress` prints how much of the configured version is matched (byte-exact code), linked (in Matching
+sources) and recovered as functions, overall and per subsystem (frontend, backend, optimizer, driver, runtime, MSL,
+and code no source claims yet), and writes `build/<version>/report.json` and `build/<version>/progress.json`.
+`python tools/progress.py --all` prints every version that has been built.
+
 Diffing
 =======
 
