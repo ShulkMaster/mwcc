@@ -12652,9 +12652,10 @@
     "source": "src/frontend/CInt64.c"
   },
   {
-    "name": "fn_004c3b20",
+    "name": "CInt64_ModU",
     "address": "0x004c3b20",
-    "size": 38
+    "size": 38,
+    "source": "src/frontend/CInt64.c"
   },
   {
     "name": "CInt64_Mod",
