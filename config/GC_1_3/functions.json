@@ -17043,9 +17043,10 @@
     "size": 1
   },
   {
-    "name": "fn_0052a1a0",
+    "name": "is_bitvector_empty",
     "address": "0x0052a1a0",
-    "size": 40
+    "size": 40,
+    "source": "src/optimizer/IroBitVect.c"
   },
   {
     "name": "fn_0052a1d0",

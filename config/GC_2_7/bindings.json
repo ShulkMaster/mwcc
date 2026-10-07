@@ -1737,6 +1737,7 @@
   "_DAT_00587630": "0x005ef32c",
   "_DAT_005880a4": "0x005ef3a6",
   "_IRO_IsIntConstant": "0x0046a500",
+  "_is_bitvector_empty": "0x0052bbe0",
   "_IRO_GetTemp": "0x00468710",
   "_create_replacement_temp_assignment": "0x0046aa00",
   "_IrOptimizer_NewLinear": "0x0046fbe0",

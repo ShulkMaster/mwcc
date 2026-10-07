@@ -2,6 +2,7 @@
 #define COMPILER_IROBITVECT_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,7 +18,11 @@ struct BitVector {
 #pragma pack(pop)
 extern void IroBitVect_ClearBitVector(BitVector *vector);
 extern int IroBitVect_ContainsSubset(BitVector *subset, BitVector *superset);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean is_bitvector_empty(struct BitVector *values);
+#else
 extern unsigned int is_bitvector_empty(struct BitVector *values);
+#endif
 extern void IroBitVect_SetAllBits(BitVector *array);
 extern void IroBitVect_CopyBitVector(BitVector *source, BitVector *destination);
 extern void IroBitVect_Subtract(BitVector *source, BitVector *destination);

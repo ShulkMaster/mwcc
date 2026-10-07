@@ -6,7 +6,11 @@
 #include "version.h"
 #include <string.h>
 
+#if VERSION >= VERSION_GC_1_3
+Boolean is_bitvector_empty(struct BitVector *values)
+#else
 unsigned int is_bitvector_empty(struct BitVector *values)
+#endif
 {
     unsigned int index;
 
