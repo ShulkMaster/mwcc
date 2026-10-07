@@ -15,6 +15,7 @@
 #include "compiler/LoopDetection.h"
 #include "compiler/LoopOptimization.h"
 #include "compiler/PCodeListing.h"
+#include "compiler/Peephole.h"
 #include "compiler/StrengthReduction.h"
 #include "compiler/ValueNumbering.h"
 
@@ -31,51 +32,73 @@ static void COptimizer_DumpIfChanged(Object *function, int changed, const char *
     }
 }
 
+static void COptimizer_ValueNumbering(Object *function, int mode)
+{
+#if VERSION >= VERSION_GC_2_7
+    ValueNumbering_PerformValueNumbering(function, mode);
+#else
+    ValueNumbering_PerformValueNumbering(mode);
+#endif
+}
+
+static void COptimizer_CopyPropagation(Object *function, int mode)
+{
+#if VERSION >= VERSION_GC_2_7
+    COpt_CopyPropagation(function, mode);
+#else
+    COpt_CopyPropagation(mode);
+#endif
+}
+
+static void COptimizer_AddPropagation(Object *function)
+{
+#if VERSION >= VERSION_GC_2_7
+    COpt_AddPropagation(function);
+#else
+    COpt_AddPropagation();
+#endif
+}
+
+static void COptimizer_LoadDeletion(Object *function)
+{
+#if VERSION >= VERSION_GC_2_7
+    COpt_LoadDeletion(function);
+#else
+    COpt_LoadDeletion();
+#endif
+}
+
+/* GC 2.7's propagation passes list the function themselves; earlier versions list it here. */
 static void COptimizer_RunCopyPropagation(Object *function, int mode)
 {
-    COpt_CopyPropagation(mode);
+    COptimizer_CopyPropagation(function, mode);
+#if VERSION < VERSION_GC_2_7
     COptimizer_DumpIfChanged(function, gCopyPropagationChanged, "AFTER COPY PROPAGATION");
+#endif
 }
 
 static void COptimizer_RunAddPropagation(Object *function)
 {
-    COpt_AddPropagation();
+    COptimizer_AddPropagation(function);
+#if VERSION < VERSION_GC_2_7
     COptimizer_DumpIfChanged(function, gAddPropagationChanged, "AFTER ADD PROPAGATION");
+#endif
 }
 
-static void COptimizer_RunLoopPasses(Object *function)
+#if VERSION >= VERSION_GC_2_7
+static void COptimizer_RunPeepholeForward(Object *function, const char *stage)
 {
-    LoopDetection_DetectLoops();
-    if (data_0058763c != NULL) {
-        COpt_SetLoopCodeMotionMode(1);
-        LoopDetection_ComputeLoopPropertiesRecursive();
-        CodeMotion_VisitLoops();
-        COpt_SetLoopCodeMotionMode(0);
-        LoopDetection_TraverseLoopsPostorder(data_0058763c);
-        COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION");
-
-        StrengthReduction_RunLoopPasses();
-        if (gStrengthReductionChanged) {
-            COpt_CopyPropagation(1);
-            if (copts.cOptimizerDumpEnabled) {
-                COptimizer_DumpStage(function, "AFTER STRENGTH REDUCTION");
-            }
+    if (copts.peepholeOptimizationEnabled) {
+        if (copts.instructionSchedulingMode == 0 && copts.deleteDeadInstructions > 1) {
+            Peephole_MergeAdjacentBlocks(function, 0);
         }
-
-        fn_005289b0();
-        if (gLoopTransformChanged) {
-            COpt_CopyPropagation(1);
-            COpt_AddPropagation();
-            if (copts.cOptimizerDumpEnabled) {
-                COptimizer_DumpStage(function, "AFTER LOOP TRANSFORMATIONS");
-            }
+        Peephole_VisitBlocksWithMultipleInstructions(function);
+        if (copts.cOptimizerDumpEnabled) {
+            COptimizer_DumpStage(function, stage);
         }
-    }
-
-    if (!gCopyPropagationChanged) {
-        COptimizer_RunCopyPropagation(function, 1);
     }
 }
+#endif
 
 void COptimizer_Optimize(Object *function)
 {
@@ -86,7 +109,7 @@ void COptimizer_Optimize(Object *function)
     }
 
     if ((level = copts.deleteDeadInstructions) == 2 || (gRunLevel2Pipeline && level > 2)) {
-        ValueNumbering_PerformValueNumbering(1);
+        COptimizer_ValueNumbering(function, 1);
         COptimizer_DumpIfChanged(function, gValueNumberingChanged, "AFTER CSE");
         COptimizer_RunCopyPropagation(function, 1);
         COptimizer_RunAddPropagation(function);
@@ -99,45 +122,66 @@ void COptimizer_Optimize(Object *function)
 
 void COptimizer_Level3(Object *function)
 {
-    ValueNumbering_PerformValueNumbering(0);
+#if VERSION >= VERSION_GC_2_7
+    COptimizer_RunPeepholeForward(function, "AFTER PEEPHOLE FORWARD");
+#endif
+    COptimizer_ValueNumbering(function, 0);
     COptimizer_DumpIfChanged(function, gValueNumberingChanged, "AFTER VALUE NUMBERING");
     COptimizer_RunCopyPropagation(function, 0);
 
     gCopyPropagationChanged = 0;
     COptimizer_RunAddPropagation(function);
-    {
-        Object *recovery_inline_5167_0 = (function);
 
-        LoopDetection_DetectLoops();
-        if (data_0058763c != NULL) {
-            COpt_SetLoopCodeMotionMode(1);
-            LoopDetection_ComputeLoopPropertiesRecursive();
-            CodeMotion_VisitLoops();
-            COpt_SetLoopCodeMotionMode(0);
-            LoopDetection_TraverseLoopsPostorder(data_0058763c);
-            COptimizer_DumpIfChanged(recovery_inline_5167_0, gCodeMotionChanged, "AFTER CODE MOTION");
+    LoopDetection_DetectLoops();
+    if (data_0058763c != NULL) {
+        COpt_SetLoopCodeMotionMode(1);
+        LoopDetection_ComputeLoopPropertiesRecursive();
+        CodeMotion_VisitLoops();
+#if VERSION >= VERSION_GC_2_7
+        COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION");
+#endif
+        COpt_SetLoopCodeMotionMode(0);
+        LoopDetection_TraverseLoopsPostorder(data_0058763c);
+#if VERSION < VERSION_GC_2_7
+        COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION");
+#endif
 
-            StrengthReduction_RunLoopPasses();
-            if (gStrengthReductionChanged) {
-                COpt_CopyPropagation(1);
-                if (copts.cOptimizerDumpEnabled) {
-                    COptimizer_DumpStage(recovery_inline_5167_0, "AFTER STRENGTH REDUCTION");
-                }
+        StrengthReduction_RunLoopPasses();
+        if (gStrengthReductionChanged) {
+#if VERSION >= VERSION_GC_2_7
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER STRENGTH REDUCTION");
             }
-
-            fn_005289b0();
-            if (gLoopTransformChanged) {
-                COpt_CopyPropagation(1);
-                COpt_AddPropagation();
-                if (copts.cOptimizerDumpEnabled) {
-                    COptimizer_DumpStage(recovery_inline_5167_0, "AFTER LOOP TRANSFORMATIONS");
-                }
+            COptimizer_CopyPropagation(function, 1);
+#else
+            COptimizer_CopyPropagation(function, 1);
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER STRENGTH REDUCTION");
             }
+#endif
         }
 
-        if (!gCopyPropagationChanged) {
-            COptimizer_RunCopyPropagation(recovery_inline_5167_0, 1);
+        fn_005289b0();
+        if (gLoopTransformChanged) {
+#if VERSION >= VERSION_GC_2_7
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER LOOP TRANSFORMATIONS");
+            }
+            COptimizer_CopyPropagation(function, 1);
+            COptimizer_AddPropagation(function);
+#else
+            COptimizer_CopyPropagation(function, 1);
+            COptimizer_AddPropagation(function);
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER LOOP TRANSFORMATIONS");
+            }
+#endif
         }
+    }
+
+    if (!gCopyPropagationChanged) {
+        COptimizer_CopyPropagation(function, 1);
+        COptimizer_DumpIfChanged(function, gCopyPropagationChanged, "AFTER COPY PROPAGATION");
     }
 
     COpt_ConstantPropagation();
@@ -145,61 +189,94 @@ void COptimizer_Level3(Object *function)
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER CONSTANT PROPAGATION");
         }
-        COpt_LoadDeletion();
+        COptimizer_LoadDeletion(function);
+#if VERSION < VERSION_GC_2_7
         COptimizer_DumpIfChanged(function, gLoadDeletionChanged, "AFTER LOAD DELETION");
+#endif
         COptimizer_RunAddPropagation(function);
     }
 
-    ValueNumbering_PerformValueNumbering(1);
+#if VERSION >= VERSION_GC_2_7
+    COptimizer_RunPeepholeForward(function, "AFTER PEEPHOLE FORWARD 2");
+#endif
+    COptimizer_ValueNumbering(function, 1);
     if (gValueNumberingChanged) {
-        COpt_CopyPropagation(1);
+#if VERSION >= VERSION_GC_2_7
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 2");
         }
+        COptimizer_CopyPropagation(function, 1);
+#else
+        COptimizer_CopyPropagation(function, 1);
+        if (copts.cOptimizerDumpEnabled) {
+            COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 2");
+        }
+#endif
     }
 }
 
 void COptimizer_Level4(Object *function)
 {
-    ValueNumbering_PerformValueNumbering(0);
+#if VERSION >= VERSION_GC_2_7
+    COptimizer_RunPeepholeForward(function, "AFTER PEEPHOLE FORWARD");
+#endif
+    COptimizer_ValueNumbering(function, 0);
     COptimizer_DumpIfChanged(function, gValueNumberingChanged, "AFTER VALUE NUMBERING");
     COptimizer_RunCopyPropagation(function, 0);
 
     gCopyPropagationChanged = 0;
     COptimizer_RunAddPropagation(function);
-    {
-        Object *recovery_inline_6220_0 = (function);
 
-        LoopDetection_DetectLoops();
-        if (data_0058763c != NULL) {
-            COpt_SetLoopCodeMotionMode(1);
-            LoopDetection_ComputeLoopPropertiesRecursive();
-            CodeMotion_VisitLoops();
-            COpt_SetLoopCodeMotionMode(0);
-            LoopDetection_TraverseLoopsPostorder(data_0058763c);
-            COptimizer_DumpIfChanged(recovery_inline_6220_0, gCodeMotionChanged, "AFTER CODE MOTION");
+    LoopDetection_DetectLoops();
+    if (data_0058763c != NULL) {
+        COpt_SetLoopCodeMotionMode(1);
+        LoopDetection_ComputeLoopPropertiesRecursive();
+        CodeMotion_VisitLoops();
+#if VERSION >= VERSION_GC_2_7
+        COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION");
+#endif
+        COpt_SetLoopCodeMotionMode(0);
+        LoopDetection_TraverseLoopsPostorder(data_0058763c);
+#if VERSION < VERSION_GC_2_7
+        COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION");
+#endif
 
-            StrengthReduction_RunLoopPasses();
-            if (gStrengthReductionChanged) {
-                COpt_CopyPropagation(1);
-                if (copts.cOptimizerDumpEnabled) {
-                    COptimizer_DumpStage(recovery_inline_6220_0, "AFTER STRENGTH REDUCTION");
-                }
+        StrengthReduction_RunLoopPasses();
+        if (gStrengthReductionChanged) {
+#if VERSION >= VERSION_GC_2_7
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER STRENGTH REDUCTION");
             }
-
-            fn_005289b0();
-            if (gLoopTransformChanged) {
-                COpt_CopyPropagation(1);
-                COpt_AddPropagation();
-                if (copts.cOptimizerDumpEnabled) {
-                    COptimizer_DumpStage(recovery_inline_6220_0, "AFTER LOOP TRANSFORMATIONS");
-                }
+            COptimizer_CopyPropagation(function, 1);
+            gCopyPropagationChanged = 0;
+#else
+            COptimizer_CopyPropagation(function, 1);
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER STRENGTH REDUCTION");
             }
+#endif
         }
 
-        if (!gCopyPropagationChanged) {
-            COptimizer_RunCopyPropagation(recovery_inline_6220_0, 1);
+        fn_005289b0();
+        if (gLoopTransformChanged) {
+#if VERSION >= VERSION_GC_2_7
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER LOOP TRANSFORMATIONS");
+            }
+            COptimizer_CopyPropagation(function, 1);
+            COptimizer_AddPropagation(function);
+#else
+            COptimizer_CopyPropagation(function, 1);
+            COptimizer_AddPropagation(function);
+            if (copts.cOptimizerDumpEnabled) {
+                COptimizer_DumpStage(function, "AFTER LOOP TRANSFORMATIONS");
+            }
+#endif
         }
+    }
+
+    if (!gCopyPropagationChanged) {
+        COptimizer_RunCopyPropagation(function, 1);
     }
 
     COpt_ConstantPropagation();
@@ -207,11 +284,13 @@ void COptimizer_Level4(Object *function)
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER CONSTANT PROPAGATION");
         }
-        COpt_LoadDeletion();
+        COptimizer_LoadDeletion(function);
+#if VERSION < VERSION_GC_2_7
         COptimizer_DumpIfChanged(function, gLoadDeletionChanged, "AFTER LOAD DELETATION");
+#endif
 
         if (gConstantPropagationChanged) {
-            COpt_CopyPropagation(1);
+            COptimizer_CopyPropagation(function, 1);
         }
         COptimizer_RunAddPropagation(function);
 
@@ -220,30 +299,57 @@ void COptimizer_Level4(Object *function)
             if (gArrayToRegisterChanged && copts.cOptimizerDumpEnabled) {
                 COptimizer_DumpStage(function, "AFTER ARRAY => REGISTER TRANSFORM");
                 COpt_ConstantPropagation();
+#if VERSION >= VERSION_GC_2_7
+                if (copts.cOptimizerDumpEnabled) {
+                    COptimizer_DumpStage(function, "AFTER CONSTANT PROPAGATION 2");
+                }
                 if (gConstantPropagationChanged) {
-                    COpt_CopyPropagation(1);
+                    COptimizer_CopyPropagation(function, 1);
+                }
+#else
+                if (gConstantPropagationChanged) {
+                    COptimizer_CopyPropagation(function, 1);
                 }
                 if (copts.cOptimizerDumpEnabled) {
                     COptimizer_DumpStage(function, "AFTER CONSTANT PROPAGATION 2");
                 }
+#endif
             }
         }
     }
 
-    ValueNumbering_PerformValueNumbering(1);
+#if VERSION >= VERSION_GC_2_7
+    COptimizer_RunPeepholeForward(function, "AFTER PEEPHOLE FORWARD 2");
+#endif
+    COptimizer_ValueNumbering(function, 1);
     if (gValueNumberingChanged) {
-        COpt_CopyPropagation(1);
+#if VERSION >= VERSION_GC_2_7
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 2");
         }
+        COptimizer_CopyPropagation(function, 1);
+#else
+        COptimizer_CopyPropagation(function, 1);
+        if (copts.cOptimizerDumpEnabled) {
+            COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 2");
+        }
+#endif
     }
 
     if (gVectorArrayConversion && fn_0052ce10()) {
-        COpt_CopyPropagation(0);
-        COpt_CopyPropagation(1);
+#if VERSION >= VERSION_GC_2_7
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER VECTOR ARRAY CONVERSION");
         }
+        COptimizer_CopyPropagation(function, 0);
+        COptimizer_CopyPropagation(function, 1);
+#else
+        COptimizer_CopyPropagation(function, 0);
+        COptimizer_CopyPropagation(function, 1);
+        if (copts.cOptimizerDumpEnabled) {
+            COptimizer_DumpStage(function, "AFTER VECTOR ARRAY CONVERSION");
+        }
+#endif
     }
 
     LoopDetection_DetectLoops();
@@ -256,11 +362,18 @@ void COptimizer_Level4(Object *function)
     CodeMotion_VisitLoops();
     COptimizer_DumpIfChanged(function, gCodeMotionChanged, "AFTER CODE MOTION 2");
 
-    ValueNumbering_PerformValueNumbering(1);
+    COptimizer_ValueNumbering(function, 1);
     if (gValueNumberingChanged) {
-        COpt_CopyPropagation(1);
+#if VERSION >= VERSION_GC_2_7
         if (copts.cOptimizerDumpEnabled) {
             COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 3");
         }
+        COptimizer_CopyPropagation(function, 1);
+#else
+        COptimizer_CopyPropagation(function, 1);
+        if (copts.cOptimizerDumpEnabled) {
+            COptimizer_DumpStage(function, "AFTER VALUE NUMBERING 3");
+        }
+#endif
     }
 }

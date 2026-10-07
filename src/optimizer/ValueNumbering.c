@@ -44,7 +44,11 @@
 #include "compiler/Switch.h"
 /* 12-byte operand descriptor. */
 
+#if VERSION >= VERSION_GC_2_7
+void ValueNumbering_PerformValueNumbering(Object *function, int options)
+#else
 void ValueNumbering_PerformValueNumbering(int options)
+#endif
 {
     struct PCodeBlock *block;
     gValueNumberingChanged = 0;
@@ -1531,7 +1535,11 @@ static inline SInt32 CanPropagateCopy(SInt32 copyIndex, CodeMotionListNode *useN
     return 1;
 }
 
+#if VERSION >= VERSION_GC_2_7
+void COpt_CopyPropagation(Object *function, SInt32 mode)
+#else
 void COpt_CopyPropagation(SInt32 mode)
+#endif
 {
     int blockIndex;
     struct CopyPropagationBitSets *block;

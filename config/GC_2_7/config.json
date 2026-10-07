@@ -50,6 +50,7 @@
     "src/msl/wcstoul.c",
     "src/msl/wctype.c",
     "src/optimizer/CIRTransform.c",
+    "src/optimizer/GlobalOptimizer.c",
     "src/optimizer/IroBitVect.c",
     "src/runtime/NMWException.cpp",
     "src/runtime/NewHand.cpp",
@@ -75,6 +76,7 @@
     "src/frontend/CMangler.c",
     "src/driver/MemUtils.c",
     "src/driver/CLDependencies.c",
-    "src/frontend/CError.c"
+    "src/frontend/CError.c",
+    "src/optimizer/GlobalOptimizer.c"
   ]
 }

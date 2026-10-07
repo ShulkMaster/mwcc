@@ -2,6 +2,7 @@
 #define COMPILER_ADDPROPAGATION_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +31,11 @@ extern SInt32 add_propagation_entry_count;
 extern int *add_propagation_block_bit_indices;
 extern struct CodeBits *addPropagationBlockBits;
 extern struct AddPropagationEntry *add_propagation_entries;
+#if VERSION >= VERSION_GC_2_7
+extern void COpt_AddPropagation(Object *function);
+#else
 extern void COpt_AddPropagation(void);
+#endif
 extern SInt32 addPropagationChanged;
 extern SInt32 gAddPropagationChanged;
 

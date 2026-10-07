@@ -2,6 +2,7 @@
 #define COMPILER_VALUENUMBERING_H
 
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/PCode.h"
 
 #ifdef __cplusplus
@@ -68,9 +69,17 @@ struct ValueUpdate {
         value; /* 0x14: copy_register_value_state saves destinationRecord for restoration by fn_0051fd70 */
 };
 #pragma options align = reset
+#if VERSION >= VERSION_GC_2_7
+extern void COpt_CopyPropagation(Object *function, SInt32 mode);
+#else
 extern void COpt_CopyPropagation(SInt32 mode);
+#endif
 extern SInt32 ValueNumbering_0051f790(RegisterValueRecord *a, PCodeInstruction *b);
+#if VERSION >= VERSION_GC_2_7
+extern void ValueNumbering_PerformValueNumbering(Object *function, int a0);
+#else
 extern void ValueNumbering_PerformValueNumbering(int a0);
+#endif
 extern void traverse_single_predecessor_successors(PCodeBlock *node);
 extern void fn_0051e720(void);
 extern void value_number_block(PCodeBlock *block);

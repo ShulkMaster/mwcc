@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,7 +46,11 @@ extern int constantPropagationChanged;
 extern int gConstantPropagationChanged;
 extern struct PCodeInstruction **virtual_register_definitions;
 extern struct PCodeInstruction **unique_definitions;
+#if VERSION >= VERSION_GC_2_7
+extern void COpt_LoadDeletion(Object *function);
+#else
 extern void COpt_LoadDeletion(void);
+#endif
 extern int gLoadDeletionChanged;
 extern struct CBlockData *data_00587c98;
 

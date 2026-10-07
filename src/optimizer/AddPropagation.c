@@ -45,7 +45,11 @@ static int COpt_AllLinked(SInt32 j, CodeMotionEntryLink *p)
     return 1;
 }
 
+#if VERSION >= VERSION_GC_2_7
+void COpt_AddPropagation(Object *function)
+#else
 void COpt_AddPropagation(void)
+#endif
 {
     SInt16 iteration;
     SInt32 blockIndex;

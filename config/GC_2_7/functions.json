@@ -14048,10 +14048,10 @@
     "source": "src/backend/PCode.c"
   },
   {
-    "name": "Peephole_VisitBlocksWithMultipleInstructions",
+    "name": "PCode_BuildPredecessors",
     "address": "0x004dcf00",
     "size": 76,
-    "source": "src/backend/Peephole.c"
+    "source": "src/backend/PCode.c"
   },
   {
     "name": "fn_004dcf50",
@@ -16051,9 +16051,10 @@
     "source": "src/frontend/CMangler.c"
   },
   {
-    "name": "fn_00500420",
+    "name": "COptimizer_Optimize",
     "address": "0x00500420",
-    "size": 157
+    "size": 157,
+    "source": "src/optimizer/GlobalOptimizer.c"
   },
   {
     "name": "COptimizer_Level4",
@@ -16062,9 +16063,10 @@
     "source": "src/optimizer/GlobalOptimizer.c"
   },
   {
-    "name": "fn_00500870",
+    "name": "COptimizer_Level3",
     "address": "0x00500870",
-    "size": 634
+    "size": 634,
+    "source": "src/optimizer/GlobalOptimizer.c"
   },
   {
     "name": "fn_00500af0",
@@ -16098,14 +16100,16 @@
     "source": "src/backend/Peephole.c"
   },
   {
-    "name": "fn_00500ba0",
+    "name": "Peephole_MergeAdjacentBlocks",
     "address": "0x00500ba0",
-    "size": 504
+    "size": 504,
+    "source": "src/backend/Peephole.c"
   },
   {
-    "name": "fn_00500da0",
+    "name": "Peephole_VisitBlocksWithMultipleInstructions",
     "address": "0x00500da0",
-    "size": 38
+    "size": 38,
+    "source": "src/backend/Peephole.c"
   },
   {
     "name": "register_peephole_rules",
@@ -21894,10 +21898,9 @@
     "size": 52
   },
   {
-    "name": "COpt_SetLoopCodeMotionMode",
+    "name": "fn_0056b9b0",
     "address": "0x0056b9b0",
-    "size": 554,
-    "source": "src/optimizer/CodeMotion.c"
+    "size": 554
   },
   {
     "name": "fn_0056bbe0",
@@ -22091,10 +22094,10 @@
     "size": 41
   },
   {
-    "name": "LoadDeletion_InitializeLoadLivenessRecordCounts",
+    "name": "COpt_SetLoopCodeMotionMode",
     "address": "0x0056ec60",
     "size": 318,
-    "source": "src/optimizer/LoadDeletion.c"
+    "source": "src/optimizer/CodeMotion.c"
   },
   {
     "name": "fn_0056eda0",
@@ -22529,10 +22532,10 @@
     "size": 105
   },
   {
-    "name": "fn_00521950",
+    "name": "fn_0052ce10",
     "address": "0x00577cf0",
     "size": 259,
-    "source": "src/optimizer/AddPropagation.c"
+    "source": "src/optimizer/LoadDeletion.c"
   },
   {
     "name": "fn_0052cf10",

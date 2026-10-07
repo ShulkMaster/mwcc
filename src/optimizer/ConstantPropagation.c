@@ -523,7 +523,11 @@ void ConstantPropagation_FindUniqueDefinitions(struct PCodeBlock *state)
     }
 }
 
+#if VERSION >= VERSION_GC_2_7
+void COpt_LoadDeletion(Object *function)
+#else
 void COpt_LoadDeletion(void)
+#endif
 {
     int blockIndex;
     CBlockData *sets;
