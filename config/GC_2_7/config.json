@@ -8,6 +8,7 @@
     "src/driver/CLLoadAndCache.c",
     "src/driver/CLProj.c",
     "src/driver/CLStaticPlugins.c",
+    "src/driver/CLWriteObjectFile.c",
     "src/driver/CWParserPluginsPrivate.c",
     "src/driver/CWPluginsPrivate.c",
     "src/driver/DropInCompilerLinkerPrivate.c",
@@ -57,6 +58,7 @@
     "src/driver/libimp-eabi-ppc.c",
     "src/frontend/CABI.c",
     "src/driver/CLFiles.c",
-    "src/driver/StaticParserGlue.c"
+    "src/driver/StaticParserGlue.c",
+    "src/driver/CLWriteObjectFile.c"
   ]
 }
