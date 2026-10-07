@@ -1,5 +1,6 @@
 #define CERROR_FILE "unknown.c"
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/PCode.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -28,6 +29,10 @@
 #include "compiler/PCodeAssembly.h"
 #include "compiler/PCodeUtilities.h"
 #include "compiler/Switch.h"
+
+#if VERSION >= VERSION_GC_2_7
+extern void initialize_aliases(void);
+#endif
 
 enum {
     OperandKind_GPR = 0,
@@ -281,10 +286,10 @@ PCodeInstruction *PCode_CloneInstruction(PCodeInstruction *instr)
 
 void PCode_ResetBlocks(void)
 {
-    unsigned short *statusValue = (unsigned short *)&gPCodeBlockCount;
-
     gPCodeBlocks = gCurrentBlock = NULL;
-    gPCodeBlockCount = 0;
-    next_label_number = *statusValue;
+    next_label_number = gPCodeBlockCount = 0;
     data_00587ffc = 1;
+#if VERSION >= VERSION_GC_2_7
+    initialize_aliases();
+#endif
 }

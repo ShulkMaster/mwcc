@@ -1548,5 +1548,8 @@
   "_cint64_min": "0x005b1cc8",
   "_CMach_GetMemberAlignment": "0x004c0960",
   "_xfree@4": "0x004173e0",
-  "_data_0058757c": "0x005ea564"
+  "_data_0058757c": "0x005ea564",
+  "_data_00587ffc": "0x005ea98c",
+  "_next_label_number": "0x005e0bb4",
+  "_initialize_aliases": "0x00512f00"
 }
