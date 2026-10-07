@@ -19,6 +19,7 @@
     "src/driver/StaticParserGlue.c",
     "src/driver/Utils.c",
     "src/driver/cc-eabi-ppc-mw.c",
+    "src/frontend/CObjCModern.c",
     "src/frontend/Unmangle.c",
     "src/msl/ansi_files.c",
     "src/msl/ansi_files_g.c",
@@ -64,6 +65,7 @@
     "src/driver/CLWriteObjectFile.c",
     "src/driver/ResourceStrings.c",
     "src/driver/CLSegs.c",
-    "src/frontend/CInit.c"
+    "src/frontend/CInit.c",
+    "src/frontend/CObjCModern.c"
   ]
 }

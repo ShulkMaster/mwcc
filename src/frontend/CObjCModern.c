@@ -494,7 +494,11 @@ ENode *CObjCModern_0050a000(TypeClass *context, ENode *receiver, HashNameNode *n
     ENode *result;
     char argumentFlag;
 
+#if VERSION >= VERSION_GC_2_7
+    CError_ASSERT(92, receiver->type == EINDIRECT);
+#else
     CError_ASSERT(89, receiver->type == EINDIRECT);
+#endif
     receiver = receiver->data.monadic;
     args = CABI_SplitNameIntoMessageArguments(name, &argumentFlag);
     tk = CPrepTokenizer_GetNextToken();
