@@ -193,7 +193,8 @@ def function_section(symbols, sections, symbol_name):
     return sec, begin, end
 
 
-def resolve_function(symbols, sections, symbol_name, target_address, addresses, pe, target_size=None):
+def resolve_function(symbols, sections, symbol_name, target_address, addresses, pe, target_size=None,
+                     content_literals=False):
     sec, begin, end = function_section(symbols, sections, symbol_name)
     # Immediates the original function itself uses: an ambiguous literal
     # (a short string that occurs many times) is resolved to one of these.
@@ -222,9 +223,15 @@ def resolve_function(symbols, sections, symbol_name, target_address, addresses, 
             raise ValueError("relocation crosses function boundary")
         dest = symbols[index]
         addend = struct.unpack_from("<I", body, local)[0]
-        if dest["name"] in addresses:
+        # Numeric labels identify literals only within one compiler invocation.
+        # Their names can shift after a source edit or collide across objects;
+        # recover locally defined data from its contents instead of global bindings.
+        generated_literal = (content_literals and re.fullmatch(r"_?@\d+", dest["name"]) is not None
+                             and dest["section"] > 0
+                             and not sections[dest["section"] - 1].get("code"))
+        if not generated_literal and dest["name"] in addresses:
             address = addresses[dest["name"]]
-        elif c_symbol(dest["name"]) in addresses:
+        elif not generated_literal and c_symbol(dest["name"]) in addresses:
             address = addresses[c_symbol(dest["name"])]
         elif dest["section"] == section_index and begin <= dest["value"] < end:
             address = target_address + dest["value"] - begin
@@ -374,6 +381,7 @@ def check(version):
     fixups = base_relocations(pe)
     addresses = {name: int(value, 0) for name, value in json.loads(Path(f"config/{version}/bindings.json").read_text()).items()}
     addresses.update({r["symbol"]: r["address"] for r in rows if "symbol" in r})
+    content_literal_sources = set(version_config(version).get("content_literal_sources", []))
     objects, results = {}, {}
     for row in rows:
         if "source" not in row:
@@ -382,7 +390,7 @@ def check(version):
             objects[row["source"]] = read_object(Path(f"build/{version}/compiled/{row['source']}.obj"))
         try:
             body, resolutions = resolve_function(*objects[row["source"]], row["symbol"], row["address"], addresses, pe,
-                                                 row["size"])
+                                                 row["size"], row["source"] in content_literal_sources)
         except ValueError:
             results[row["name"]] = (None, False)
             continue

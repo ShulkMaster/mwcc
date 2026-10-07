@@ -151,6 +151,10 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
                 ++name;
             break;
         case '_':
+#if VERSION >= VERSION_GC_2_7
+            if (data_005649b8 == '_')
+                ++name;
+#endif
             switch (name[1]) {
                 case '#':
                 case '%':
@@ -366,11 +370,23 @@ void unmangle_function_parameters(int *context, MOutBuf *output, char *encoding)
                 }
                 break;
             }
+#if VERSION >= VERSION_GC_2_7
+            if (*encoding == '_') {
+                encoding = unmangle_type(context, NULL, encoding + 1);
+                if (*encoding != '\0')
+                    longjmp(context, 1);
+                break;
+            }
+#endif
             encoding = unmangle_type(context, output, encoding);
             if (*encoding == '\0') {
                 break;
             }
+#if VERSION >= VERSION_GC_2_7
+            if (*encoding != '_' && output != NULL && output->left != 0) {
+#else
             if (output != NULL && output->left != 0) {
+#endif
                 *output->ptr++ = ',';
                 output->left--;
             }
@@ -572,6 +588,58 @@ char *unmangle_vector_type(int *unused, MOutBuf *buf, char *s, void *loc)
 }
 
 /* Cursor and remaining capacity for the output buffer. */
+#if VERSION >= VERSION_GC_2_7
+char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *suffix, char marker)
+{
+    char *argument = input;
+    char *kind;
+    char *result;
+    unsigned int count;
+
+    kind = unmangle_indirect_declarator(context, NULL, input);
+    switch (*kind) {
+        case 'A':
+            if (suffix != NULL)
+                argument = suffix;
+            return unmangle_array(context, output, kind, argument);
+        case 'F':
+            if (suffix != NULL)
+                argument = suffix;
+            return unmangle_function_type(context, output, kind, argument);
+    }
+    if (marker == 'M') {
+        input = unmangle_qualified_name(context, NULL, input + 1, 0, 0);
+        result = unmangle_type(context, output, input);
+        if (output == NULL)
+            return result;
+        if (output != NULL && output->left != 0) {
+            *output->ptr++ = ' ';
+            output->left--;
+        }
+        unmangle_qualified_name(context, output, argument + 1, 0, 0);
+        if (output != NULL) {
+            count = 3;
+            if (output->left < count)
+                count = output->left;
+            memcpy(output->ptr, "::*", count);
+            output->ptr += count;
+            output->left -= count;
+        }
+    } else {
+        result = unmangle_type(context, output, input + 1);
+        if (output == NULL)
+            return result;
+        if (output != NULL && output->left != 0) {
+            *output->ptr++ = marker;
+            output->left--;
+        }
+    }
+    if (suffix != NULL)
+        write_qualifiers(output, suffix);
+    return result;
+}
+
+#else
 char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *suffix, char marker)
 {
     char *argument = input;
@@ -631,6 +699,8 @@ char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *s
     }
     return result;
 }
+
+#endif
 
 char *unmangle_function_type(int *context, MOutBuf *output, char *cursor, char *suffix)
 {
@@ -954,8 +1024,13 @@ char *unmangle_qualified_name(int *context, MOutBuf *output, char *cursor, char 
     char *lastComponent;
     if (*cursor == 'Q') {
         componentCount = (int)cursor[1];
+#if VERSION >= VERSION_GC_2_7
+        componentCount = componentCount - '0';
+        cursor += 2;
+#else
         cursor += 2;
         componentCount = componentCount - '0';
+#endif
         if (componentCount < 1 || componentCount > 9) {
             fn_0041b390(context, 1);
         }

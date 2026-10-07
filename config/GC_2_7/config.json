@@ -39,5 +39,8 @@
     "src/runtime/NewHand.cpp",
     "src/runtime/globdest.c",
     "src/runtime/maincrt.c"
+  ],
+  "content_literal_sources": [
+    "src/frontend/Unmangle.c"
   ]
 }
