@@ -1807,7 +1807,7 @@ static inline ENode *CExpr_GetDefaultArgument(ENode *function, FuncArg *formal)
     if (IsTemplDep(formal->dexpr)) {
         CError_ASSERT(3264, function->type == EOBJREF);
         value = CTemplTool_DeduceDefaultArg(function->data.objref, fn_00513040(formal->dexpr, 0));
-        return CExpr_AssignmentPromotion(value, formal->type, formal->qual, 1);
+        return argumentpromotion(value, formal->type, formal->qual, 1);
     }
     return fn_00513040(formal->dexpr, 0);
 #else
@@ -1925,7 +1925,7 @@ ENode *CExpr_MakeFunctionCall(ENode *expr, ENodeList *args)
                     arg->node = CExpr_VarArgPromotion(arg->node, formal == &data_00583098);
                     variadic = 1;
                 } else {
-                    arg->node = CExpr_AssignmentPromotion(arg->node, formal->type, formal->qual, 1);
+                    arg->node = argumentpromotion(arg->node, formal->type, formal->qual, 1);
                     formal = formal->next;
                 }
             } else {
@@ -2036,7 +2036,7 @@ ENode *CExpr2_0046e9d0(Object *obj, Type *functype, ENodeList *args)
                 return node;
             }
             if (arg != &data_00583098 && arg != &data_00584748) {
-                list->node = CExpr_AssignmentPromotion(list->node, arg->type, arg->qual, 1);
+                list->node = argumentpromotion(list->node, arg->type, arg->qual, 1);
                 arg = arg->next;
             } else {
                 list->node = CExpr_VarArgPromotion(list->node, arg == &data_00583098);
@@ -2317,7 +2317,7 @@ ENode *CExpr_GenericFuncCall(BClassList *scope, ENode *instance, Boolean qualifi
 
     while (argument != NULL) {
         if (formal != NULL && formal != &data_00583098 && formal != &data_00584748) {
-            argument->node = CExpr_AssignmentPromotion(argument->node, formal->type, formal->qual, 1);
+            argument->node = argumentpromotion(argument->node, formal->type, formal->qual, 1);
             formal = formal->next;
         } else {
             if (formal == NULL) {
@@ -2979,17 +2979,11 @@ ENode *integralpromote(ENode *expr)
     return expr;
 }
 
-#if VERSION >= VERSION_GC_2_7
-/* TODO: declare in CExpr.h: the pointer generation (array and function decay) that CExpr_VarArgPromotion applies
- * unless old_argmatch is set. */
-extern ENode *fn_00546740(ENode *expr);
-#endif
-
 ENode *CExpr_VarArgPromotion(ENode *expr, Boolean allowWarning)
 {
 #if VERSION >= VERSION_GC_2_7
     if (copts.old_argmatch == 0)
-        expr = fn_00546740(expr);
+        expr = CExpr_GeneratePointerAndRewriteConst(expr);
 #endif
     switch ((char)expr->rtype->type) {
         case 0:
@@ -3017,7 +3011,7 @@ ENode *CExpr_VarArgPromotion(ENode *expr, Boolean allowWarning)
             break;
     }
     if (CMach_PassResultInHiddenArg(expr->rtype))
-        expr = CExpr_AssignmentPromotion(expr, expr->rtype, expr->flags, 1);
+        expr = argumentpromotion(expr, expr->rtype, expr->flags, 1);
     if (!allowWarning && copts.fa6 &&
         ((expr->rtype->type == 1 && ((TypeIntegral *)expr->rtype)->integral >= 11) || expr->rtype->type == 2))
         CError_Warning(ERR_ASSIGNING_NON_INT_NUMERIC_VALUE_UNPROTOTYPED);

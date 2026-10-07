@@ -186,6 +186,9 @@ extern TypeTemplDep *CDecl_NewTemplDepType(UInt8 templateKind);
 extern Type *CDecl_NewPointerType(Type *targetType);
 extern Type *CDecl_NewArrayType(Type *elementType, SInt32 size);
 extern Type *CDecl_NewStructType(SInt32 size, SInt16 align);
+#if VERSION >= VERSION_GC_2_7
+extern void CDecl_SetFuncFlags(TypeFunc *function, UInt32 flags);
+#endif
 extern ENode *CDecl_ParseSelectorExpression(void);
 extern ENode *CDecl_ParseProtocolExpression(void);
 extern TypeIntegral stsignedlonglong;

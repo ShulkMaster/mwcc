@@ -18174,7 +18174,7 @@
     "source": "src/frontend/CExpr.c"
   },
   {
-    "name": "CExpr_AssignmentPromotion",
+    "name": "argumentpromotion",
     "address": "0x004f9ed0",
     "size": 291,
     "source": "src/frontend/CExpr.c"

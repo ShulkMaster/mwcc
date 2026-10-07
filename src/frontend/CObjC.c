@@ -56,7 +56,7 @@
             matchedParameter = method->args;                                                                           \
             matchedArgument = arguments;                                                                               \
             for (;;) {                                                                                                 \
-                matchedArgument->expression = CExpr_AssignmentPromotion(                                               \
+                matchedArgument->expression = argumentpromotion(                                               \
                     matchedArgument->expression, matchedParameter->type, matchedParameter->qual, 1);                   \
                 matchedArgument = matchedArgument->next;                                                               \
                 if (matchedArgument == 0)                                                                              \
@@ -539,7 +539,7 @@ ENode *CObjC_MakeMessageSend(ENode *receiver, TypeClass *obj, MessageArgument *a
             map = ob->f18;                                                                                             \
             mlp = l;                                                                                                   \
             for (;;) {                                                                                                 \
-                mlp->f08 = CExpr_AssignmentPromotion(mlp->f08, map->f0c, map->f10, 1);                                 \
+                mlp->f08 = argumentpromotion(mlp->f08, map->f0c, map->f10, 1);                                 \
                 mlp = mlp->next;                                                                                       \
                 if (mlp == 0)                                                                                          \
                     break;                                                                                             \

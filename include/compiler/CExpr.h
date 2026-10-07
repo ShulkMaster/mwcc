@@ -82,7 +82,11 @@ extern ENode *CExpr_MakeNameLookupResultExpr(CScopeParseResult *p);
 extern ENode *make_member_function_esetconst(CScopeParseResult *candidates);
 extern ENode *scan_explicit_conversion(Type *type, SInt32 qualifiers);
 extern ENode *CExpr_DoExplicitConversion(Type *classType, unsigned long qualifiers, ENodeList *arguments);
-extern ENode *CExpr_AssignmentPromotion(ENode *expression, Type *type, unsigned short qualifiers, int mode);
+extern ENode *argumentpromotion(ENode *expression, Type *type, unsigned short qualifiers, int mode);
+#if VERSION >= VERSION_GC_2_7
+extern ENode *CExpr_AssignmentPromotion(ENode *expression, Type *type, UInt32 qualifiers, Boolean flag);
+extern Boolean CExpr_CanImplicitlyConvert(ENode *expr, Type *type, UInt32 qualifiers);
+#endif
 extern ENode *oldassignmentpromotion(ENode *e, Type *t, SInt16 sz, SInt32 flag);
 extern void check_implicit_pointer_qual_conversion(ENode *a, Type *b, SInt16 c);
 extern ENode *CExpr_GeneratePointerAndRewriteConst(ENode *expr);

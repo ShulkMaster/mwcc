@@ -1470,7 +1470,7 @@ ENode *parse_non_type_template_argument(Type *targetType, unsigned int qualifier
     expr = conv_assignment_expression();
     non_type_template_argument_mode = 0;
     if (targetType != NULL && !CTemplateTools_IsDependentType(targetType) && expr->rtype->type != TYPETEMPLDEPEXPR) {
-        expr = CExpr_AssignmentPromotion(expr, targetType, qualifiers, 1);
+        expr = argumentpromotion(expr, targetType, qualifiers, 1);
         if (targetType->type == TYPEPOINTER) {
             if (expr->type == ETYPCON && expr->data.monadic->type == EINTCONST) {
                 expr = expr->data.monadic;

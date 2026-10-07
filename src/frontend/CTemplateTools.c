@@ -283,7 +283,7 @@ FuncArg *CTemplateTools_005160b0(TemplateContext *ctx, FuncArg *args)
                 isDependentExpression = (expression->rtype->type == TYPETEMPLDEPEXPR);
             if (isDependentExpression) {
                 tail->dexpr =
-                    CExpr_AssignmentPromotion(CTemplTool_DeduceExpr(ctx, tail->dexpr), tail->type, tail->qual, 0);
+                    argumentpromotion(CTemplTool_DeduceExpr(ctx, tail->dexpr), tail->type, tail->qual, 0);
                 tail->dexpr = fn_00513040(tail->dexpr, 1);
             }
         }

@@ -135,6 +135,9 @@ extern void select_layout_member_overrides(ClassLayout *node);
 extern Object *CClass_CopyConstructor(TypeClass *cls);
 extern Object *CClass_AssignmentOperator(TypeClass *theclass);
 extern Object *CClass_DefaultConstructor(TypeClass *cls);
+#if VERSION >= VERSION_GC_2_7
+extern Object *CClass_DummyDefaultConstructor(TypeClass *cls);
+#endif
 extern Boolean CClass_IsEmpty(register TypeClass *type);
 extern UInt8 CClass_GetOverrideKind(TypeFunc *a, TypeFunc *b, Boolean errorflag);
 extern void mark_vbases_has_override(ClassLayout *root, ClassLayout *node, unsigned char mark);

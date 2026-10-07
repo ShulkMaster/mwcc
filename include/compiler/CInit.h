@@ -14,7 +14,12 @@ struct CInit {
     ENode exprbuf;
     UInt8 state;
     UInt8 usesConstructorSyntax; /* 0x1f: initializer_uses_constructor_syntax */
-    UInt8 parenthesized;         /* 0x20: initializer_is_parenthesized, initializer_set_parenthesized */
+#if VERSION >= VERSION_GC_2_7
+    SInt32 parenthesisDepth; /* 0x20: advance_initializer_state counts the open parentheses of a vector literal */
+    struct Type *type;       /* 0x24: advance_initializer_state keeps the type of the parenthesized vector literal */
+#else
+    UInt8 parenthesized; /* 0x20: initializer_is_parenthesized, initializer_set_parenthesized */
+#endif
 };
 /* The initializer state CInit saves and restores around a nested initializer (cinit_state is the current one):
    the object being initialized, its node list, the output buffer and its use, and the emit callbacks. */
@@ -99,7 +104,7 @@ struct NameEntry {
 };
 #pragma pack(pop)
 extern void CInit_RewriteString(ENode *node, SInt32 flag_arg);
-extern NameEntry *CInit_DeclarePooledWString(char *string, UInt32 length);
+extern NameEntry *CInit_DeclarePooledWString(char *string, SInt32 length);
 extern Object *CInit_DeclareString(const char *data, UInt32 length, UInt8 kind1, UInt8 kind2);
 extern void CInit_InitializeStaticData(Object *initObject, void (*output)(ENode *));
 extern ENode *CInit_AutoObject(Object *obj, Type *type, UInt32 qual);
@@ -128,6 +133,10 @@ extern Boolean CInit_004d20e0(Type *type, ENode *initializer, SInt32 offset, cha
 extern Boolean initialize_class_object(Object *obj, Type *initObject, ENode *expr, SInt32 offset, Boolean parse);
 extern ENode *create_destructor_registration_call(Type *p1, Object *p2, ENode *p3);
 extern ENode *build_init_assignment(ENode *previous, ENode *base, SInt32 offset, Type *type, ENode *value);
+#if VERSION >= VERSION_GC_2_7
+extern Statement *CInit_ConstructClassArray(Statement *stmt, TypeClass *tclass, Object *ctor, Object *dtor, ENode *firstArg,
+                                            SInt32 count);
+#endif
 extern void CInit_004d2700(InitializerData *data, Type *type, UInt32 qual, Boolean flag);
 extern int initialize_typed_data(InitializerData *p1, CInit *p2, Type *ty, UInt32 fl, int p5);
 extern void initialize_struct_data(InitializerData *ctx, CInit *ci, Type *ts, UInt32 a4, Boolean a5);
@@ -145,7 +154,13 @@ extern Boolean CInit_004d3ba0(Type *type);
 extern UInt8 advance_initializer_state(CInit *ci);
 extern void initialize_array_data(InitializerData *pool, CInit *iter, TypePointer *arg, UInt32 arg4, Boolean flag);
 extern void append_initializer_entry(InitializerData *ctx, Type *type, ENode *expr);
-extern void initialize_class_initializer_data(InitializerData *dst, CInit *op, Type *type, UInt32 qual, int flag);
+extern void initialize_class_initializer_data(InitializerData *dst, CInit *op, Type *type, UInt32 qual,
+#if VERSION >= VERSION_GC_2_7
+                                              Boolean flag
+#else
+                                              int flag
+#endif
+);
 extern NameEntry *CInit_DeclarePooledString(const char *name, SInt32 len, SInt8 flag);
 extern void CInit_InitializeData(Object *obj);
 extern void fn_004cea90(Object *object, void *buffer, void *args, int size);

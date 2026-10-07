@@ -9337,10 +9337,9 @@
     "size": 69
   },
   {
-    "name": "atomtype",
+    "name": "fn_0046a2f0",
     "address": "0x0046a2f0",
-    "size": 308,
-    "source": "src/frontend/CParser.c"
+    "size": 308
   },
   {
     "name": "fn_0046a430",
@@ -12100,10 +12099,10 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "CExpr_PointerGeneration",
+    "name": "CExpr2_NewESCOPEBEGINNode",
     "address": "0x004be690",
     "size": 70,
-    "source": "src/frontend/CExpr.c"
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004be6e0",
@@ -14909,9 +14908,10 @@
     "source": "src/frontend/CParser.c"
   },
   {
-    "name": "fn_004e8ce0",
+    "name": "atomtype",
     "address": "0x004e8ce0",
-    "size": 134
+    "size": 134,
+    "source": "src/frontend/CParser.c"
   },
   {
     "name": "CParser_NewFuncArg",
@@ -15472,9 +15472,10 @@
     "size": 47
   },
   {
-    "name": "fn_004f5b40",
+    "name": "CFunc_InsertAfterStatement",
     "address": "0x004f5b40",
-    "size": 58
+    "size": 58,
+    "source": "src/frontend/CFunc.c"
   },
   {
     "name": "fn_004f5b80",
@@ -16670,9 +16671,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050bc30",
+    "name": "find_dtor_temp_arg",
     "address": "0x0050bc30",
-    "size": 194
+    "size": 194,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "emit_indirect_assignment",
@@ -16687,9 +16689,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050bfa0",
+    "name": "create_scopebegin_node",
     "address": "0x0050bfa0",
-    "size": 43
+    "size": 43,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "initialize_class_array",
@@ -16698,9 +16701,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050c480",
+    "name": "CInit_ConstructClassArray",
     "address": "0x0050c480",
-    "size": 150
+    "size": 150,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "CInit_ExportConst",
@@ -16715,9 +16719,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "CInit_AutoInit",
+    "name": "CInit_004d1170",
     "address": "0x0050cc70",
-    "size": 230
+    "size": 230,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "initialize_object_at_offset",
@@ -16756,9 +16761,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050da40",
+    "name": "init_int",
     "address": "0x0050da40",
-    "size": 157
+    "size": 157,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "init_int_or_relocation",
@@ -16803,24 +16809,16 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050e620",
+    "name": "initialize_class_initializer_data",
     "address": "0x0050e620",
-    "size": 755
+    "size": 755,
+    "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050e920",
+    "name": "initialize_struct_data",
     "address": "0x0050e920",
-    "size": 821
-  },
-  {
-    "name": "fn_0050ec55",
-    "address": "0x0050ec55",
-    "size": 2
-  },
-  {
-    "name": "fn_0050ec87",
-    "address": "0x0050ec87",
-    "size": 49
+    "size": 939,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "initialize_array_data",
@@ -16835,9 +16833,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050f1b0",
+    "name": "initialize_int",
     "address": "0x0050f1b0",
-    "size": 163
+    "size": 163,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "initialize_pointer_or_intconst",
@@ -16852,9 +16851,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "fn_0050f570",
+    "name": "append_initializer_entry",
     "address": "0x0050f570",
-    "size": 210
+    "size": 210,
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "advance_initializer_state",
@@ -16869,10 +16869,10 @@
     "source": "src/frontend/CInit.c"
   },
   {
-    "name": "append_qualified_function_signature",
+    "name": "write_buffer_at_offset",
     "address": "0x0050fa00",
     "size": 177,
-    "source": "src/frontend/CError.c"
+    "source": "src/frontend/CInit.c"
   },
   {
     "name": "CInit_Init",
@@ -18816,7 +18816,7 @@
     "size": 606
   },
   {
-    "name": "fn_0052efe0",
+    "name": "CClass_DummyDefaultConstructor",
     "address": "0x0052efe0",
     "size": 480
   },
@@ -20048,7 +20048,7 @@
     "source": "src/frontend/CExpr.c"
   },
   {
-    "name": "CExpr_AssignmentPromotion",
+    "name": "argumentpromotion",
     "address": "0x005463a0",
     "size": 294,
     "source": "src/frontend/CExpr.c"
@@ -20071,9 +20071,10 @@
     "size": 73
   },
   {
-    "name": "fn_00546740",
+    "name": "CExpr_GeneratePointerAndRewriteConst",
     "address": "0x00546740",
-    "size": 19
+    "size": 19,
+    "source": "src/frontend/CExpr.c"
   },
   {
     "name": "pointer_generation",
@@ -20474,7 +20475,7 @@
     "size": 698
   },
   {
-    "name": "fn_0054f650",
+    "name": "CExpr_AssignmentPromotion",
     "address": "0x0054f650",
     "size": 334
   },
@@ -20494,7 +20495,7 @@
     "size": 609
   },
   {
-    "name": "fn_00550410",
+    "name": "CExpr_CanImplicitlyConvert",
     "address": "0x00550410",
     "size": 202
   },

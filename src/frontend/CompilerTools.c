@@ -356,7 +356,11 @@ void CompilerTools_ClearPoolBlocks(void)
     memset(&galloc_pool, 0, sizeof(galloc_pool));
 }
 
+#if VERSION >= VERSION_GC_2_7
+void *CompilerTools_AllocatePool(SInt32 size)
+#else
 void *CompilerTools_AllocatePool(unsigned int size)
+#endif
 {
     char *allocation;
     size = (size & ~7U) + 8U;

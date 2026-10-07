@@ -4617,7 +4617,7 @@ ENode *CExpr_DoExplicitConversion(Type *classType, unsigned long qualifiers, ENo
 
 enum { TYPECLASS_004f9ed0 = 5 };
 
-ENode *CExpr_AssignmentPromotion(ENode *expression, Type *type, unsigned short qualifiers, int mode)
+ENode *argumentpromotion(ENode *expression, Type *type, unsigned short qualifiers, int mode)
 {
     ENode *converted;
     ENodeList *arguments;

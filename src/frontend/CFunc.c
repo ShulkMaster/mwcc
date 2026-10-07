@@ -3206,7 +3206,7 @@ ENode *CFunc_DefaultArg(Type *destination, SInt32 flags, FuncArg *value)
     DAT_00587fd8 = NULL;
 
     if (CTemplTool_IsTypeDepExpr(expr) == 0 && CTemplateTools_IsDependentType(destination) == 0) {
-        expr = CExpr_AssignmentPromotion(expr, destination, flags, 1);
+        expr = argumentpromotion(expr, destination, flags, 1);
     } else {
         record = CPrep_GetLastBufferedToken();
         if (record != NULL && record->tokenfile != NULL) {

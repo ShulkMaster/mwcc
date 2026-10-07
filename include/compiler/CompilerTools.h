@@ -2,6 +2,7 @@
 #define COMPILER_COMPILERTOOLS_H
 
 #include <setjmp.h>
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/win32.h"
 
@@ -83,7 +84,11 @@ extern void CToLowercase(char *src, char *dst);
 extern char *ScanDec(char *src, SInt32 *value, Boolean *flag);
 extern void *CompilerTools_AllocatePoolMemory(UInt32 requestedSize);
 extern void *CompilerTools_AllocateBlock(SInt32 size);
+#if VERSION >= VERSION_GC_2_7
+extern void *CompilerTools_AllocatePool(SInt32 size);
+#else
 extern void *CompilerTools_AllocatePool(unsigned int size);
+#endif
 extern void CompilerTools_ClearPoolBlocks(void);
 extern void releaseheaps(void);
 extern SInt16 initheaps(void (*param)());

@@ -87,6 +87,7 @@
     "src/frontend/CompilerTools.c",
     "src/driver/CLCompilerLinkerDropin_V10.cpp",
     "src/driver/ParserHelpers.c",
-    "src/frontend/CPrepTokenizer.c"
+    "src/frontend/CPrepTokenizer.c",
+    "src/frontend/CObjC.c"
   ]
 }
