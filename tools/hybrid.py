@@ -153,6 +153,42 @@ class PE:
         offset = self.offset(address)
         return bytes(self.data[offset:offset + size])
 
+    def exception_boundary(self, name):
+        """The runtime cexc.obj boundaries of the retained retail exception table."""
+        if name not in ("__PcToActionStart", "__PcToActionEnd"):
+            return None
+        matches = []
+        code = []
+        for i, (rva, vsize, raw, size) in enumerate(self.sections):
+            header = self.table + i * 40
+            section_name = bytes(self.data[header:header + 8]).rstrip(b"\0")
+            flags = struct.unpack_from("<I", self.data, header + 36)[0]
+            if flags & 0x20000000:
+                code.append((self.image_base + rva, self.image_base + rva + vsize))
+            if section_name == b".exc":
+                matches.append((rva, vsize, raw, size))
+        if len(matches) != 1:
+            raise Unresolved("runtime exception boundary needs one retail .exc section")
+        rva, vsize, raw, size = matches[0]
+        # cexc.obj: empty .exc$AAA, eight-byte .exc$BBB entries, then the
+        # four-byte 0xffffffff .exc$CCC end sentinel, excluding file padding.
+        if vsize < 12 or vsize % 8 != 4 or vsize > size or raw + vsize > len(self.data):
+            raise Unresolved("invalid retail exception-table extent")
+        table = self.data[raw:raw + vsize]
+        if table[-4:] != b"\xff" * 4:
+            raise Unresolved("invalid retail exception-table end sentinel")
+        previous = -1
+        for offset in range(0, vsize - 4, 8):
+            pc, action = struct.unpack_from("<II", table, offset)
+            if pc <= previous or not any(start <= pc < end for start, end in code):
+                raise Unresolved("invalid retail exception-table PC order/range")
+            try:
+                self.offset(action)
+            except ValueError as error:
+                raise Unresolved("invalid retail exception-table action pointer") from error
+            previous = pc
+        return self.image_base + rva + (vsize - 4 if name == "__PcToActionEnd" else 0)
+
     def write(self, address, data):
         """DATA over the original's bytes at ADDRESS; the loader no longer fixes up anything it overlaps."""
         offset = self.offset(address)
@@ -303,6 +339,9 @@ class Linker:
             address = self.program.bound(coff.source, name)
             if address is not None:
                 return "address", address
+            boundary = self.pe.exception_boundary(name)
+            if boundary is not None:
+                return "address", boundary
             found = self.program.globals().get(name) or self.program.globals().get(c_symbol(name))
             if found is None:
                 raise Unresolved(f"{name} (referenced by {coff.source})")

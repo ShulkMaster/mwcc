@@ -81,8 +81,21 @@ class HybridTest(unittest.TestCase):
             self.assertEqual(entry[0], 0xE9, item["key"])
             self.assertEqual(address + 5 + struct.unpack_from("<i", entry, 1)[0], copy, item["key"])
             self.assertGreaterEqual(copy, int(self.manifest["new_section"], 16))
-        # (the rest of the original is untouched)
-        self.assertEqual(hybrid_pe.read(0x401000, 0x100), pe.read(0x401000, 0x100))
+        # Startup can now link too. Check all retained code outside the exact
+        # entry-patch footprints, rather than assuming startup was skipped.
+        entries = {f"{f['source']}:{f['name']}": f for f in self.program.functions if "source" in f}
+        code = next(section for section in PEFile(hybrid.ORIGINAL).sections if section.name == ".text")
+        start = code.virtual_address
+        size = min(code.virtual_size, code.file_size)
+        expected = bytearray(pe.read(start, size))
+        actual = hybrid_pe.read(start, size)
+        for item in self.manifest["injected"]:
+            offset = int(item["address"], 16) - start
+            count = entries[item["key"]]["size"] if item["copy"] == "in place" else 5
+            self.assertGreaterEqual(offset, 0)
+            self.assertLessEqual(offset + count, size)
+            expected[offset:offset + count] = actual[offset:offset + count]
+        self.assertEqual(actual, bytes(expected))
 
     def test_exact_copies_are_the_originals_bytes(self):
         """An exact function that references nothing is copied byte for byte."""
@@ -828,6 +841,115 @@ class EvidenceTest(unittest.TestCase):
         self.assertEqual(result['initial_trial']['inputs_sha256'],'inputs')
         self.assertEqual(result['remaining_trial']['comparison_sha256'],'comparisons')
 
+
+def exception_table_fixture(records=((4198416, 4202496), (4198432, 4202500)), sentinel=4294967295, extra=False):
+    p = hybrid.PE.__new__(hybrid.PE)
+    p.image_base = 4194304
+    p.table = 0
+    body = b''.join((struct.pack('<II', *r) for r in records)) + struct.pack('<I', sentinel)
+    p.sections = [(4096, 256, 128, 256), (8192, len(body), 512, 64)]
+    p.data = bytearray(576)
+    p.data[:8] = b'.text\x00\x00\x00'
+    struct.pack_into('<I', p.data, 36, 1610612768)
+    p.data[40:48] = b'.exc\x00\x00\x00\x00'
+    p.data[512:512 + len(body)] = body
+    if extra:
+        p.sections.append((12288, len(body), 512, 64))
+        p.data[80:88] = b'.exc\x00\x00\x00\x00'
+    return p
+
+class RuntimeExceptionBoundaryTest(unittest.TestCase):
+
+    def test_start_and_end_are_table_and_sentinel(self):
+        p = exception_table_fixture()
+        self.assertEqual(p.exception_boundary('__PcToActionStart'), 4202496)
+        self.assertEqual(p.exception_boundary('__PcToActionEnd'), 4202512)
+        self.assertNotEqual(p.exception_boundary('__PcToActionEnd'), 4202516)
+
+    def test_file_padding_does_not_extend_table(self):
+        p = exception_table_fixture()
+        p.data[532:576] = b'x' * 44
+        self.assertEqual(p.exception_boundary('__PcToActionEnd'), 4202512)
+
+    def test_bad_sentinel_rejected(self):
+        with self.assertRaises(hybrid.Unresolved):
+            exception_table_fixture(sentinel=0).exception_boundary('__PcToActionEnd')
+
+    def test_duplicate_section_rejected(self):
+        with self.assertRaises(hybrid.Unresolved):
+            exception_table_fixture(extra=True).exception_boundary('__PcToActionStart')
+
+    def test_missing_table_rejected(self):
+        pe = exception_table_fixture()
+        pe.data[40:48] = b".other\0\0"
+        with self.assertRaises(hybrid.Unresolved):
+            pe.exception_boundary("__PcToActionStart")
+
+    def test_table_must_be_fully_file_backed(self):
+        for raw, size in ((512, 0), (570, 64)):
+            pe = exception_table_fixture()
+            rva, vsize, _, _ = pe.sections[1]
+            pe.sections[1] = (rva, vsize, raw, size)
+            with self.subTest(raw=raw, size=size), self.assertRaises(hybrid.Unresolved):
+                pe.exception_boundary("__PcToActionEnd")
+
+    def test_nonrecord_extent_rejected(self):
+        p = exception_table_fixture()
+        r, v, o, s = p.sections[1]
+        p.sections[1] = (r, v + 1, o, s)
+        with self.assertRaises(hybrid.Unresolved):
+            p.exception_boundary('__PcToActionEnd')
+
+    def test_unsorted_or_duplicate_pc_rejected(self):
+        for records in [((4198432, 4202496), (4198416, 4202500)), ((4198416, 4202496), (4198416, 4202500))]:
+            with self.subTest(records=records), self.assertRaises(hybrid.Unresolved):
+                exception_table_fixture(records).exception_boundary('__PcToActionEnd')
+
+    def test_outside_pc_and_action_rejected(self):
+        for records in [((4823449, 4202496),), ((4198416, 4823449),)]:
+            with self.subTest(records=records), self.assertRaises(hybrid.Unresolved):
+                exception_table_fixture(records).exception_boundary('__PcToActionEnd')
+
+    def test_linker_uses_real_boundary_only_for_reserved_symbols(self):
+        p = SimpleNamespace(bound=lambda *_: None, globals=lambda: {})
+        l = hybrid.Linker(p, exception_table_fixture())
+        c = SimpleNamespace(source='runtime.c')
+        self.assertEqual(l.target(c, dict(name='__PcToActionEnd', section=0)), ('address', 4202512))
+        with self.assertRaises(hybrid.Unresolved):
+            l.target(c, dict(name='__UnrelatedMissing', section=0))
+
+    def test_explicit_binding_precedence_preserved(self):
+        p = SimpleNamespace(bound=lambda *_: 123, globals=lambda: {})
+        l = hybrid.Linker(p, exception_table_fixture(sentinel=0))
+        c = SimpleNamespace(source='runtime.c')
+        self.assertEqual(l.target(c, dict(name='__PcToActionEnd', section=0)), ('address', 123))
+
+    @unittest.skipUnless(BUILT, 'needs a GC_2_7 build')
+    def test_complete_startup_header_matches_retained_retail(self):
+        program = hybrid.Program()
+        pe = hybrid.PE(hybrid.ORIGINAL)
+        coff = program.obj('src/runtime/maincrt.c')
+        startup = coff.defined('_mainCRTStartup')
+        entry = next((f for f in program.functions if f['name'] == 'mainCRTStartup'))
+        self.assertEqual(entry['size'], 104)
+        linker = hybrid.Linker(program, pe)
+        linker.closure(coff, startup['section'] - 1, set())
+        tables = next((s for s in coff.symbols.values() if s['name'] == '_ExceptionTables'))
+        section = coff.sections[tables['section'] - 1]
+        header = bytearray(section['data'][tables['value']:tables['value'] + 12])
+        for offset, index, kind in section['relocs']:
+            if not tables['value'] <= offset < tables['value'] + 12:
+                continue
+            self.assertEqual(kind, 6)
+            resolved_kind, value = linker.target(coff, coff.symbols[index])
+            self.assertEqual(resolved_kind, 'address')
+            position = offset - tables['value']
+            addend = struct.unpack_from('<I', header, position)[0]
+            struct.pack_into('<I', header, position, value + addend)
+        code = coff.sections[startup['section'] - 1]
+        site = next((offset for offset, index, kind in code['relocs'] if coff.symbols[index]['name'] == '_ExceptionTables' and kind == 6))
+        address = struct.unpack('<I', pe.read(int(entry['address'], 0) + site - startup['value'], 4))[0]
+        self.assertEqual(bytes(header), pe.read(address, 12))
 
 if __name__ == "__main__":
     unittest.main()
