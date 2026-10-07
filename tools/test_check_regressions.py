@@ -24,7 +24,43 @@ def snapshot(rows, right=None):
     return {"schema": SCHEMA, "version": "GC_2_7", "units": {"unit": state}}
 
 
+def branch(address, destination):
+    return {"instruction": {"address": str(address), "size": 5, "parts": [
+        {"opcode": {"mnemonic": "call"}}, {"arg": {"branch_dest": str(destination)}}]}}
+
+
 class RowGateTests(unittest.TestCase):
+    def test_normalized_external_call_is_not_a_match(self):
+        captured = snapshot([branch(0, 28272)], [branch(0, 27808)])
+        function = next(iter(captured["units"]["unit"]["functions"].values()))
+        self.assertFalse(function["exact"])
+        self.assertFalse(function["rows"]["0"]["full"])
+        self.assertTrue(function["rows"]["0"]["opcode"])
+        self.assertEqual(function["rows"]["0"]["args"], [False])
+
+    def test_external_call_destination_regression_is_rejected(self):
+        before = snapshot([branch(0, 28272)])
+        after = snapshot([branch(0, 28272)], [branch(0, 27808)])
+        self.assertTrue(any("matched argument 0 lost" in e for e in regressions(before, after)))
+
+    def test_correcting_external_call_is_an_improvement(self):
+        before = snapshot([branch(0, 28272)], [branch(0, 27808)])
+        after = snapshot([branch(0, 28272)])
+        after["units"]["unit"]["base"] = "corrected"
+        self.assertEqual(regressions(before, after), [])
+
+    def test_internal_branch_destination_uses_aligned_target_row(self):
+        before = snapshot([branch(0, 5), instruction(5)], [branch(0, 8), instruction(8)])
+        function = next(iter(before["units"]["unit"]["functions"].values()))
+        self.assertTrue(function["rows"]["0"]["full"])
+        self.assertEqual(function["rows"]["0"]["args"], [True])
+
+    def test_internal_branch_redirected_to_another_row_is_rejected(self):
+        rows = [branch(0, 5), instruction(5), instruction(6)]
+        before = snapshot(rows, [branch(0, 8), instruction(8), instruction(9)])
+        after = snapshot(rows, [branch(0, 9), instruction(8), instruction(9)])
+        self.assertTrue(any("matched argument 0 lost" in e for e in regressions(before, after)))
+
     def test_same_percentage_gain_hides_loss(self):
         before = snapshot([instruction(0), instruction(1, "DIFF_REPLACE")])
         after = snapshot([instruction(0, "DIFF_REPLACE"), instruction(1)])

@@ -72,7 +72,8 @@ python tools/check_regressions.py check local/before-GC_2_7.json GC_2_7
 
 Repeat for all four versions before landing changes. The gate rejects lost matching instructions, opcodes or
 arguments, new inserted rows, lost mappings, and changed exact code bytes. It checks the original's row addresses
-instead of aggregate percentages, so gains elsewhere cannot hide a regression. Missing or stale comparison
+instead of aggregate percentages, and verifies external call destinations even when objdiff normalizes their
+labels, so gains elsewhere cannot hide a regression. Missing or stale comparison
 evidence fails the check. Run `python tools/test_check_regressions.py` to test the gate itself.
 
 Project structure

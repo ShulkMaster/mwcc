@@ -17,7 +17,7 @@ import sys
 import time
 
 VERSIONS = ("GC_1_2_5", "GC_1_2_5n", "GC_1_3", "GC_2_7")
-SCHEMA = 1
+SCHEMA = 2
 
 
 def digest(value):
@@ -75,6 +75,16 @@ def function_state(symbol, base_symbol):
         raise ValueError(f"unaligned diff rows: {symbol['name']}")
     rows = {}
     insertions = collections.Counter()
+    # objdiff normalizes branch labels, including some out-of-function calls.
+    # Pair internal labels through the aligned rows, but verify external
+    # destinations explicitly so a call to the wrong function cannot match.
+    branch_targets = {}
+    if base_symbol:
+        for target_row, base_row in zip(left, right):
+            target_instruction = target_row.get("instruction")
+            base_instruction = base_row.get("instruction")
+            if target_instruction and base_instruction:
+                branch_targets[str(base_instruction.get("address", "0"))] = str(target_instruction.get("address", "0"))
     previous = "START"
     next_addresses = [str(r["instruction"].get("address", "0")) if "instruction" in r else None for r in left]
     next_address = "END"
@@ -109,6 +119,19 @@ def function_state(symbol, base_symbol):
             args = [not bool(part) for part in diffs]
         else:
             args = [full] * arg_count
+        if base_symbol:
+            target_args = [part["arg"] for part in instruction.get("parts", []) if "arg" in part]
+            base_args = [part["arg"] for part in right[index].get("instruction", {}).get("parts", []) if "arg" in part]
+            for arg_index, argument in enumerate(target_args):
+                if "branch_dest" not in argument:
+                    continue
+                base_argument = base_args[arg_index] if arg_index < len(base_args) else {}
+                destination = base_argument.get("branch_dest")
+                if destination is not None:
+                    destination = branch_targets.get(str(destination), str(destination))
+                if destination != str(argument["branch_dest"]):
+                    args[arg_index] = False
+                    full = False
         rows[address] = {"kind": kind, "full": full, "opcode": opcode, "args": args}
         previous = address
     return {"mapped": base_symbol is not None, "rows": rows, "insertions": dict(insertions),
