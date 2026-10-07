@@ -9222,13 +9222,13 @@
     "source": "src/optimizer/IROUseDef.c"
   },
   {
-    "name": "fn_00459940",
+    "name": "GetAssigned",
     "address": "0x00459940",
     "size": 120,
     "source": "src/optimizer/IROUseDef.c"
   },
   {
-    "name": "find_type_one_linear",
+    "name": "GetOperand",
     "address": "0x004599c0",
     "size": 359,
     "source": "src/optimizer/IROUseDef.c"

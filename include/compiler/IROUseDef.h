@@ -40,13 +40,13 @@ struct IROUse {
 extern void fn_00459420(void);
 extern void split_variable_range(VarRecord *entry);
 extern void visit_connected_defs_and_uses(IRODef *p);
-extern IROLinear *fn_00459940(IROLinear *node);
+extern IROLinear *GetAssigned(IROLinear *node);
 extern SInt32 IRO_UseDef(UInt8 eliminateUnused, UInt8 simplifyUses);
 extern Boolean propagate_inc_dec(void);
 extern void add_constant_to_next_use(IROLinear *expression, CInt64 value, Type *type);
 extern CInt64 get_update_delta(IROLinear *node);
 extern void mark_var_used_at_call(Object *obj);
-extern IROLinear *find_type_one_linear(IROLinear *e);
+extern IROLinear *GetOperand(IROLinear *e);
 extern void build_use_def_records(void);
 extern void create_def_record(VarRecord *var, struct IROLinear *linear, unsigned char definite);
 extern struct IRODef *def_list;

@@ -8173,14 +8173,16 @@
     "size": 48
   },
   {
-    "name": "fn_0045d5a0",
+    "name": "GetAssigned",
     "address": "0x0045d5a0",
-    "size": 120
+    "size": 120,
+    "source": "src/optimizer/IROUseDef.c"
   },
   {
-    "name": "fn_0045d620",
+    "name": "GetOperand",
     "address": "0x0045d620",
-    "size": 343
+    "size": 343,
+    "source": "src/optimizer/IROUseDef.c"
   },
   {
     "name": "fn_0045d780",

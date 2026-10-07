@@ -8622,15 +8622,16 @@
     "size": 48
   },
   {
-    "name": "fn_00459940",
+    "name": "GetAssigned",
     "address": "0x0045e180",
     "size": 134,
     "source": "src/optimizer/IROUseDef.c"
   },
   {
-    "name": "fn_0045e210",
+    "name": "GetOperand",
     "address": "0x0045e210",
-    "size": 343
+    "size": 343,
+    "source": "src/optimizer/IROUseDef.c"
   },
   {
     "name": "IRO_UseDef",

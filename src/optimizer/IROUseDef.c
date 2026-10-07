@@ -1,5 +1,6 @@
 #define CERROR_FILE "IROUseDef.c"
 #include "compiler/common.h"
+#include "version.h"
 #include "compiler/IROUseDef.h"
 #include "compiler/enode.h"
 #include "compiler/objects.h"
@@ -157,7 +158,7 @@ void split_variable_range(VarRecord *entry)
         if (wordIndex < data_00587f70->size && (1 << use->index & data_00587f70->bits[use->index >> 5]) != 0 &&
             use->linear != NULL) {
             useReference = entry->object;
-            useNode = fn_00459940(use->linear);
+            useNode = GetAssigned(use->linear);
             CE_ASSERT(useNode == 0 || useNode->type != IROLinearOperand || useNode->u.node->type != EOBJREF ||
                           useNode->u.node->data.objref != useReference,
                       CError_FATAL(1277));
@@ -199,7 +200,7 @@ void visit_connected_defs_and_uses(IRODef *p)
 
     IRO_BitVectorSet(p->index, data_00587f70);
     IroBitVect_ClearBit(p->index, data_0058711c);
-    for (n = p->var->uses, key = fn_00459940(p->linear); n != NULL; n = n->varnext) {
+    for (n = p->var->uses, key = GetAssigned(p->linear); n != NULL; n = n->varnext) {
         if ((n->index >> 5) < data_00587174->size && (data_00587174->bits[n->index >> 5] & (1u << (n->index & 31)))) {
             if (((p->index >> 5) < n->reachingDefs->size &&
                  (n->reachingDefs->bits[p->index >> 5] & (1u << (p->index & 31)))) ||
@@ -211,7 +212,7 @@ void visit_connected_defs_and_uses(IRODef *p)
                         (data_0058711c->bits[m->index >> 5] & (1u << (m->index & 31)))) {
                         if (((m->index >> 5) < n->reachingDefs->size &&
                              (n->reachingDefs->bits[m->index >> 5] & (1u << (m->index & 31)))) ||
-                            fn_00459940(m->linear) == n->linear) {
+                            GetAssigned(m->linear) == n->linear) {
                             visit_connected_defs_and_uses(m);
                         }
                     }
@@ -230,7 +231,7 @@ static void IROUseDef_SetBit(UInt32 bit, BitVector *bv)
 }
 
 /* The variable operand a use or definition (an assignment or an increment through an address) refers to. */
-IROLinear *fn_00459940(IROLinear *node)
+IROLinear *GetAssigned(IROLinear *node)
 {
     if (node == NULL)
         return NULL;
@@ -239,20 +240,34 @@ IROLinear *fn_00459940(IROLinear *node)
     } else if (node->type == IROLinearOp1Arg) {
         node = node->u.monadic;
     } else {
+#if VERSION >= VERSION_GC_2_7
+        CError_Internal("IROUseDef.c", 2497u);
+#elif VERSION >= VERSION_GC_1_3
+        CError_Internal("IROUseDef.c", 2338u);
+#else
         CError_Internal("IROUseDef.c", 1153u);
+#endif
     }
     if (node->type != IROLinearOp1Arg || node->nodetype != EINDIRECT) {
+#if VERSION >= VERSION_GC_2_7
+        CError_Internal("IROUseDef.c", 2510u);
+#elif VERSION >= VERSION_GC_1_3
+        CError_Internal("IROUseDef.c", 2351u);
+#else
         CError_Internal("IROUseDef.c", 1160u);
+#endif
     }
     node = node->u.monadic;
-    if (node->type == IROLinearOp2Arg && node->nodetype == EADD) {
-        struct IROLinear *result = find_type_one_linear(node);
-        node = result;
-    }
+#if VERSION >= VERSION_GC_2_7
+    if (node->type == IROLinearOp1Arg && node->nodetype == EBITFIELD)
+        node = node->u.monadic;
+#endif
+    if (node->type == IROLinearOp2Arg && node->nodetype == EADD)
+        node = GetOperand(node);
     return node;
 }
 
-IROLinear *find_type_one_linear(IROLinear *e)
+IROLinear *GetOperand(IROLinear *e)
 {
     IROLinear *r;
 
@@ -260,9 +275,9 @@ IROLinear *find_type_one_linear(IROLinear *e)
         return e;
     }
     if (e->type == IROLinearOp2Arg && e->nodetype == EADD) {
-        r = find_type_one_linear(e->u.diadic.left);
+        r = GetOperand(e->u.diadic.left);
         if (r == NULL) {
-            r = find_type_one_linear(e->u.diadic.right);
+            r = GetOperand(e->u.diadic.right);
         }
         return r;
     }
