@@ -56,7 +56,7 @@ struct CNameRef {
 #pragma options align = reset
 #pragma options align = mac68k
 struct COpts {
-#if VERSION >= VERSION_GC_2_7
+#if VERSION >= VERSION_GC_1_3
     UInt8 nativeByteOrder;                               /* 0x00: little_endian */
     UInt8 field_0x01;                                    /* 0x01 */
     SInt16 processor;                                    /* 0x02 */
@@ -104,7 +104,9 @@ struct COpts {
     UInt8 field_0x50;                                    /* 0x50 */
     UInt8 field_0x51;                                    /* 0x51 */
     UInt8 gecko_float_typecons;                          /* 0x52: gecko_float_typecons */
+#if VERSION >= VERSION_GC_2_7
     UInt8 disable_vector_frame;                          /* 0x53: disable_vector_frame */
+#endif
     UInt8 ppc_opt_bclr_bcctr;                            /* 0x54: ppc_opt_bclr_bcctr */
     UInt8 useRegisterSaveHelpers;                        /* 0x55: use_lmw_stmw */
     UInt8 field_0x56;                                    /* 0x56 */
@@ -114,10 +116,13 @@ struct COpts {
     UInt8 field_0x5a;                                    /* 0x5a */
     UInt8 unsafe_global_reg_vars;                        /* 0x5b: unsafe_global_reg_vars */
     UInt8 ignore_global_reg_vars;                        /* 0x5c: ignore_global_reg_vars */
-    UInt8 field_0x5d;                                    /* 0x5d */
     UInt32 field_0x5e;                                   /* 0x5e */
+#if VERSION >= VERSION_GC_2_7
     UInt8 gprfloatcopy;                                  /* 0x62: gprfloatcopy */
+#endif
+#if VERSION >= VERSION_GC_2_7
     UInt8 old_style_bitfields;                           /* 0x63: old_style_bitfields */
+#endif
     UInt8 asmsemicolcomment;                             /* 0x64: asmsemicolcomment */
     UInt8 asmpoundcomment;                               /* 0x65: asmpoundcomment */
     UInt8 field_0x66;                                    /* 0x66 */
@@ -196,9 +201,13 @@ struct COpts {
     UInt8 optEH;                                         /* 0xb9: optEH */
     UInt8 optEH2;                                        /* 0xba: optEH2 */
     UInt8 new_mangler;                                   /* 0xbb: new_mangler */
+#if VERSION >= VERSION_GC_2_7
     UInt8 fullpath_file;                                 /* 0xbc: fullpath_file */
+#endif
     UInt8 microsoft_exceptions;                          /* 0xbd: microsoft_exceptions */
+#if VERSION >= VERSION_GC_2_7
     UInt8 stdc_libfuncname_redefined;                    /* 0xbe: stdc_libfuncname_redefined */
+#endif
     char f9c;                                            /* 0xbf: warning_errors */
     char f9d;                                            /* 0xc0: extended_errorcheck */
     UInt8 f9e;                                           /* 0xc1: check_header_flags */
@@ -218,7 +227,9 @@ struct COpts {
     Boolean fab;                                         /* 0xcf: warn_no_side_effect */
     Boolean fac;                                         /* 0xd0: warn_resultnotused */
     UInt8 warn_ptr_int_conv;                             /* 0xd1: warn_ptr_int_conv */
+#if VERSION >= VERSION_GC_2_7
     UInt8 warn_uninitializedvar;                         /* 0xd2: warn_uninitializedvar */
+#endif
     signed char structalignment;                         /* 0xd3 */
     UInt8 arrayAlignment;                                /* 0xd4: align_array_members */
     SInt8 faf;                                           /* 0xd5: dont_reuse_strings */
@@ -265,7 +276,6 @@ struct COpts {
     char fd4;                                            /* 0xfe */
     UInt8 fd5;                                           /* 0xff */
     Boolean fd6;                                         /* 0x100 */
-    UInt8 field_0x101;                                   /* 0x101 */
     int precompiledHeaderCreator;                        /* 0x102 */
     UInt32 precompiledHeaderFileTypes[2];                /* 0x106 */
     HashNameNode *fe4;                                   /* 0x10e */
