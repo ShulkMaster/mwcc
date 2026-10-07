@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""python deception/tools/screen.py --game DIR [--units N] [--parallel N] [FUNCTION ...]
+"""python deception/tools/screen.py --game DIR [--units N] [--parallel N] [--jobs N] [FUNCTION ...]
 
 Injects each reconstructed frontend function alone (all of config/GC_2_7/functions.json's frontend functions when
 none is named) and compares the ASTs of N of the game's units with the original's (ast_check.py record first):
@@ -58,7 +58,8 @@ def main():
     parser.add_argument("functions", nargs="*")
     parser.add_argument("--game", type=Path, required=True)
     parser.add_argument("--units", type=int, default=60)
-    parser.add_argument("--parallel", type=int, default=4)
+    parser.add_argument("--parallel", type=int, default=1, help="functions screened at once")
+    parser.add_argument("--jobs", type=int, default=4, help="compiles at once per function")
     args = parser.parse_args()
     game = args.game.resolve()
     every = ast_check.units(game)
@@ -67,7 +68,7 @@ def main():
     functions = json.loads((ROOT / "config/GC_2_7/functions.json").read_text())
     candidates = [(f["name"], f["source"]) for f in functions if f.get("source", "").startswith("src/frontend/")
                   and (not args.functions or f["name"] in args.functions)]
-    jobs = max(1, (os.cpu_count() or 4) // args.parallel)
+    jobs = args.jobs
     out_path = ROOT / "build/deception/screen.json"
     results = json.loads(out_path.read_text()) if out_path.exists() and not args.functions else {}
     # (an unlinked function is screened again: bindings may have been added since)
