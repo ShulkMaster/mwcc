@@ -5489,9 +5489,10 @@
     "source": "src/driver/CLAccessPaths.c"
   },
   {
-    "name": "fn_004285b0",
+    "name": "CLAccessPaths_FreeItems",
     "address": "0x004285b0",
-    "size": 80
+    "size": 80,
+    "source": "src/driver/CLAccessPaths.c"
   },
   {
     "name": "allocate_slot",
@@ -5583,9 +5584,10 @@
     "source": "src/driver/CLSegs.c"
   },
   {
-    "name": "fn_00428cc0",
+    "name": "CLSegs_FreeValues",
     "address": "0x00428cc0",
-    "size": 80
+    "size": 80,
+    "source": "src/driver/CLSegs.c"
   },
   {
     "name": "allocate_access_path_value_index",
@@ -5616,9 +5618,10 @@
     "source": "src/driver/CLDependencies.c"
   },
   {
-    "name": "fn_00428e90",
+    "name": "CLDependencies_FreeDeps",
     "address": "0x00428e90",
-    "size": 52
+    "size": 52,
+    "source": "src/driver/CLDependencies.c"
   },
   {
     "name": "get_record_flag",

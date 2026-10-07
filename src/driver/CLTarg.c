@@ -54,7 +54,11 @@ void free_target(CLTarget *target)
     CLFiles_FreeAllocationRecords(&target->generatedFiles);
     CLFiles_FreeChainNodes(&target->fileLookup);
     CLDependencies_FreeDeps(&target->dependencyTable);
+#if VERSION >= VERSION_GC_2_7
+    xfree(target);
+#else
     free(target);
+#endif
 }
 
 void CLTarg_FreeTargets(CLTarget *head)
