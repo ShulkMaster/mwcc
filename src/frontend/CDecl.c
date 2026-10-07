@@ -3259,13 +3259,17 @@ void CDecl_ScanDeclarator(DeclInfo *p)
     SInt32 saved;
     CScopeSave save;
 
-    if (((DeclInfo *)p)->resolvedObjects != NULL || ((DeclInfo *)p)->resolvedObject != NULL) {
+    if (p->resolvedObjects != NULL || p->resolvedObject != NULL) {
         parse_resolved_member_function_decl(p, 1);
         return;
     }
     BE_elf_SaveScope(&save);
     if (p->dtype == NULL)
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(2772);
+#else
         CError_FATAL(2559);
+#endif
     first = 1;
     for (;;) {
         Type *node;
@@ -3275,7 +3279,7 @@ void CDecl_ScanDeclarator(DeclInfo *p)
         p->nspace = NULL;
         p->operatorToken = 0;
         if (node->type == TYPEFUNC) {
-            p->dtype = (Type *)galloc(0x1a);
+            p->dtype = galloc(sizeof(TypeFunc));
             *(TypeFunc *)p->dtype = *(TypeFunc *)node;
         }
         p->name = NULL;

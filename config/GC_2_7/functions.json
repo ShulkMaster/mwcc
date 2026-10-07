@@ -6874,10 +6874,10 @@
     "size": 180
   },
   {
-    "name": "CDecl_CheckObjectType",
+    "name": "undefine_macro",
     "address": "0x0043c040",
     "size": 221,
-    "source": "src/frontend/CDecl.c"
+    "source": "src/frontend/CPrep.c"
   },
   {
     "name": "define_macro",
@@ -19445,9 +19445,10 @@
     "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_0053bda0",
+    "name": "CDecl_CheckObjectType",
     "address": "0x0053bda0",
-    "size": 137
+    "size": 137,
+    "source": "src/frontend/CDecl.c"
   },
   {
     "name": "fn_0053be30",

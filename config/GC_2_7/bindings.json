@@ -324,6 +324,7 @@
   "_CClass_FindVBaseOffset": "0x0052ddf0",
   "_CClass_GetOverrideKind": "0x0052f390",
   "_CClass_GetVBaseOffset": "0x0052ddb0",
+  "_CDecl_CheckObjectType": "0x0053bda0",
   "_CDecl_CompleteType": "0x0053bf30",
   "_CErrBuf_Putc": "0x004651d0",
   "_CError_GetErrorString@8": "0x00444330",
