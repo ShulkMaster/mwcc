@@ -362,6 +362,7 @@
   "_COptimizer_DumpIfChanged": "0x00507ad0",
   "_COptimizer_DumpStage": "0x004d1610",
   "_COptimizer_RunLoopPasses": "0x00500870",
+  "_CParser_NewClassAction": "0x004e45a0",
   "_CParser_GetWCharType": "0x004e7fd0",
   "_CParser_HasInternalLinkage": "0x004e72d0",
   "_CParser_IsNullOrAtOrDollarPrefixedName": "0x004e9190",

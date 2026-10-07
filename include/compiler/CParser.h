@@ -1,6 +1,7 @@
 #ifndef COMPILER_CPARSER_H
 #define COMPILER_CPARSER_H
 
+#include "version.h"
 #include <setjmp.h>
 #include "compiler/common.h"
 
@@ -215,6 +216,9 @@ extern Boolean CParser_00490660(SInt16 *operatorToken, Boolean allowConversion);
 extern void fn_004908d0(void);
 extern unsigned int CParser_PrependClassTypeLink(TypeClass *type);
 extern void CParser_NewCallBackAction(Object *object, TypeClass *theclass);
+#if VERSION >= VERSION_GC_2_7
+extern void CParser_NewClassAction(TypeClass *theclass);
+#endif
 extern void CParser_RegisterSingleExprFunction(Object *object, ENode *expr);
 extern void CParser_PrependClassParseRec(TypeClass *type);
 extern Object *CParser_NewCompilerDefFunctionObject(void);
