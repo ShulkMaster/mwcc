@@ -312,7 +312,7 @@ void CDecl_CompleteClass(ClassLayoutInput *ctx, TypeClass *cls)
         fn_004ebae0(cls);
         declare_auto_generated_destructor(ctx, cls);
         generate_copy_constructor(ctx, cls);
-        make_auto_generated_dtor(ctx, cls);
+        CDecl_AddDefaultConstructor(ctx, cls);
         declare_default_copy_constructor(ctx, cls);
     }
 
@@ -491,7 +491,7 @@ void declare_auto_generated_destructor(ClassLayoutInput *type, TypeClass *cls)
         memclrw(func, sizeof(TypeMemberFunc));
         func->type = TYPEFUNC;
         func->functype = (Type *)&void_ptr;
-        func->flags = FUNC_METHOD | FUNC_AUTO_GENERATED | 0x4000;
+        func->flags = FUNC_METHOD | FUNC_AUTO_GENERATED | FUNC_IS_DTOR;
         func->theclass = cls;
         func->is_static = 0;
         arg = CParser_NewFuncArg();
@@ -674,7 +674,7 @@ void declare_default_copy_constructor(ClassLayoutInput *decl, TypeClass *type)
         }
     }
     if (needed != 0) {
-        ctorType = CDecl_MakeDefaultDtorType(type, constArg);
+        ctorType = CDecl_MakeCopyCtorType(type, constArg);
         name = constructor_name;
         ctor = CParser_NewCompilerDefFunctionObject();
         ctor->name = name;
@@ -687,7 +687,7 @@ void declare_default_copy_constructor(ClassLayoutInput *decl, TypeClass *type)
     }
 }
 
-TypeMemberFunc *CDecl_MakeDefaultDtorType(TypeClass *theclass, char is_const)
+TypeMemberFunc *CDecl_MakeCopyCtorType(TypeClass *theclass, char is_const)
 {
     TypeMemberFunc *func;
     FuncArg *arg;
@@ -697,8 +697,8 @@ TypeMemberFunc *CDecl_MakeDefaultDtorType(TypeClass *theclass, char is_const)
     func = (TypeMemberFunc *)galloc(sizeof(TypeMemberFunc));
     memclrw(func, sizeof(TypeMemberFunc));
     func->type = TYPEFUNC;
-    func->functype = (Type *)((char *)&stvoid + 8);
-    func->flags = FUNC_METHOD | FUNC_AUTO_GENERATED | FUNC_IS_DTOR;
+    func->functype = (Type *)&void_ptr;
+    func->flags = FUNC_METHOD | FUNC_AUTO_GENERATED | FUNC_IS_CTOR;
     func->theclass = theclass;
     func->is_static = 0;
     arg = CParser_NewFuncArg();
@@ -726,7 +726,7 @@ TypeMemberFunc *CDecl_MakeDefaultDtorType(TypeClass *theclass, char is_const)
     return func;
 }
 
-void make_auto_generated_dtor(ClassLayoutInput *context, TypeClass *cls)
+void CDecl_AddDefaultConstructor(ClassLayoutInput *context, TypeClass *cls)
 {
     ClassList *base;
     ObjMemberVar *member;
@@ -793,7 +793,7 @@ void make_auto_generated_dtor(ClassLayoutInput *context, TypeClass *cls)
         memclrw(func, sizeof(*func));
         func->type = TYPEFUNC;
         func->functype = (Type *)&void_ptr;
-        func->flags = FUNC_IS_DTOR | FUNC_AUTO_GENERATED | FUNC_METHOD;
+        func->flags = FUNC_IS_CTOR | FUNC_AUTO_GENERATED | FUNC_METHOD;
         func->theclass = cls;
         func->is_static = 0;
         if (cls->flags & CLASS_HAS_VBASES) {
@@ -844,7 +844,7 @@ void make_defarg_function(TypeClass *cls)
                 memclrw(functionType, sizeof(*functionType));
                 functionType->type = TYPEFUNC;
                 functionType->functype = (Type *)&void_ptr;
-                functionType->flags = (FUNC_METHOD | FUNC_AUTO_GENERATED | FUNC_IS_DTOR);
+                functionType->flags = (FUNC_METHOD | FUNC_AUTO_GENERATED | FUNC_IS_CTOR);
                 functionType->theclass = cls;
                 functionType->is_static = 0;
                 if (cls->flags & CLASS_HAS_VBASES) {
@@ -1312,7 +1312,7 @@ void parse_class_members(ClassLayoutInput *decle, TypeClass *tclass, SInt16 mode
                                     AddShortArg((TypeFunc *)md.declarator.dtype);
                                 md.declarator.qual &= ~Q_VIRTUAL;
                             }
-                            ((TypeFunc *)md.declarator.dtype)->flags |= FUNC_IS_DTOR;
+                            ((TypeFunc *)md.declarator.dtype)->flags |= FUNC_IS_CTOR;
                             md.declarator.name = constructor_name;
                             md.declarator.qual |= dsqual;
                             declare_member_function(decle, tclass, &md.declarator, access, 0, 0, 1, 0);
@@ -1377,7 +1377,7 @@ void parse_class_members(ClassLayoutInput *decle, TypeClass *tclass, SInt16 mode
                             AddShortArg((TypeFunc *)md.declarator.dtype);
                         }
                         md.declarator.name = destructor_name;
-                        ((TypeFunc *)md.declarator.dtype)->flags |= 0x4000;
+                        ((TypeFunc *)md.declarator.dtype)->flags |= FUNC_IS_DTOR;
                         md.declarator.qual |= dsqual;
                         declare_member_function(decle, tclass, &md.declarator, access, 1, 0, 1, 0);
                     } else {
@@ -2021,7 +2021,7 @@ void declare_member_function(ClassLayoutInput *layout, TypeClass *cls, struct De
         }
     }
     if (parseBody != 0) {
-        if (tk == '{' || tk == TK_TRY || (tk == ':' && CClass_IsDestructor(member)))
+        if (tk == '{' || tk == TK_TRY || (tk == ':' && CClass_IsConstructor(member)))
             scan_inline_definition(member, NULL);
     }
     {
@@ -3345,14 +3345,14 @@ void parse_resolved_member_function_decl(DeclInfo *di, Boolean define)
         return;
     }
     if (obj->type->type == TYPEFUNC) {
-        if (TYPE_FUNC(obj->type)->flags & 0x6000) {
+        if (TYPE_FUNC(obj->type)->flags & (FUNC_IS_CTOR | FUNC_IS_DTOR)) {
             if (tclass->sominfo)
                 di->dtype = (Type *)&stvoid;
             else
                 di->dtype = (Type *)&void_ptr;
             di->nspace = obj->nspace;
             di->name = obj->name;
-            if (TYPE_FUNC(obj->type)->flags & FUNC_IS_DTOR)
+            if (TYPE_FUNC(obj->type)->flags & FUNC_IS_CTOR)
                 di->isConstructor = 1;
             tk = CPrepTokenizer_GetNextToken();
             save = currentNameSpace;
@@ -3360,7 +3360,7 @@ void parse_resolved_member_function_decl(DeclInfo *di, Boolean define)
             CDecl_ParseDirectFuncDecl(di);
             currentNameSpace = save;
             if (di->dtype->type == TYPEFUNC) {
-                if (TYPE_FUNC(obj->type)->flags & FUNC_IS_DTOR) {
+                if (TYPE_FUNC(obj->type)->flags & FUNC_IS_CTOR) {
                     if (((tclass = obj->nspace->theclass)->flags & CLASS_HAS_VBASES) && !tclass->sominfo)
                         CDecl_AddArgument(tfunc = TYPE_FUNC(di->dtype));
                 } else {

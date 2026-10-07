@@ -1673,5 +1673,6 @@
   "_bitvectorinitialize": "0x0057dff0",
   "_bitvectorunion": "0x0057dea0",
   "_bitvectorcopy": "0x0057e060",
-  "_compiler_linker_callbacks": "0x005a557c"
+  "_compiler_linker_callbacks": "0x005a557c",
+  "_CDecl_MakeCopyCtorType": "0x00534980"
 }

@@ -2127,7 +2127,7 @@ ENode *CExpr_GenericFuncCall(BClassList *scope, ENode *instance, Boolean qualifi
 
         if ((type->flags & FUNC_PURE) != 0 && data_00588238 != NULL) {
             TypeFunc *enclosingType = (TypeFunc *)data_00588238->type;
-            if ((enclosingType->flags & 0x6000) != 0 && data_00588040 == type->theclass &&
+            if ((enclosingType->flags & (FUNC_IS_CTOR | FUNC_IS_DTOR)) != 0 && data_00588040 == type->theclass &&
                 instance->type == EINDIRECT && instance->data.monadic->type == EINDIRECT &&
                 instance->data.monadic->data.monadic->type == EOBJREF &&
                 instance->data.monadic->data.monadic->data.objref->name == this_arg_name &&
@@ -2144,7 +2144,7 @@ ENode *CExpr_GenericFuncCall(BClassList *scope, ENode *instance, Boolean qualifi
 
             if (((instance->flags & Q_CONST) != 0 && ((type->args->qual & Q_CONST) == 0)) ||
                 ((instance->flags & Q_VOLATILE) != 0 && ((type->args->qual & Q_VOLATILE) == 0))) {
-                if ((type->flags & 0x6000) == 0)
+                if ((type->flags & (FUNC_IS_CTOR | FUNC_IS_DTOR)) == 0)
                     CError_ReportError(ERR_CANNOT_PASS_CONST_VOLATILE_DATA_OBJECT);
             }
 
@@ -2409,11 +2409,7 @@ Boolean CExpr_GetFuncMatchArgs(Object *obj, ENodeList *arguments, ENode *instanc
         result->parameters = ((TypeMemberFunc *)obj->type)->args;
         return 1;
     }
-#if VERSION >= VERSION_GC_1_3
     if (((TypeMemberFunc *)obj->type)->flags & FUNC_IS_CTOR) {
-#else
-    if (((TypeMemberFunc *)obj->type)->flags & FUNC_IS_DTOR) {
-#endif
         result->arguments = arguments;
         result->parameters = ((TypeMemberFunc *)obj->type)->args->next;
         return 1;
@@ -4326,11 +4322,7 @@ ENode *CExpr_IsTempConstruction(ENode *e, Type *type, ENode **out)
         return NULL;
 
     if (e->data.monadic->data.funccall.funcref->type != EOBJREF ||
-#if VERSION >= VERSION_GC_1_3
         CClass_IsConstructor(e->data.monadic->data.funccall.funcref->data.objref) == 0) {
-#else
-        CClass_IsDestructor(e->data.monadic->data.funccall.funcref->data.objref) == 0) {
-#endif
         if (e->data.monadic->data.funccall.functype->functype != type)
             return NULL;
         if (CABI_GetStructResultArgumentIndex(e->data.monadic->data.funccall.functype) == 1) {

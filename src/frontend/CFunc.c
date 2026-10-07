@@ -250,7 +250,7 @@ void CFunc_ParseFuncDef(Object *func, DeclInfo *definition, TypeClass *scopeObje
     } else {
         functionTryBlock = 0;
     }
-    if (CClass_IsDestructor(func)) {
+    if (CClass_IsConstructor(func)) {
         if (data_00588040 == NULL)
             CError_FATAL(3466);
         parse_ctor_initializers();
@@ -273,7 +273,7 @@ void CFunc_ParseFuncDef(Object *func, DeclInfo *definition, TypeClass *scopeObje
         gen.returnType = TYPE_FUNC(func->type)->functype;
         gen.returnQual = TYPE_FUNC(func->type)->qual;
         if (functionTryBlock) {
-            isSpecialMember = CClass_IsDestructor(func) || CClass_HasTypeFuncFlag16384(func);
+            isSpecialMember = CClass_IsConstructor(func) || CClass_IsDestructor(func);
             CExcept_ScanTryBlock(&gen, isSpecialMember);
             if (tk != 0)
                 CPrep_UngetToken();
@@ -314,9 +314,9 @@ void CFunc_ParseFuncDef(Object *func, DeclInfo *definition, TypeClass *scopeObje
                 CError_ReportError(ERR_UNDEFINED_LABEL, label->name->name);
         }
         if (!func_errors) {
-            if (CClass_IsDestructor(func))
+            if (CClass_IsConstructor(func))
                 CABI_InsertConstructorInitialization(func, &state, data_00588040, NULL, functionTryBlock);
-            if (CClass_HasTypeFuncFlag16384(func))
+            if (CClass_IsDestructor(func))
                 CABI_TransDestructor(func, func, &state, data_00588040, 0);
             CFunc_DestructorCleanup(&state);
             if (data_00588040 != NULL && data_00588040->sominfo != NULL)
@@ -1054,8 +1054,8 @@ void parse_statement(StatementContext *context)
     switch (tk) {
         case TK_RETURN:
             tk = CPrepTokenizer_GetNextToken();
-            if (((context->returnType == &stvoid && !copts.cplusplus) || CClass_IsDestructor(data_00588238)) ||
-                CClass_HasTypeFuncFlag16384(data_00588238)) {
+            if (((context->returnType == &stvoid && !copts.cplusplus) || CClass_IsConstructor(data_00588238)) ||
+                CClass_IsDestructor(data_00588238)) {
                 if (tk != ';') {
                     CError_ReportError(ERR_ILLEGAL_RETURN_VALUE_VOID_CONSTRUCTOR_DESTRUCTOR);
                     s_expression();

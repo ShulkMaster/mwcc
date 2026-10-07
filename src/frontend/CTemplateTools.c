@@ -1003,7 +1003,7 @@ static FuncArg *CTemplateTools_FirstArg(TypeMemberFunc *f)
     if ((f->flags & FUNC_METHOD) && !f->is_static) {
         CError_ASSERT(374, a != NULL);
         a = a->next;
-        if ((f->flags & FUNC_IS_DTOR) && (f->theclass->flags & CLASS_HAS_VBASES)) {
+        if ((f->flags & FUNC_IS_CTOR) && (f->theclass->flags & CLASS_HAS_VBASES)) {
             CError_ASSERT(379, a != NULL);
             a = a->next;
         }

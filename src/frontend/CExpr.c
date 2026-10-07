@@ -4184,7 +4184,7 @@ ENode *make_scope_parse_result_expr(CScopeParseResult *nameResult, ENode *expr, 
                     return create_objectnode(OBJECT(nameResult->object));
                 }
 
-                if (!CClass_HasTypeFuncFlag16384(OBJECT(nameResult->object)))
+                if (!CClass_IsDestructor(OBJECT(nameResult->object)))
                     break;
                 tk = CPrepTokenizer_GetNextToken();
                 if (tk != '(') {

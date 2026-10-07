@@ -1831,33 +1831,15 @@ Boolean CClass_ReferenceArgument(TypeClass *cls)
     return result;
 }
 
-Boolean CClass_HasTypeFuncFlag16384(Object *object)
-{
-    unsigned int result = 0;
-    unsigned int isFunction = 0;
-
-    if (object != NULL && object->type->type == TYPEFUNC)
-        isFunction = 1;
-    if (isFunction) {
-        TypeFunc *function = TYPE_FUNC(object->type);
-        unsigned int flags = function->flags;
-        if (flags & 16384U)
-            result = 1;
-    }
-    return result;
-}
-
 Boolean CClass_IsDestructor(Object *obj)
 {
     return obj != NULL && obj->type->type == TYPEFUNC && (TYPE_FUNC(obj->type)->flags & FUNC_IS_DTOR) != 0;
 }
 
-#if VERSION >= VERSION_GC_1_3
 Boolean CClass_IsConstructor(Object *obj)
 {
     return obj != NULL && obj->type->type == TYPEFUNC && (TYPE_FUNC(obj->type)->flags & FUNC_IS_CTOR) != 0;
 }
-#endif
 
 /* Finds the member object of the class whose type is a
  * function and whose name is the global DAT_005870f4. */

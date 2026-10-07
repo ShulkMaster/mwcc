@@ -361,7 +361,6 @@
   "_CClass_GetOverrideKind": "0x0052d950",
   "_CDecl_CompleteType": "0x0053a4a0",
   "_CDecl_DefineClass": "0x00532470",
-  "_CDecl_MakeDefaultDtorType": "0x00532f40",
   "_CDecl_ParseDeclarator": "0x005388d0",
   "_CError_FatalError": "0x004636a0",
   "_CError_GetErrorString@8": "0x004443d0",
@@ -1600,5 +1599,6 @@
   "_CExpr_ConversionIteratorNext": "0x004ba8c0",
   "_memberpointercompare": "0x0053e620",
   "_compiler_linker_callbacks": "0x005a24bc",
-  "_realloc": "0x004047a0"
+  "_realloc": "0x004047a0",
+  "_CDecl_MakeCopyCtorType": "0x00532f40"
 }

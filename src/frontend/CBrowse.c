@@ -257,7 +257,7 @@ void write_function_browse_record(Object *obj, SInt32 fileNumber, SInt32 scopeNu
         }
     } else {
         needsDemangling = 1;
-        if (functionType->flags & 0x6000) {
+        if (functionType->flags & (FUNC_IS_CTOR | FUNC_IS_DTOR)) {
             className = functionType->theclass->classname->name;
             while (*className >= '0' && *className <= '9')
                 className++;
@@ -266,7 +266,7 @@ void write_function_browse_record(Object *obj, SInt32 fileNumber, SInt32 scopeNu
             className = strrchr(demangledName, ':');
             if (className != NULL)
                 displayName = className + 1;
-            if (functionType->flags & 0x4000) {
+            if (functionType->flags & FUNC_IS_DTOR) {
                 destructorName[0] = '~';
                 strncpy(destructorName + 1, displayName, sizeof(destructorName) - 1);
                 displayName = destructorName;
@@ -494,9 +494,9 @@ void CBrowse_RecordFunction(Object *obj, SInt32 start, SInt32 end)
                 flags |= 1;
             if (func->is_static)
                 flags |= 2;
-            if (func->flags & FUNC_IS_DTOR)
+            if (func->flags & FUNC_IS_CTOR)
                 flags |= 0x800;
-            if (func->flags & 0x4000)
+            if (func->flags & FUNC_IS_DTOR)
                 flags |= 0x1000;
             AppendGListByte(&browse_member_list, 0);
             AppendGListByte(&browse_member_list, cbrowse_filename[obj->access - 4]);

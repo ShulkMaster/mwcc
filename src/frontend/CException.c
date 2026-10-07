@@ -360,7 +360,7 @@ void update_statement_dobjstacks(Statement *node)
                 e = e->data.monadic;
             if (e->type == EFUNCCALL) {
                 if (e->data.funccall.funcref->type == EOBJREF &&
-                    CClass_IsDestructor(e->data.funccall.funcref->data.objref) && (info = p->dobjstack) != NULL &&
+                    CClass_IsConstructor(e->data.funccall.funcref->data.objref) && (info = p->dobjstack) != NULL &&
                     info->kind == 1 && (args = e->data.funccall.args) != NULL && args->node->type == EOBJREF &&
                     args->node->data.objref == info->data.local.object) {
                     currentDobjstack = currentDobjstack->next;

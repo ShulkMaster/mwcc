@@ -846,7 +846,7 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                 }
                 if (tclass->flags & CLASS_HAS_VBASES)
                     CDecl_PrependFuncArg(TYPE_FUNC(di.dtype), &stsignedshort);
-                TYPE_FUNC(di.dtype)->flags |= FUNC_IS_DTOR;
+                TYPE_FUNC(di.dtype)->flags |= FUNC_IS_CTOR;
                 di.name = constructor_name;
                 currentNameSpace = stack->scope->parent;
                 goto declare;
@@ -868,7 +868,7 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                     di.name = constructor_name;
                     if (templclass->base.flags & CLASS_HAS_VBASES)
                         CDecl_PrependFuncArg(TYPE_FUNC(di.dtype), &stsignedshort);
-                    TYPE_FUNC(di.dtype)->flags |= FUNC_IS_DTOR;
+                    TYPE_FUNC(di.dtype)->flags |= FUNC_IS_CTOR;
                     parse_template_member_definition(params, &templclass->base, &di, startOffset);
                     return;
                 }
@@ -910,7 +910,7 @@ void parse_function_template_declaration(TemplateScopeState *stack, TemplatePara
                         else
                             CDecl_PrependFuncArg(TYPE_FUNC(di.dtype), &stsignedshort);
                         di.name = destructor_name;
-                        TYPE_FUNC(di.dtype)->flags |= 0x4000;
+                        TYPE_FUNC(di.dtype)->flags |= FUNC_IS_DTOR;
                         parse_template_member_definition(params, &templclass->base, &di, startOffset);
                         return;
                     }

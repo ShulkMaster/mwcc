@@ -487,7 +487,7 @@ void CError_FunctionCallError(short errorCode, ObjectList *objects, ENodeList *a
                     append_function_name(&message, objects->object.value->nspace, objects->object.value->name,
                                          objects->object.value->type);
                     if ((TYPE_METHOD(objects->object.value->type)->flags & FUNC_METHOD) != 0 &&
-                        (TYPE_METHOD(objects->object.value->type)->flags & FUNC_IS_DTOR) != 0 &&
+                        (TYPE_METHOD(objects->object.value->type)->flags & FUNC_IS_CTOR) != 0 &&
                         (TYPE_CLASS(TYPE_METHOD(objects->object.value->type)->theclass)->flags & CLASS_HAS_VBASES) !=
                             0 &&
                         arguments != NULL)
@@ -1263,12 +1263,8 @@ void append_function_args(StrBuf *buf, TypeMemberFunc *type, char skip)
             if (((flags = type->flags) & 0x10) && !type->is_static) {
                 qual = arg->qual;
                 arg = arg->next;
-#if VERSION >= VERSION_GC_2_7
                 if (arg &&
                     ((flags & FUNC_IS_DTOR) || ((flags & FUNC_IS_CTOR) && (type->theclass->flags & CLASS_HAS_VBASES))))
-#else
-                if (arg && ((flags & 0x4000) || ((flags & 0x2000) && (type->theclass->flags & CLASS_HAS_VBASES))))
-#endif
                     arg = arg->next;
             }
         }

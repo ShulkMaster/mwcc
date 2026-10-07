@@ -17764,9 +17764,10 @@
     "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_00532f40",
+    "name": "CDecl_MakeCopyCtorType",
     "address": "0x00532f40",
-    "size": 283
+    "size": 283,
+    "source": "src/frontend/CDecl.c"
   },
   {
     "name": "fn_00533060",

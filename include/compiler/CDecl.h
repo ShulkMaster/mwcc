@@ -111,8 +111,8 @@ extern void fill_class_layout_entries(ClassLayoutInput *table, TypeClass *type, 
 extern void declare_auto_generated_destructor(ClassLayoutInput *type, TypeClass *cls);
 extern void generate_copy_constructor(ClassLayoutInput *type, TypeClass *cls);
 extern void declare_default_copy_constructor(ClassLayoutInput *decl, TypeClass *type);
-extern TypeMemberFunc *CDecl_MakeDefaultDtorType(TypeClass *theclass, char is_const);
-extern void make_auto_generated_dtor(ClassLayoutInput *context, TypeClass *cls);
+extern TypeMemberFunc *CDecl_MakeCopyCtorType(TypeClass *theclass, char is_const);
+extern void CDecl_AddDefaultConstructor(ClassLayoutInput *context, TypeClass *cls);
 extern void make_defarg_function(TypeClass *cls);
 extern void parse_class_bases(struct TypeClassTemplate *classType, short mode, char allowDependent);
 extern Boolean CDecl_CheckNewBase(TypeClass *cls, TypeClass *base, Boolean flag);

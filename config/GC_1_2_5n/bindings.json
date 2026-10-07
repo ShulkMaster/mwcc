@@ -120,7 +120,7 @@
   "_find_virtual_base_path": "0x004eb830",
   "_find_base_path": "0x004eb8e0",
   "_CClass_ReferenceArgument": "0x004ebbb0",
-  "_CClass_IsDestructor": "0x004ebc70",
+  "_CClass_IsDestructor": "0x004ebc40",
   "_CClass_Destructor": "0x004ebca0",
   "_CClass_CopyConstructor": "0x004ebd50",
   "_CClass_AssignmentOperator": "0x004ebe20",
@@ -133,7 +133,6 @@
   "_declare_auto_generated_destructor": "0x004fbfe0",
   "_generate_copy_constructor": "0x004fc170",
   "_declare_default_copy_constructor": "0x004fc3c0",
-  "_make_auto_generated_dtor": "0x004fc610",
   "_make_defarg_function": "0x004fc810",
   "_parse_class_bases": "0x004fc990",
   "_CDecl_CheckNewBase": "0x004fccb0",
@@ -5120,7 +5119,6 @@
   "_CClass_AppendPath": "0x004eba20",
   "_CClass_GetPathCopy": "0x004eba60",
   "_fn_004ebae0": "0x004ebae0",
-  "_CClass_HasTypeFuncFlag16384": "0x004ebc40",
   "_CClass_Constructor": "0x004ebce0",
   "_CClass_MemberObject": "0x004ebd20",
   "_get_or_create_thunk_object": "0x004ec290",
@@ -5196,7 +5194,6 @@
   "_CDecl_ParseDeclarationAttributeFlags": "0x004fba60",
   "_CDecl_DefineClass": "0x004fbb00",
   "_fill_class_layout_entries": "0x004fbd70",
-  "_CDecl_MakeDefaultDtorType": "0x004fc550",
   "_parse_class_members": "0x004fcf60",
   "_CDecl_CopyDeclInfoToNewFunc": "0x004fe4c0",
   "_CDecl_NewTypeMemberFunc": "0x004fea20",
@@ -6301,5 +6298,8 @@
   "_data_005374c4": "0x005374c4",
   "_integralpromote": "0x004738d0",
   "_forceintegral": "0x00473ee0",
-  "_compiler_linker_callbacks": "0x0054d774"
+  "_compiler_linker_callbacks": "0x0054d774",
+  "_CClass_IsConstructor": "0x004ebc70",
+  "_CDecl_MakeCopyCtorType": "0x004fc550",
+  "_CDecl_AddDefaultConstructor": "0x004fc610"
 }

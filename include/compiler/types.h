@@ -2,6 +2,7 @@
 #define COMPILER_TYPES_H
 
 #include "compiler/common.h"
+#include "version.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -52,8 +53,15 @@ enum {
     FUNC_CONVERSION = 0x40,
     FUNC_AUTO_GENERATED = 0x100,
     FUNC_INTRINSIC = 0x200,
+#if VERSION >= VERSION_GC_1_3
+    FUNC_AUTO_INLINE = 0x800,
     FUNC_IS_CTOR = 0x1000,
     FUNC_IS_DTOR = 0x2000
+#else
+    FUNC_AUTO_INLINE = 0x1000,
+    FUNC_IS_CTOR = 0x2000,
+    FUNC_IS_DTOR = 0x4000
+#endif
 };
 #define IS_TYPEFUNC_METHOD(ty) ((ty)->flags & FUNC_METHOD)
 #define IS_TYPE_POINTER(ty) ((ty)->type == TYPEPOINTER || (ty)->type == TYPEARRAY)

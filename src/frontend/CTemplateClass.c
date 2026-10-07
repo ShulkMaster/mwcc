@@ -424,14 +424,7 @@ void instantiate_object_type(TemplateContext *context, TemplateClassDeclaration 
                         CScope_AddObject(context->instance->nspace, OBJECT(object)->name, (ObjBase *)OBJECT(object));
                     }
                 }
-                if ((TYPE_FUNC(OBJECT(object)->type)->flags &
-#if VERSION >= VERSION_GC_1_3
-                     FUNC_IS_CTOR
-#else
-                     FUNC_IS_DTOR
-#endif
-                     ) &&
-                    context->hasNewVBases) {
+                if ((TYPE_FUNC(OBJECT(object)->type)->flags & FUNC_IS_CTOR) && context->hasNewVBases) {
                     FuncArg *argument;
                     CError_ASSERT(1710, TYPE_FUNC(OBJECT(object)->type)->args != NULL);
                     argument = CParser_NewFuncArg();
@@ -505,14 +498,8 @@ void instantiate_template_object(TemplateContext *ctx, Object *templ)
                 CError_FATAL(1574);
             if (obj->base.u.func.u != NULL || obj->base.u.func.defargdata != NULL)
                 CError_FATAL(1575);
-            if ((((TypeFunc *)obj->base.type)->flags &
-#if VERSION >= VERSION_GC_1_3
-                 FUNC_IS_CTOR
-#else
-                 FUNC_IS_DTOR
-#endif
-                 ) != 0 &&
-                ctx->hasNewVBases != 0 && matchingInstance == NULL) {
+            if ((((TypeFunc *)obj->base.type)->flags & FUNC_IS_CTOR) != 0 && ctx->hasNewVBases != 0 &&
+                matchingInstance == NULL) {
                 FuncArg *arg;
                 if (((TypeFunc *)obj->base.type)->args == NULL)
                     CError_FATAL(1581);
@@ -620,14 +607,7 @@ void CTemplateClass_0051c680(TemplateContext *ctx, Object *obj)
     CError_ASSERT(1477, newobj->type->type == TYPEFUNC);
     ((TypeFunc *)newobj->type)->flags |= 0x400;
 
-    if ((((TypeFunc *)newobj->type)->flags &
-#if VERSION >= VERSION_GC_1_3
-         FUNC_IS_CTOR
-#else
-         FUNC_IS_DTOR
-#endif
-         ) != 0 &&
-        ctx->hasNewVBases != 0 && found == NULL) {
+    if ((((TypeFunc *)newobj->type)->flags & FUNC_IS_CTOR) != 0 && ctx->hasNewVBases != 0 && found == NULL) {
         CError_ASSERT(1484, ((TypeFunc *)newobj->type)->args != NULL);
         arg = CParser_NewFuncArg();
         arg->type = (Type *)&stsignedshort;

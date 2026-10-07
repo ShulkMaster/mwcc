@@ -19176,7 +19176,7 @@
     "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "CDecl_MakeDefaultDtorType",
+    "name": "CDecl_MakeCopyCtorType",
     "address": "0x00534980",
     "size": 283,
     "source": "src/frontend/CDecl.c"

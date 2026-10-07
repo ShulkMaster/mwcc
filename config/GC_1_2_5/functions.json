@@ -17370,13 +17370,13 @@
     "source": "src/frontend/CClass.c"
   },
   {
-    "name": "CClass_HasTypeFuncFlag16384",
+    "name": "CClass_IsDestructor",
     "address": "0x004ebc40",
     "size": 47,
     "source": "src/frontend/CClass.c"
   },
   {
-    "name": "CClass_IsDestructor",
+    "name": "CClass_IsConstructor",
     "address": "0x004ebc70",
     "size": 47,
     "source": "src/frontend/CClass.c"
@@ -18342,13 +18342,13 @@
     "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "CDecl_MakeDefaultDtorType",
+    "name": "CDecl_MakeCopyCtorType",
     "address": "0x004fc550",
     "size": 190,
     "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "make_auto_generated_dtor",
+    "name": "CDecl_AddDefaultConstructor",
     "address": "0x004fc610",
     "size": 502,
     "source": "src/frontend/CDecl.c"

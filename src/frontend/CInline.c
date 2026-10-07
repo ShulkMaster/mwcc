@@ -331,7 +331,7 @@ void CInline_0050ee60(Statement *stmt, Object *func, Boolean flag)
         if (copts.f70 && !copts.disableInlining && fn_00511180(func, stmt->next) &&
             check_statement_count_and_locals_size(func, stmt->next)) {
             isInline = autoInline = 1;
-            TYPE_FUNC(func->type)->flags |= FUNC_IS_CTOR;
+            TYPE_FUNC(func->type)->flags |= FUNC_AUTO_INLINE;
         }
     } else {
         isInline = 1;
@@ -2115,7 +2115,7 @@ Boolean can_inline(ENode *node)
     CInlineInfo *inlineInfo;
 
     if (function->type->type == TYPEFUNC &&
-        ((function->qual & Q_INLINE) || (TYPE_METHOD(function->type)->flags & FUNC_IS_CTOR)) &&
+        ((function->qual & Q_INLINE) || (TYPE_METHOD(function->type)->flags & FUNC_AUTO_INLINE)) &&
         (function->datatype == DFUNC || (function->datatype == DVFUNC && (node->flags & ENODE_FLAG_80)))) {
         if (copts.fb6 == 0 && data_00582468 > 0 && copts.inlineLimit == 0) {
             inlineInfo = function->u.func.u;
@@ -2420,7 +2420,7 @@ ENode *copy_result_reference(ENode *e)
             if (e->rtype->type != TYPEPOINTER || TPTR_TARGET(e->rtype)->type != TYPECLASS)
                 break;
             if (e->data.funccall.funcref->type == EOBJREF &&
-                CClass_IsDestructor(e->data.funccall.funcref->data.addr.objref) &&
+                CClass_IsConstructor(e->data.funccall.funcref->data.addr.objref) &&
                 (args = e->data.funccall.args) != NULL)
                 return CInline_CopyConst(args->node);
             if (TPTR_TARGET(e->rtype) != e->data.funccall.functype->functype)

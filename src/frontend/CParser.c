@@ -876,8 +876,8 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                                         ((TYPE_FUNC(
                                               ((Object *)((NameSpaceObjectList *)state->resolvedObjects)->object)->type)
                                               ->flags &
-                                          0x2000) |
-                                         0x4000) != 0) {
+                                          FUNC_IS_CTOR) |
+                                         FUNC_IS_DTOR) != 0) {
                                         requireType = 0;
                                     }
                                 } else {
@@ -893,8 +893,8 @@ void CParser_GetDeclSpecs(DeclInfo *state, Boolean allowObject)
                                             state->resolvedObject = scope.object;
                                             if (((Object *)state->resolvedObject)->type->type == TYPEFUNC &&
                                                 ((TYPE_FUNC(((Object *)state->resolvedObject)->type)->flags &
-                                                  FUNC_IS_DTOR) |
-                                                 0x4000) != 0) {
+                                                  FUNC_IS_CTOR) |
+                                                 FUNC_IS_DTOR) != 0) {
                                                 requireType = 0;
                                             }
                                         } else {
