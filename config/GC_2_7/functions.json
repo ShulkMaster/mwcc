@@ -9395,9 +9395,10 @@
     "size": 16
   },
   {
-    "name": "fn_0046aa00",
+    "name": "create_replacement_temp_assignment",
     "address": "0x0046aa00",
-    "size": 201
+    "size": 201,
+    "source": "src/optimizer/IroCSE.c"
   },
   {
     "name": "IroCSE_ComputeAvailableExpressions",

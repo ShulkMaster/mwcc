@@ -1616,5 +1616,10 @@
   "_DAT_00587e58": "0x005e73d2",
   "_DAT_00587630": "0x005e7374",
   "_IRO_GetTemp": "0x00467850",
-  "_create_temp_object": "0x004f4200"
+  "_create_temp_object": "0x004f4200",
+  "_create_replacement_temp_assignment": "0x00469b40",
+  "_IrOptimizer_NewLinear": "0x0046ece0",
+  "_IroUtil_InsertLinearRangeAfter": "0x00468410",
+  "_linear_index_counter": "0x005e5f78",
+  "_IroCSE_0044e560": "0x00467880"
 }
