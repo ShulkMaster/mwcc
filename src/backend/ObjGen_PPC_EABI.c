@@ -588,25 +588,25 @@ UInt16 ObjGen_PPC_EABI_GetSectionIndex(short reg)
     return reg;
 }
 
-/* Eight-byte entries accumulated for an output record. */
-
-/* Partial layouts of the output state and its owners. */
-
 void ObjGen_PPC_EABI_AppendOutputEntry(ObjGenSection *context, unsigned int value)
 {
     SerializedFormat *entries = context->output->sectionData.serialized->format;
     if (!entries->kind) {
         if (!entries->last) {
-            entries->last = (SerializedValueList *)galloc(8U);
+            entries->last = galloc(sizeof(*entries->last));
             entries->values = entries->last;
         } else {
-            entries->last->next = (SerializedValueList *)galloc(8U);
+            entries->last->next = galloc(sizeof(*entries->last));
             entries->last = entries->last->next;
         }
-        memset(entries->last, 0, 8U);
+        memset(entries->last, 0, sizeof(*entries->last));
         entries->last->value = value;
         if (entries->count > 32767)
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(2528);
+#else
             CError_FATAL(2466);
+#endif
         entries->count += 1;
     }
 }
@@ -1255,7 +1255,11 @@ short ObjGen_PPC_EABI_GetHeaderIndex(short kind)
             value = copts.smallDataSection->header->index;
             break;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(1117);
+#else
             CError_FATAL(1103);
+#endif
     }
     return value;
 }
@@ -1918,7 +1922,11 @@ char *ObjGen_PPC_EABI_GetSectionName(struct ObjGenSection *descriptor)
         }
         entry = entry->next;
     }
+#if VERSION >= VERSION_GC_2_7
+    CError_FATAL(667);
+#else
     CError_FATAL(630);
+#endif
     return NULL;
 }
 

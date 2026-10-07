@@ -1,6 +1,7 @@
 #ifndef COMPILER_OBJGEN_PPC_EABI_H
 #define COMPILER_OBJGEN_PPC_EABI_H
 
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CompilerTools.h"
 #include "compiler/InlineAsmPPC.h"
@@ -67,7 +68,11 @@ struct ObjGenSection {
     struct ObjGenSection *next;
     struct ObjGenSection *nextInGroup;
     UInt8 kind;
+#if VERSION >= VERSION_GC_2_7
+    UInt32 flags;
+#else
     UInt8 flags;
+#endif
     SInt16 index;
     SInt32 relocationCount;
     struct ObjGenSymbolLink *symbolLink;
