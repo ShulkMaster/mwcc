@@ -138,7 +138,11 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
     unsigned int length;
     unsigned int functionLength;
     char *memberSuffix;
+#if VERSION >= VERSION_GC_2_7
+    unsigned int separatorLength;
+#else
     int separatorLength;
+#endif
     unsigned int memberLength;
     jmp_buf state;
     MOutBuf identifierBuffer;
@@ -147,12 +151,12 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
 
     switch (name[0]) {
         case '.':
-            if (data_005649b8 == '.')
+            if (unmangle_symbol_prefix == '.')
                 ++name;
             break;
         case '_':
 #if VERSION >= VERSION_GC_2_7
-            if (data_005649b8 == '_')
+            if (unmangle_symbol_prefix == '_')
                 ++name;
 #endif
             switch (name[1]) {
@@ -164,8 +168,13 @@ void Unmangle_UnmangleSymbolName(char *name, char *output, int outputSize)
     }
 
     if (_Setjmp(state) == 0) {
+#if VERSION >= VERSION_GC_2_7
+        identifierBuffer.ptr = identifier;
+        identifierBuffer.left = sizeof(identifier) - 1;
+#else
         identifierBuffer.left = sizeof(identifier) - 1;
         identifierBuffer.ptr = identifier;
+#endif
         outputBuffer.ptr = output;
         outputBuffer.left = outputSize - 1;
         if (*name != '_' || name[1] != '_' || (suffix = fn_004e8800(state, &identifierBuffer, name + 2)) == NULL) {
@@ -364,7 +373,7 @@ void unmangle_function_parameters(int *context, MOutBuf *output, char *encoding)
                     if (output->left < length) {
                         length = output->left;
                     }
-                    memcpy(output->ptr, &data_005649c0, length);
+                    memcpy(output->ptr, &unmangle_ellipsis, length);
                     output->ptr += length;
                     output->left -= length;
                 }
@@ -610,32 +619,34 @@ char *unmangle_indirect_type(int *context, MOutBuf *output, char *input, char *s
     if (marker == 'M') {
         input = unmangle_qualified_name(context, NULL, input + 1, 0, 0);
         result = unmangle_type(context, output, input);
-        if (output == NULL)
-            return result;
-        if (output != NULL && output->left != 0) {
-            *output->ptr++ = ' ';
-            output->left--;
-        }
-        unmangle_qualified_name(context, output, argument + 1, 0, 0);
         if (output != NULL) {
-            count = 3;
-            if (output->left < count)
-                count = output->left;
-            memcpy(output->ptr, "::*", count);
-            output->ptr += count;
-            output->left -= count;
+            if (output != NULL && output->left != 0) {
+                *output->ptr++ = ' ';
+                output->left--;
+            }
+            unmangle_qualified_name(context, output, argument + 1, 0, 0);
+            if (output != NULL) {
+                count = 3;
+                if (output->left < count)
+                    count = output->left;
+                memcpy(output->ptr, "::*", count);
+                output->ptr += count;
+                output->left -= count;
+            }
+            if (suffix != NULL)
+                write_qualifiers(output, suffix);
         }
     } else {
         result = unmangle_type(context, output, input + 1);
-        if (output == NULL)
-            return result;
-        if (output != NULL && output->left != 0) {
-            *output->ptr++ = marker;
-            output->left--;
+        if (output != NULL) {
+            if (output != NULL && output->left != 0) {
+                *output->ptr++ = marker;
+                output->left--;
+            }
+            if (suffix != NULL)
+                write_qualifiers(output, suffix);
         }
     }
-    if (suffix != NULL)
-        write_qualifiers(output, suffix);
     return result;
 }
 
@@ -1054,8 +1065,13 @@ char *unmangle_qualified_name(int *context, MOutBuf *output, char *cursor, char 
         lastComponent = cursor;
         lastLength = length;
         next = scan_component(context, output, cursor, length, output);
+#if VERSION >= VERSION_GC_2_7
+        cursor = next;
+        component = component + 1;
+#else
         component = component + 1;
         cursor = next;
+#endif
     }
     if (append != 0 && output != NULL) {
         if (alternate != 0) {

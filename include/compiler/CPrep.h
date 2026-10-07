@@ -94,7 +94,7 @@ struct COpts {
     struct ObjGenSection *smallDataSection;             /* 0x34 */
     struct ObjGenSection *smallBSSSection;              /* 0x38 */
     SInt32 sectionHeaderTableSize;                      /* 0x3c */
-    SInt32 *sectionHeaderTable;                         /* 0x40 */
+    struct SectionSymbolAttributes **sectionHeaderTable;  /* 0x40 */
     struct InterruptList *interruptList;                /* 0x44 */
     struct InterruptGenerationRecord *interruptOptions; /* 0x48 */
     UInt8 f4e;                                          /* 0x4c: incompatible_return_small_structs */

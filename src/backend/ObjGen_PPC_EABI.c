@@ -261,13 +261,25 @@ InterruptGenerationRecord *fn_00488750(Object *object, BE_SymNode *linkage)
         if (section_table_dirty != 0 && section_table_dirty != 0) {
             section_table_dirty = 0;
             copts.sectionHeaderTableSize = (tableSize = sectionHeaderCount),
+#if VERSION >= VERSION_GC_2_7
+            data_00580db4 = copts.sectionHeaderTable = galloc(tableSize * sizeof(*copts.sectionHeaderTable));
+#else
             data_00580db4 = copts.sectionHeaderTable = (SInt32 *)galloc(tableSize << 2);
+#endif
+#if VERSION >= VERSION_GC_2_7
+            memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
             memset(copts.sectionHeaderTable, 0, sectionHeaderCount << 2);
+#endif
             count = 0;
             entry = entryHead = section_list;
             if (entryHead != NULL) {
                 do {
+#if VERSION >= VERSION_GC_2_7
+                    copts.sectionHeaderTable[count] = entry->header;
+#else
                     copts.sectionHeaderTable[count] = (SInt32)entry->header;
+#endif
                     count = count + 1;
                     entry = entry->next;
                 } while (entry != NULL);
@@ -917,13 +929,25 @@ static inline void fill_section_table(void)
         section_table_dirty = 0;
         count = sectionHeaderCount;
         copts.sectionHeaderTableSize = count;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         index = 0;
         lp = head = section_list;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = lp->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
                 lp = lp->next;
                 index++;
             } while (lp != NULL);
@@ -1002,13 +1026,25 @@ static inline void initialize_section_table(void)
     if (section_table_dirty) {
         section_table_dirty = 0;
         copts.sectionHeaderTableSize = count = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         index = 0;
         lp = head = section_list;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = lp->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
                 lp = lp->next;
                 index++;
             } while (lp != NULL);
@@ -1076,12 +1112,24 @@ static inline void fill_section_table_for_code(void)
 
     if (section_table_dirty) {
         section_table_dirty = 0, copts.sectionHeaderTableSize = count = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         entry = first = section_list, index = 0;
         if (first)
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = entry->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)entry->header;
+#endif
                 entry = entry->next, index++;
             } while (entry);
     }
@@ -1270,13 +1318,25 @@ static inline void fill_section_header_table(void)
     section_table_dirty = 0;
     count = sectionHeaderCount;
     copts.sectionHeaderTableSize = count;
+#if VERSION >= VERSION_GC_2_7
+    data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
     data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+    memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
     memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
     lp = head = section_list;
     index = 0;
     if (head != NULL) {
         do {
+#if VERSION >= VERSION_GC_2_7
+            copts.sectionHeaderTable[index] = lp->header;
+#else
             copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
             index++;
             lp = lp->next;
         } while (lp != NULL);
@@ -1293,13 +1353,25 @@ static inline void build_section_table(UInt16 sectionCount)
     SInt32 index;
 
     copts.sectionHeaderTableSize = count;
+#if VERSION >= VERSION_GC_2_7
+    data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
     data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+    memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
     memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
     record = head = section_list;
     index = 0;
     if (head != NULL) {
         do {
+#if VERSION >= VERSION_GC_2_7
+            copts.sectionHeaderTable[index] = record->header;
+#else
             copts.sectionHeaderTable[index] = (SInt32)record->header;
+#endif
             index++;
             record = record->next;
         } while (record != NULL);
@@ -1551,7 +1623,11 @@ void ObjGen_PPC_EABI_UpdateSectionHeaders(void)
     index = 0;
     if (head != NULL) {
         do {
+#if VERSION >= VERSION_GC_2_7
+            section->header = copts.sectionHeaderTable[index];
+#else
             section->header = (struct SectionSymbolAttributes *)copts.sectionHeaderTable[index];
+#endif
             index++;
             section = section->next;
         } while (section != NULL);
@@ -1570,13 +1646,25 @@ void ObjGen_PPC_EABI_BuildSectionHeaderTable(void)
     if (section_table_dirty) {
         section_table_dirty = 0;
         copts.sectionHeaderTableSize = n = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(n * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(n * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         p = head = section_list;
         i = 0;
         if (head)
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[i++] = p->header;
+#else
                 copts.sectionHeaderTable[i++] = (SInt32)p->header;
+#endif
                 p = p->next;
             } while (p);
     }
@@ -1686,13 +1774,25 @@ static inline void rebuild_section_header_table(void)
         section_table_dirty = 0;
         count = sectionHeaderCount;
         copts.sectionHeaderTableSize = count;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         lp = head = section_list;
         index = 0;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = lp->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
                 index++;
                 lp = lp->next;
             } while (lp != NULL);
@@ -1711,13 +1811,25 @@ static inline void ensure_section_table_ac10(void)
         return;
     section_table_dirty = 0;
     copts.sectionHeaderTableSize = count = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+    data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
     data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+    memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
     memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
     entry = head = section_list;
     index = 0;
     if (head) {
         do {
+#if VERSION >= VERSION_GC_2_7
+            copts.sectionHeaderTable[index] = entry->header;
+#else
             copts.sectionHeaderTable[index] = (SInt32)entry->header;
+#endif
             index++;
             entry = entry->next;
         } while (entry);
@@ -1770,13 +1882,25 @@ static inline void fill_section_table_0048ad10(void)
     if (section_table_dirty) {
         section_table_dirty = 0;
         copts.sectionHeaderTableSize = count = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         lp = head = section_list;
         index = 0;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = lp->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
                 index++;
                 lp = lp->next;
             } while (lp != NULL);
@@ -1834,13 +1958,25 @@ static inline void build_section_header_table(void)
         section_table_dirty = 0;
         count = sectionHeaderCount;
         copts.sectionHeaderTableSize = count;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         lp = head = section_list;
         index = 0;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = lp->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)lp->header;
+#endif
                 index++;
                 lp = lp->next;
             } while (lp != NULL);
@@ -1857,13 +1993,25 @@ static inline void build_section_index(void)
     if (section_table_dirty) {
         section_table_dirty = 0;
         copts.sectionHeaderTableSize = count = sectionHeaderCount;
+#if VERSION >= VERSION_GC_2_7
+        data_00580db4 = copts.sectionHeaderTable = galloc(count * sizeof(*copts.sectionHeaderTable));
+#else
         data_00580db4 = copts.sectionHeaderTable = galloc(count * 4);
+#endif
+#if VERSION >= VERSION_GC_2_7
+        memset(copts.sectionHeaderTable, 0, sectionHeaderCount * sizeof(*copts.sectionHeaderTable));
+#else
         memset(copts.sectionHeaderTable, 0, sectionHeaderCount * 4);
+#endif
         entry = head = section_list;
         index = 0;
         if (head != NULL) {
             do {
+#if VERSION >= VERSION_GC_2_7
+                copts.sectionHeaderTable[index] = entry->header;
+#else
                 copts.sectionHeaderTable[index] = (SInt32)entry->header;
+#endif
                 index++;
                 entry = entry->next;
             } while (entry != NULL);
