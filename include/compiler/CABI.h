@@ -30,6 +30,7 @@ struct VtOffEntry {
     struct VtOffEntry *next;
     SInt32 value;
 };
+extern SInt16 CABI_GetStructResultArgumentIndex(TypeFunc *type);
 extern ENode *CABI_MakeThisExpr(TypeClass *typeClass, int count);
 extern ENode *CABI_DestroyObject(Object *dtor, ENode *objexpr, UInt8 mode, Boolean flag1, Boolean flag2);
 extern Object *CABI_GetDestructorObject(Object *obj, UInt8 mode);

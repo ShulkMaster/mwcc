@@ -1,4 +1,5 @@
 #define CERROR_FILE "CMachine.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CMachine.h"
 #include "compiler/enode.h"
@@ -175,6 +176,17 @@ Float CMach_FloatReciprocal(Float value)
     value.data.value = 1.0L / value.data.value;
     return value;
 }
+
+#if VERSION >= VERSION_GC_2_7
+CInt64 fn_004bfeb0(Type *type, Type *otherType, CInt64 value)
+{
+    CInt64 result;
+
+    result.lo = 0;
+    result.hi = 0;
+    return result;
+}
+#endif
 
 Boolean CMach_PassResultInHiddenArg(Type *type)
 {
@@ -625,7 +637,11 @@ UInt16 fn_004a8400(TypeStruct *str)
 }
 SInt16 CMach_MemberAlignValue(Type *type, SInt32 offset)
 {
+#if VERSION >= VERSION_GC_1_3
+    SInt16 alignment = CMach_GetMemberAlignment(type, 0, 1);
+#else
     SInt16 alignment = get_type_align(type);
+#endif
     if ((SInt32)alignment <= 1)
         return 0;
     return (alignment - (offset & (alignment - 1U))) & (alignment - 1U);

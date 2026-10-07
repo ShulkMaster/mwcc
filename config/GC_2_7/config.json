@@ -47,6 +47,7 @@
     "src/frontend/Unmangle.c",
     "src/frontend/CPrep.c",
     "src/frontend/CPreprocess.c",
-    "src/driver/libimp-eabi-ppc.c"
+    "src/driver/libimp-eabi-ppc.c",
+    "src/frontend/CABI.c"
   ]
 }

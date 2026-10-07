@@ -194,7 +194,6 @@ struct CPrecNode;
 extern void parse_inline_definition(struct CPrecNode *inlineInfo);
 extern Object *create_local_object(Type *type, unsigned int qual, unsigned int a2);
 extern void *create_inline_switch_data(Statement *base, Statement *classInfo);
-extern SInt16 CInline_ReturnZero(Type *type);
 extern void CInline_GeneratePendingFunctionBody(void);
 extern PendingFunction *generate_guarded_initializers(PendingFunction *pending);
 extern struct InlineObjectEntry *undefined_function_objects;

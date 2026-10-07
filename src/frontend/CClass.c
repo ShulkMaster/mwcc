@@ -1,4 +1,5 @@
 #define CERROR_FILE "CClass.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CClass.h"
 #include "compiler/enode.h"
@@ -1749,6 +1750,13 @@ Boolean CClass_IsDestructor(Object *obj)
 {
     return obj != NULL && obj->type->type == TYPEFUNC && (TYPE_FUNC(obj->type)->flags & FUNC_IS_DTOR) != 0;
 }
+
+#if VERSION >= VERSION_GC_1_3
+Boolean CClass_IsConstructor(Object *obj)
+{
+    return obj != NULL && obj->type->type == TYPEFUNC && (TYPE_FUNC(obj->type)->flags & FUNC_IS_CTOR) != 0;
+}
+#endif
 
 /* Finds the member object of the class whose type is a
  * function and whose name is the global DAT_005870f4. */

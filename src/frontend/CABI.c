@@ -1,4 +1,5 @@
 #define CERROR_FILE "CABI.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CABI.h"
 #include "compiler/enode.h"
@@ -712,7 +713,11 @@ SInt32 CABI_GetCtorOffsetOffset(TypeClass *tclass, TypeClass *baseclass)
         size = tclass->vbases->offset;
     if (baseclass) {
         basesize = CABI_FindNVBase(tclass, baseclass, 0);
+#if VERSION >= VERSION_GC_1_3
+        CError_ASSERT(1178, basesize >= 0);
+#else
         CError_ASSERT(1169, basesize >= 0);
+#endif
         size -= basesize;
     }
     savealign = copts.structalignment;
@@ -1701,7 +1706,11 @@ SInt16 CABI_ComputeAlignmentPadding(Type *data, SInt32 mask)
     SInt16 value;
     SInt32 alignment;
 
+#if VERSION >= VERSION_GC_1_3
+    value = get_type_align(data);
+#else
     value = CMachine_GetTypeAlignment(data);
+#endif
     alignment = value;
     if (alignment <= 1) {
         return 0;
@@ -2063,3 +2072,10 @@ void layout_nonvirtual_bases(void *abiContext, TypeClass *derivedClass)
     }
     derivedClass->size = offset;
 }
+
+#pragma auto_inline off
+SInt16 CABI_GetStructResultArgumentIndex(TypeFunc *type)
+{
+    return 0;
+}
+#pragma auto_inline reset

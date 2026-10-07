@@ -53,13 +53,6 @@
 
 #include "compiler/ENode.h"
 
-#pragma auto_inline off
-SInt16 CInline_ReturnZero(Type *type)
-{
-    return 0;
-}
-
-#pragma auto_inline reset
 void CInline_GeneratePendingFunctionBody(void)
 {
     Statement body;
@@ -1737,7 +1730,7 @@ Statement *generate_inline_statements(Object *function, Statement *tail, CInline
                 if (entry->data.operand != NULL) {
                     node->expr.expression = gen_expr(entry->data.operand);
                     if (convertReturn) {
-                        SInt32 index = CInline_ReturnZero(function->type);
+                        SInt32 index = CABI_GetStructResultArgumentIndex(TYPE_FUNC(function->type));
                         ENode *conversion;
 
                         if (data_0058245a[index].var == NULL)
@@ -2219,7 +2212,7 @@ ENode *inline_call_expression(ENode *expr)
                     if (result != NULL) {
                         statementExpr = makecommaexpression(result, statementExpr);
                     }
-                    argumentIndex = CInline_ReturnZero(object->type);
+                    argumentIndex = CABI_GetStructResultArgumentIndex(TYPE_FUNC(object->type));
                     if (data_0058245a[argumentIndex].var == NULL) {
                         argument = InlineArgument(data_0058245a[argumentIndex].expr);
                     } else {
@@ -2436,7 +2429,7 @@ ENode *copy_result_reference(ENode *e)
                 break;
             if ((args = e->data.funccall.args) == NULL)
                 break;
-            switch (CInline_ReturnZero((Type *)e->data.funccall.functype)) {
+            switch (CABI_GetStructResultArgumentIndex(e->data.funccall.functype)) {
                 case 0:
                     break;
                 case 1:

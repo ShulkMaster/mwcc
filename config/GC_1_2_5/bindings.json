@@ -5271,7 +5271,7 @@
   "_CABI_ComputeAlignmentPadding": "0x0050e7f0",
   "_CABI_GetPtrDiffTType": "0x0050e820",
   "_CABI_GetSizeTType": "0x0050e830",
-  "_CInline_ReturnZero": "0x0050e840",
+  "_CABI_GetStructResultArgumentIndex": "0x0050e840",
   "_CInline_GeneratePendingFunctionBody": "0x0050e850",
   "_generate_guarded_initializers": "0x0050e9a0",
   "_fn_0050ebc0": "0x0050ebc0",

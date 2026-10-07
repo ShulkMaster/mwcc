@@ -1,6 +1,7 @@
 #ifndef COMPILER_CCLASS_H
 #define COMPILER_CCLASS_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -123,6 +124,9 @@ extern void fn_004ebae0(TypeClass *type);
 extern Boolean CClass_ReferenceArgument(TypeClass *cls);
 extern Boolean CClass_HasTypeFuncFlag16384(Object *object);
 extern Boolean CClass_IsDestructor(Object *obj);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean CClass_IsConstructor(Object *obj);
+#endif
 extern Object *CClass_Destructor(TypeClass *cls);
 extern NameSpaceObjectList *CClass_Constructor(TypeClass *type);
 extern NameSpaceObjectList *CClass_MemberObject(TypeClass *type, HashNameNode *name);

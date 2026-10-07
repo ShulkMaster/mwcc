@@ -719,7 +719,7 @@ void setup_function_arguments(Object *function, DeclInfo *body, Statement *state
         }
         newEntry = (ObjectList *)CompilerTools_AllocatePool(sizeof(ObjectList));
         newEntry->object.value = result;
-        if (CInline_ReturnZero(function->type) != 0) {
+        if (CABI_GetStructResultArgumentIndex(TYPE_FUNC(function->type)) != 0) {
             if (arguments == NULL)
                 CError_FATAL(2846);
             newEntry->next = (arguments)->next;

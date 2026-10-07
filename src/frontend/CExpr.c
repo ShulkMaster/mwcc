@@ -617,7 +617,7 @@ ENode *parse_assignment_operator(ENode *expr, UInt8 assignmentKind, SInt16 overl
             expr->rtype == functionCall->data.funccall.functype->functype &&
             CMachine_FunctionRequiresMemoryReturn(functionCall->data.funccall.functype) == 1 &&
             (callArguments = functionCall->data.funccall.args) != NULL) {
-            switch (CInline_ReturnZero((Type *)functionCall->data.funccall.functype)) {
+            switch (CABI_GetStructResultArgumentIndex(functionCall->data.funccall.functype)) {
                 case 0:
                     break;
                 case 1:

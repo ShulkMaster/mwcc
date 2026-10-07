@@ -1532,5 +1532,7 @@
   "_xcalloc@8": "0x00417300",
   "_xmalloc@8": "0x00417280",
   "_xrealloc@12": "0x00417330",
-  "_xstrdup@4": "0x004173b0"
+  "_xstrdup@4": "0x004173b0",
+  "_cint64_min": "0x005b1cc8",
+  "_CMach_GetMemberAlignment": "0x004c0960"
 }

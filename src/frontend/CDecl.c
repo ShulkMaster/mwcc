@@ -2527,6 +2527,68 @@ static Boolean HighIsNegative(SInt32 hi)
     return (hi & 0x80000000) != 0;
 }
 
+#if VERSION >= VERSION_GC_1_3
+static TypeIntegral *UnsignedIntType(int *counter)
+{
+    switch (*counter) {
+        case 0:
+            *counter = 1;
+            return &stunsignedchar;
+        case 1:
+            if (stunsignedshort.size > stunsignedchar.size) {
+                *counter = 2;
+                return &stunsignedshort;
+            }
+        case 2:
+            if (stunsignedint.size > stunsignedshort.size) {
+                *counter = 3;
+                return &stunsignedint;
+            }
+        case 3:
+            if (stunsignedlong.size > stunsignedint.size) {
+                *counter = 4;
+                return &stunsignedlong;
+            }
+        case 4:
+            *counter = 5;
+            if (stunsignedlonglong.size > stunsignedlong.size && copts.f77 != 0 && copts.f78 != 0)
+                return &stunsignedlonglong;
+        default:
+            return NULL;
+    }
+}
+
+static TypeIntegral *SignedIntType(int *counter)
+{
+    switch (*counter) {
+        case 0:
+            *counter = 1;
+            return &stsignedchar;
+        case 1:
+            if (stsignedshort.size > stsignedchar.size) {
+                *counter = 2;
+                return &stsignedshort;
+            }
+        case 2:
+            if (stsignedint.size > stsignedshort.size) {
+                *counter = 3;
+                return &stsignedint;
+            }
+        case 3:
+            if (stsignedlong.size > stsignedint.size) {
+                *counter = 4;
+                return &stsignedlong;
+            }
+        case 4:
+            *counter = 5;
+            if (stsignedlonglong.size > stsignedlong.size && copts.f77 != 0 && copts.f78 != 0)
+                return &stsignedlonglong;
+        default:
+            return NULL;
+    }
+}
+
+#else
 static TypeIntegral *SignedIntType(SInt32 size)
 {
     if (stsignedchar.size == size)
@@ -2552,6 +2614,8 @@ static Type *UnsignedIntType(SInt32 size)
         return (Type *)&stunsignedlonglong;
     return (Type *)&stunsignedlong;
 }
+
+#endif
 
 static Boolean IsNegative(SInt32 hi)
 {
@@ -2861,6 +2925,10 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
     ObjEnumConst *n;
     ObjEnumConst *m;
     Type *t;
+    CInt64 a, b;
+#if VERSION >= VERSION_GC_1_3
+    int counter;
+#endif
 
     if (copts.f63 == 0) {
         for (n = res->enumlist; n != NULL; n = n->next) {
@@ -2868,7 +2936,6 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
                 break;
         }
         if (n != NULL) {
-            CInt64 a, b;
             b = a = qval_zero;
             for (m = res->enumlist; m != NULL; m = m->next) {
                 if (HighIsNegative(m->val.hi) && !Type_IsUnsigned(m->type)) {
@@ -2881,6 +2948,22 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
             }
             if (HighIsNegative(b.hi))
                 CError_ReportError(ERR_NUMBER_OUT_RANGE);
+#if VERSION >= VERSION_GC_1_3
+            counter = 0;
+            for (;;) {
+                t = (Type *)SignedIntType(&counter);
+                if (t == NULL) {
+                    t = (Type *)&stsignedlong;
+                    CError_ReportError(ERR_NUMBER_OUT_RANGE);
+                    break;
+                }
+                if (CInt64_IsInRange(b, t->size) && CInt64_IsInRange(a, t->size))
+                    break;
+                if (t->size == stsignedlong.size && copts.rejectZeroLengthArrayMembers == 0 &&
+                    CInt64_IsInRange(a, t->size) && CInt64_IsInURange(b, t->size))
+                    break;
+            }
+#else
             if (CInt64_IsInRange(b, 1) && CInt64_IsInRange(a, 1)) {
                 t = (Type *)SignedIntType(1);
             } else if (CInt64_IsInRange(b, 2) && CInt64_IsInRange(a, 2)) {
@@ -2894,6 +2977,7 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
                 if (t->size != 8)
                     CError_ReportError(ERR_NUMBER_OUT_RANGE);
             }
+#endif
         } else {
             CInt64 c;
             c = qval_zero;
@@ -2901,6 +2985,19 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
                 if (CInt64_GreaterU(m->val, c))
                     c = m->val;
             }
+#if VERSION >= VERSION_GC_1_3
+            counter = 0;
+            for (;;) {
+                t = (Type *)UnsignedIntType(&counter);
+                if (t == NULL) {
+                    t = (Type *)&stunsignedlong;
+                    CError_ReportError(ERR_NUMBER_OUT_RANGE);
+                    break;
+                }
+                if (CInt64_IsInURange(c, t->size))
+                    break;
+            }
+#else
             if (CInt64_IsInURange(c, 1)) {
                 t = UnsignedIntType(1);
             } else if (CInt64_IsInURange(c, 2)) {
@@ -2912,6 +3009,7 @@ void CDecl_ComputeUnderlyingEnumType(TypeEnum *res)
                 if (t->size != 8)
                     CError_ReportError(ERR_NUMBER_OUT_RANGE);
             }
+#endif
         }
     } else {
         t = (Type *)&stsignedint;

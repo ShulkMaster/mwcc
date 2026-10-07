@@ -1,4 +1,5 @@
 #define CERROR_FILE "CExpr2.c"
+#include "version.h"
 #include "compiler/common.h"
 #include "compiler/CExpr2.h"
 #include "compiler/enode.h"
@@ -4165,13 +4166,21 @@ ENode *CExpr_IsTempConstruction(ENode *e, Type *type, ENode **out)
         return NULL;
 
     if (e->data.monadic->data.funccall.funcref->type != EOBJREF ||
+#if VERSION >= VERSION_GC_1_3
+        CClass_IsConstructor(e->data.monadic->data.funccall.funcref->data.objref) == 0) {
+#else
         CClass_IsDestructor(e->data.monadic->data.funccall.funcref->data.objref) == 0) {
+#endif
         if (e->data.monadic->data.funccall.functype->functype != type)
             return NULL;
-        if (CInline_ReturnZero((Type *)e->data.monadic->data.funccall.functype) == 1) {
+        if (CABI_GetStructResultArgumentIndex(e->data.monadic->data.funccall.functype) == 1) {
             args = args->next;
             if (args == NULL)
+#if VERSION >= VERSION_GC_1_3
+                CError_FATAL(1277);
+#else
                 CError_FATAL(1154);
+#endif
         }
     }
     if (out != NULL)
@@ -4843,6 +4852,15 @@ CInt64 CExpr_IntConstConvert(Type *type, Type *otherType, CInt64 value)
 {
     if (type == (Type *)&stbool)
         return CMach_CalcIntDiadic(otherType, value, 0x169, qval_zero);
+#if VERSION >= VERSION_GC_1_3
+    if ((type->type == TYPEINT && TYPE_INTEGRAL(type)->integral >= 0x11) ||
+        (otherType->type == TYPEINT && TYPE_INTEGRAL(otherType)->integral >= 0x11))
+#if VERSION >= VERSION_GC_2_7
+        return fn_004bfeb0(type, otherType, value);
+#else
+        return fn_004bece0(type, otherType, value);
+#endif
+#endif
     return CMach_CalcIntDiadic(type, value, 0x2b, qval_zero);
 }
 

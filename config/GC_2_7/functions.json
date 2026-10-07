@@ -11969,9 +11969,10 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004bd340",
+    "name": "CExpr_IsTempConstruction",
     "address": "0x004bd340",
-    "size": 141
+    "size": 141,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "create_objectnode",
@@ -12033,9 +12034,10 @@
     "source": "src/frontend/CExpr2.c"
   },
   {
-    "name": "fn_004be3e0",
+    "name": "CExpr_IntConstConvert",
     "address": "0x004be3e0",
-    "size": 128
+    "size": 128,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "forceintegral",
@@ -12177,7 +12179,8 @@
   {
     "name": "fn_004bfeb0",
     "address": "0x004bfeb0",
-    "size": 29
+    "size": 29,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004bfed0",
@@ -12244,9 +12247,10 @@
     "size": 54
   },
   {
-    "name": "fn_004c0930",
+    "name": "CMach_MemberAlignValue",
     "address": "0x004c0930",
-    "size": 46
+    "size": 46,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004c0960",
@@ -12512,9 +12516,10 @@
     "source": "src/frontend/CInt64.c"
   },
   {
-    "name": "fn_004c32d0",
+    "name": "CInt64_IsInRange",
     "address": "0x004c32d0",
-    "size": 562
+    "size": 562,
+    "source": "src/frontend/CInt64.c"
   },
   {
     "name": "CInt64_NotEqual",
@@ -18671,9 +18676,10 @@
     "source": "src/frontend/CClass.c"
   },
   {
-    "name": "fn_0052eb50",
+    "name": "CClass_IsConstructor",
     "address": "0x0052eb50",
-    "size": 47
+    "size": 47,
+    "source": "src/frontend/CClass.c"
   },
   {
     "name": "CClass_Destructor",
@@ -19252,19 +19258,22 @@
     "size": 715
   },
   {
-    "name": "fn_005384b0",
+    "name": "CDecl_ComputeUnderlyingEnumType",
     "address": "0x005384b0",
-    "size": 645
+    "size": 645,
+    "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_00538740",
+    "name": "UnsignedIntType",
     "address": "0x00538740",
-    "size": 179
+    "size": 179,
+    "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_00538800",
+    "name": "SignedIntType",
     "address": "0x00538800",
-    "size": 179
+    "size": 179,
+    "source": "src/frontend/CDecl.c"
   },
   {
     "name": "CDecl_ScanDeclarator",
@@ -20845,9 +20854,10 @@
     "source": "src/frontend/CABI.c"
   },
   {
-    "name": "fn_0055b3c0",
+    "name": "CABI_GetCtorOffsetOffset",
     "address": "0x0055b3c0",
-    "size": 131
+    "size": 131,
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "CABI_FindNVBase",
@@ -20933,10 +20943,10 @@
     "size": 85
   },
   {
-    "name": "CMach_MemberAlignValue",
+    "name": "CABI_ComputeAlignmentPadding",
     "address": "0x0055c4a0",
     "size": 36,
-    "source": "src/backend/CMachine.c"
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "fn_0055c4d0",
@@ -20949,9 +20959,10 @@
     "size": 6
   },
   {
-    "name": "fn_0055c4f0",
+    "name": "CABI_GetStructResultArgumentIndex",
     "address": "0x0055c4f0",
-    "size": 3
+    "size": 3,
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "CInline_GeneratePendingFunctionBody",

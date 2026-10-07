@@ -1588,5 +1588,7 @@
   "_write_type": "0x00519440",
   "_write_vclasslist": "0x0051beb0",
   "_writtenEntry": "0x005e684c",
-  "_written_entry_buckets": "0x005df0fc"
+  "_written_entry_buckets": "0x005df0fc",
+  "_fn_004bece0": "0x004bece0",
+  "_CMach_GetMemberAlignment": "0x004bf830"
 }

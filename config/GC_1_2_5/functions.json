@@ -19254,10 +19254,10 @@
     "source": "src/frontend/CABI.c"
   },
   {
-    "name": "CInline_ReturnZero",
+    "name": "CABI_GetStructResultArgumentIndex",
     "address": "0x0050e840",
     "size": 3,
-    "source": "src/frontend/CInline.c"
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "CInline_GeneratePendingFunctionBody",

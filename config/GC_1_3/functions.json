@@ -11318,9 +11318,10 @@
     "size": 303
   },
   {
-    "name": "fn_004bc170",
+    "name": "CExpr_IsTempConstruction",
     "address": "0x004bc170",
-    "size": 141
+    "size": 141,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bc200",
@@ -11373,9 +11374,10 @@
     "size": 367
   },
   {
-    "name": "fn_004bd210",
+    "name": "CExpr_IntConstConvert",
     "address": "0x004bd210",
-    "size": 128
+    "size": 128,
+    "source": "src/frontend/CExpr2.c"
   },
   {
     "name": "fn_004bd290",
@@ -11573,9 +11575,10 @@
     "size": 45
   },
   {
-    "name": "fn_004bf800",
+    "name": "CMach_MemberAlignValue",
     "address": "0x004bf800",
-    "size": 46
+    "size": 46,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004bf830",
@@ -17373,9 +17376,10 @@
     "source": "src/frontend/CClass.c"
   },
   {
-    "name": "fn_0052d110",
+    "name": "CClass_IsConstructor",
     "address": "0x0052d110",
-    "size": 47
+    "size": 47,
+    "source": "src/frontend/CClass.c"
   },
   {
     "name": "CClass_Destructor",
@@ -17887,19 +17891,22 @@
     "size": 715
   },
   {
-    "name": "fn_00536a70",
+    "name": "CDecl_ComputeUnderlyingEnumType",
     "address": "0x00536a70",
-    "size": 645
+    "size": 645,
+    "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_00536d00",
+    "name": "UnsignedIntType",
     "address": "0x00536d00",
-    "size": 179
+    "size": 179,
+    "source": "src/frontend/CDecl.c"
   },
   {
-    "name": "fn_00536dc0",
+    "name": "SignedIntType",
     "address": "0x00536dc0",
-    "size": 179
+    "size": 179,
+    "source": "src/frontend/CDecl.c"
   },
   {
     "name": "fn_00536e80",
@@ -19326,7 +19333,7 @@
     "size": 603
   },
   {
-    "name": "fn_005588f0",
+    "name": "CABI_GetCtorOffsetOffset",
     "address": "0x005588f0",
     "size": 131
   },
@@ -19410,12 +19417,6 @@
     "size": 85
   },
   {
-    "name": "CMach_MemberAlignValue",
-    "address": "0x005599d0",
-    "size": 36,
-    "source": "src/backend/CMachine.c"
-  },
-  {
     "name": "CABI_ComputeAlignmentPadding",
     "address": "0x005599d0",
     "size": 36,
@@ -19432,9 +19433,10 @@
     "size": 6
   },
   {
-    "name": "fn_00559a20",
+    "name": "CABI_GetStructResultArgumentIndex",
     "address": "0x00559a20",
-    "size": 3
+    "size": 3,
+    "source": "src/frontend/CABI.c"
   },
   {
     "name": "fn_00559a30",

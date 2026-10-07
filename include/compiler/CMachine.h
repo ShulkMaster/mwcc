@@ -1,6 +1,7 @@
 #ifndef COMPILER_CMACHINE_H
 #define COMPILER_CMACHINE_H
 
+#include "version.h"
 #include "compiler/common.h"
 
 #ifdef __cplusplus
@@ -17,6 +18,9 @@ extern void CMachine_ResetMaximumAlignment(void);
 extern SInt16 CMachine_GetTypeAlignment(Type *type);
 extern UInt16 fn_004a8400(TypeStruct *str);
 extern SInt16 CMach_MemberAlignValue(Type *a0, SInt32 a1);
+#if VERSION >= VERSION_GC_1_3
+extern SInt16 CMach_GetMemberAlignment(Type *type, SInt32 minimumAlignment, Boolean flag);
+#endif
 extern int CMach_StructLayoutGetCurSize(void);
 extern SInt16 get_type_align(Type *a0);
 extern short CMach_GetClassAlign(TypeClass *list);
@@ -54,6 +58,11 @@ extern signed short bitfield_storage_size;
 extern int data_00580fa4;
 extern void initialize_hash_name_globals(void);
 extern Float CMach_FloatReciprocal(Float a0);
+#if VERSION >= VERSION_GC_2_7
+extern CInt64 fn_004bfeb0(Type *type, Type *otherType, CInt64 value);
+#elif VERSION >= VERSION_GC_1_3
+extern CInt64 fn_004bece0(Type *type, Type *otherType, CInt64 value);
+#endif
 extern Boolean CMach_FloatIsPowerOf2(Float f);
 extern char vector_pixel_name[];
 extern HashNameNode *data_0055f638;
