@@ -43,12 +43,6 @@ int Utils_IsHexDigit(char c)
     return Utils_IsDigit(c) || ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
 }
 
-static inline void resetflags(void)
-{
-    int a, b;
-    a = b = 0;
-}
-
 static inline char *putbar(char *out)
 {
     *out = '|';
@@ -68,9 +62,10 @@ char *Utils_FormatOptions(char *options, char *destination, SInt8 flags)
     char d;
     int prefixIndex;
     char *out;
+    int flagA, flagB;
 
     bracketDepth = 0;
-    d = 1;
+    flagA = 1;
     suffixLength = 1;
     out = destination;
     option = options;
@@ -134,7 +129,7 @@ char *Utils_FormatOptions(char *options, char *destination, SInt8 flags)
             }
         }
         if (previousPrefix != 0) {
-            resetflags();
+            flagA = flagB = 0;
             option += previousPrefix;
             while (option < separator) {
                 *out++ = *option++;
@@ -179,7 +174,7 @@ char *Utils_FormatOptions(char *options, char *destination, SInt8 flags)
         }
         flags &= 0xbf;
         previousPrefix = commonPrefix;
-        resetflags();
+        flagA = flagB = 0;
     }
     while (bracketDepth--) {
         *out++ = ']';
