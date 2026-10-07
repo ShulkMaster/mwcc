@@ -4335,39 +4335,45 @@
     "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041e960",
+    "name": "CWPluginsPrivate_GetRequest",
     "address": "0x0041e960",
-    "size": 75
+    "size": 75,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041e9b0",
+    "name": "CWPluginsPrivate_GetAPIVersion",
     "address": "0x0041e9b0",
-    "size": 76
+    "size": 76,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ea00",
+    "name": "CWPluginsPrivate_GetSourceFile",
     "address": "0x0041ea00",
     "size": 82
   },
   {
     "name": "CWPluginsPrivate_GetTargetName",
     "address": "0x0041ea60",
-    "size": 78
+    "size": 78,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eab0",
+    "name": "CWPluginsPrivate_GetNumFiles",
     "address": "0x0041eab0",
-    "size": 79
+    "size": 79,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eb00",
+    "name": "CWPluginsPrivate_InvokeExportedRecordCallback",
     "address": "0x0041eb00",
-    "size": 89
+    "size": 89,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eb60",
+    "name": "CWPluginsPrivate_CallSignatureCallback",
     "address": "0x0041eb60",
-    "size": 98
+    "size": 98,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
     "name": "ensure_callback_cache",
@@ -4376,94 +4382,112 @@
     "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ec10",
+    "name": "get_opcode_descriptor",
     "address": "0x0041ec10",
-    "size": 133
+    "size": 133,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eca0",
+    "name": "CWPluginsPrivate_ValidateAndCallCallback",
     "address": "0x0041eca0",
-    "size": 139
+    "size": 139,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ed30",
+    "name": "fn_0041b7f0",
     "address": "0x0041ed30",
-    "size": 64
+    "size": 64,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ed70",
+    "name": "CWPluginsPrivate_InvokeMessageCallback",
     "address": "0x0041ed70",
-    "size": 71
+    "size": 71,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041edc0",
+    "name": "CWPluginsPrivate_CallCallback9",
     "address": "0x0041edc0",
-    "size": 66
+    "size": 66,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ee10",
+    "name": "fn_0041b8d0",
     "address": "0x0041ee10",
-    "size": 56
+    "size": 56,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ee50",
+    "name": "fn_0041b910",
     "address": "0x0041ee50",
-    "size": 46
+    "size": 46,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ee80",
+    "name": "CWPluginsPrivate_CallArgumentValueCallback",
     "address": "0x0041ee80",
-    "size": 85
+    "size": 85,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eee0",
+    "name": "CWPluginsPrivate_CallFileProcessingCallback",
     "address": "0x0041eee0",
-    "size": 90
+    "size": 90,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041ef40",
+    "name": "CWPluginsPrivate_OpenFile",
     "address": "0x0041ef40",
-    "size": 111
+    "size": 111,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041efb0",
+    "name": "CWPluginsPrivate_CallValuePairCallback",
     "address": "0x0041efb0",
-    "size": 64
+    "size": 64,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041eff0",
+    "name": "fn_0041bab0",
     "address": "0x0041eff0",
-    "size": 90
+    "size": 90,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f050",
+    "name": "CWPluginsPrivate_CallContextArgumentCallback",
     "address": "0x0041f050",
-    "size": 55
+    "size": 55,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f090",
+    "name": "fn_0041bb50",
     "address": "0x0041f090",
-    "size": 90
+    "size": 90,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f0f0",
+    "name": "fn_0041bbb0",
     "address": "0x0041f0f0",
-    "size": 55
+    "size": 55,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f130",
+    "name": "CWPluginsPrivate_ReturnArgument",
     "address": "0x0041f130",
-    "size": 7
+    "size": 7,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f140",
+    "name": "CWPluginsPrivate_InvokeCallback40",
     "address": "0x0041f140",
-    "size": 78
+    "size": 78,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
-    "name": "fn_0041f190",
+    "name": "fn_0041bc50",
     "address": "0x0041f190",
-    "size": 58
+    "size": 58,
+    "source": "src/driver/CWPluginsPrivate.c"
   },
   {
     "name": "cc_eabi_ppc_ReportCompilingFunction",
