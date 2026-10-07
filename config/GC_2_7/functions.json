@@ -15811,9 +15811,10 @@
     "source": "src/backend/DumpIR.c"
   },
   {
-    "name": "fn_004fd8f0",
+    "name": "set_label_stmt_flag",
     "address": "0x004fd8f0",
-    "size": 50
+    "size": 50,
+    "source": "src/optimizer/COptimizer.c"
   },
   {
     "name": "COptimizer_OptimizeStatementList",
@@ -16994,10 +16995,9 @@
     "source": "src/frontend/CBrowse.c"
   },
   {
-    "name": "set_label_stmt_flag",
+    "name": "fn_00513800",
     "address": "0x00513800",
-    "size": 103,
-    "source": "src/optimizer/COptimizer.c"
+    "size": 103
   },
   {
     "name": "fn_00513870",
