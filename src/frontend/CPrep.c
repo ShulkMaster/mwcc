@@ -102,20 +102,25 @@ typedef enum { CPrep_DidPush, CPrep_DidPop } CPrep_DidFlag;
         (macro_).isExpanding = 0;                                                                                      \
     } while (0)
 
+/* TODO: [near miss] CPrep_AllocateVarInfo GC_2_7 ~99.93%: allocation and clear await the 42-byte VarInfo layout. */
 VarInfo *CPrep_AllocateVarInfo(void)
 {
     VarInfo *info;
     info = (VarInfo *)CompilerTools_AllocatePool(sizeof(VarInfo));
     memclrw(info, sizeof(VarInfo));
+#if VERSION < VERSION_GC_2_7
     info->usage = 0;
+#endif
     info->deftoken = *CPrep_GetLastBufferedToken();
     info->varnumber = next_varnumber;
     next_varnumber++;
+#if VERSION < VERSION_GC_2_7
     info->noregister = 0;
     info->used = 0;
     info->reg = 0;
     info->regHi = 0;
     info->in_param_area = 0;
+#endif
     return info;
 }
 
@@ -499,7 +504,11 @@ void parse_else_directive(void)
             data_0057f6c8[if_depth - 1].state = 4;
             return;
         default:
+#if VERSION >= VERSION_GC_2_7
+            CError_FATAL(5825);
+#else
             CError_FATAL(5734);
+#endif
             return;
     }
 }
@@ -536,7 +545,11 @@ void parse_elif_directive(void)
                 skip_inactive_if_blocks();
                 return;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(5787);
+#else
                 CError_FATAL(5696);
+#endif
         }
     }
 }
@@ -4660,7 +4673,11 @@ void CPrep_UngetToken(void)
     remainingBufferedTokenCount++;
     bufferedTokenPosition--;
     if (bufferedTokenPosition < buffered_tokens)
+#if VERSION >= VERSION_GC_2_7
+        CError_FATAL(909);
+#else
         CError_FATAL(1237);
+#endif
 }
 
 #pragma sym on
