@@ -1942,6 +1942,11 @@ void appendmember(TypeStruct *s, StructMember *m)
 
 Boolean Type_IsUnsigned(Type *type)
 {
+#if VERSION >= VERSION_GC_1_3
+    if (IS_TYPE_ENUM(type))
+        type = TYPE_ENUM(type)->enumtype;
+    return fn_004bff30(type);
+#else
     if (IS_TYPE_ENUM(type))
         type = TYPE_ENUM(type)->enumtype;
 
@@ -1951,6 +1956,7 @@ Boolean Type_IsUnsigned(Type *type)
         (copts.unsignedChar && type == (Type *)&stchar) || type->type == TYPEPOINTER)
         return 1;
     return 0;
+#endif
 }
 
 SInt16 iscpp_typeequal(Type *leftType, Type *rightType)

@@ -1679,5 +1679,11 @@
   "_compiler_linker_callbacks": "0x005a557c",
   "_CDecl_MakeCopyCtorType": "0x00534980",
   "_fn_004d1650": "0x004d1650",
-  "_currentDwarfFunctionState": "0x005ea614"
+  "_currentDwarfFunctionState": "0x005ea614",
+  "_CInt64_GreaterEqual": "0x004c35b0",
+  "_CInt64_LessEqualU": "0x004c3680",
+  "_CInt64_LessEqual": "0x004c36d0",
+  "_CInt64_Shr": "0x004c3a40",
+  "_CInt64_ModU": "0x004c3b20",
+  "_CInt64_DivU": "0x004c3d00"
 }

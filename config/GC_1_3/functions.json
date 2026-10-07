@@ -11532,9 +11532,10 @@
     "size": 88
   },
   {
-    "name": "fn_004bf100",
+    "name": "fn_004bff30",
     "address": "0x004bf100",
-    "size": 57
+    "size": 57,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004bf140",
@@ -11708,9 +11709,10 @@
     "size": 553
   },
   {
-    "name": "fn_004c0ac0",
+    "name": "CMach_CalcIntDiadic",
     "address": "0x004c0ac0",
-    "size": 2641
+    "size": 2641,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004c1520",
@@ -13804,9 +13806,10 @@
     "size": 31
   },
   {
-    "name": "fn_004e6610",
+    "name": "Type_IsUnsigned",
     "address": "0x004e6610",
-    "size": 20
+    "size": 20,
+    "source": "src/frontend/CParser.c"
   },
   {
     "name": "fn_004e6630",

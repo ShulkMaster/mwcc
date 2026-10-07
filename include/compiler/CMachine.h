@@ -44,6 +44,9 @@ extern void CMachine_InitVectorMem(Type *type, MWVector128 val, void *mem);
 extern void CMach_InitIntMem(Type *type, CInt64 val, void *mem);
 extern CInt64 CMach_CalcIntConvertFromFloat(Type *type, double value);
 extern CInt64 CMach_CalcIntMonadic(Type *type, SInt16 op, CInt64 val);
+#if VERSION >= VERSION_GC_1_3
+extern Boolean fn_004bff30(Type *type);
+#endif
 extern CInt64 CMach_CalcIntDiadic(Type *type, CInt64 a, SInt16 op, CInt64 b);
 extern int CMach_GetQUALalign(int a0);
 extern void CMach_PrintFloat(char *a0, Float val);

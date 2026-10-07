@@ -12240,7 +12240,8 @@
   {
     "name": "fn_004bff30",
     "address": "0x004bff30",
-    "size": 57
+    "size": 57,
+    "source": "src/backend/CMachine.c"
   },
   {
     "name": "fn_004bff70",
@@ -14819,9 +14820,10 @@
     "size": 31
   },
   {
-    "name": "fn_004e7e40",
+    "name": "Type_IsUnsigned",
     "address": "0x004e7e40",
-    "size": 20
+    "size": 20,
+    "source": "src/frontend/CParser.c"
   },
   {
     "name": "fn_004e7e60",
@@ -14907,10 +14909,9 @@
     "source": "src/frontend/CParser.c"
   },
   {
-    "name": "Type_IsUnsigned",
+    "name": "fn_004e8ce0",
     "address": "0x004e8ce0",
-    "size": 134,
-    "source": "src/frontend/CParser.c"
+    "size": 134
   },
   {
     "name": "CParser_NewFuncArg",

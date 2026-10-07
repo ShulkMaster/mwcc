@@ -1604,5 +1604,11 @@
   "_CDecl_MakeCopyCtorType": "0x00532f40",
   "_bitvectorunion": "0x0057acb0",
   "_bitvectorinitialize": "0x0057ad30",
-  "_bitvectorcopy": "0x0057ada0"
+  "_bitvectorcopy": "0x0057ada0",
+  "_CInt64_GreaterEqual": "0x004c2440",
+  "_CInt64_LessEqualU": "0x004c2510",
+  "_CInt64_LessEqual": "0x004c2560",
+  "_CInt64_Shr": "0x004c28d0",
+  "_CInt64_ModU": "0x004c29b0",
+  "_CInt64_DivU": "0x004c2b90"
 }

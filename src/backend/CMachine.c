@@ -1216,6 +1216,33 @@ CInt64 CMach_CalcIntMonadic(Type *type, SInt16 op, CInt64 val)
 
 #define ISZERO64(v) ((Boolean)(((v).hi == 0) && ((v).lo == 0)))
 
+#if VERSION >= VERSION_GC_1_3
+Boolean fn_004bff30(Type *type)
+{
+    switch (type->type) {
+        case TYPEINT:
+            switch (TYPE_INTEGRAL(type)->integral) {
+                case IT_BOOL:
+                case IT_UCHAR:
+                case IT_WCHAR_T:
+                case IT_USHORT:
+                case IT_UINT:
+                case IT_ULONG:
+                case IT_ULONGLONG:
+                    return 1;
+                case IT_CHAR:
+                    return copts.unsignedChar;
+                default:
+                    return 0;
+            }
+        case TYPEPOINTER:
+            return 1;
+        default:
+            return 0;
+    }
+}
+#endif
+
 CInt64 CMach_CalcIntDiadic(Type *type, CInt64 a, SInt16 op, CInt64 b)
 {
     if (Type_IsUnsigned(type)) {
@@ -1235,7 +1262,13 @@ CInt64 CMach_CalcIntDiadic(Type *type, CInt64 a, SInt16 op, CInt64 b)
             case 8:
                 break;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(331);
+#elif VERSION >= VERSION_GC_1_3
+                CError_FATAL(327);
+#else
                 CError_FATAL(243);
+#endif
         }
         switch (op) {
             case '*':
@@ -1353,7 +1386,13 @@ CInt64 CMach_CalcIntDiadic(Type *type, CInt64 a, SInt16 op, CInt64 b)
             case 8:
                 break;
             default:
+#if VERSION >= VERSION_GC_2_7
+                CError_FATAL(393);
+#elif VERSION >= VERSION_GC_1_3
+                CError_FATAL(389);
+#else
                 CError_FATAL(305);
+#endif
         }
         switch (op) {
             case '*':
