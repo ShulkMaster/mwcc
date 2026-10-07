@@ -437,7 +437,7 @@ void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 
     unsigned char *names;
     unsigned char *name;
     unsigned char *str;
-    void **hand;
+    StorageHandle *hand;
     UINT dofs;
     signed fpos;
     int flags;
@@ -569,25 +569,21 @@ void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 
                             val = SWAP32(val);
                             if (val + dofs + ph->data_offs > size)
                                 goto bad2;
-                            hand = (void **)Memory_NewHandle(val);
+                            hand = (StorageHandle *)Memory_NewHandle(val);
                             if (hand == NULL)
                                 goto bad2;
-                            fn_00413a00((struct StorageHandle *)hand);
+                            fn_00413a00(hand);
                             if (buf == NULL) {
                                 if ((resource_error = Files_SetPosition(refnum, 1, fpos)) != 0)
                                     goto bad2;
-                                if ((resource_error = Files_Read(refnum, &val, *hand)) != 0)
+                                if ((resource_error = Files_Read(refnum, &val, hand->data)) != 0)
                                     goto bad2;
                             } else {
                                 if (fpos + *(signed *)&val > size)
                                     goto bad2;
-                                memcpy(*hand, buf + fpos, *(signed *)&val);
+                                memcpy(hand->data, buf + fpos, *(signed *)&val);
                             }
-#if VERSION >= VERSION_GC_2_7
-                            fn_00413a50((StorageHandle *)hand);
-#else
                             fn_00413a50(hand);
-#endif
                             if (refs[j].nameOffset != 0xffff) {
                                 str = names + refs[j].nameOffset;
                                 name = (unsigned char *)malloc(*str + 1);
@@ -596,7 +592,7 @@ void read_resource_file(short refnum, char readonly, unsigned char *buf, SInt32 
                                 name = NULL;
                             }
                             if (insert_res_entry(&rt->entries, refs[j].id, types[count].type, name, refs[j].attributes,
-                                                 (StorageHandle *)hand) == NULL)
+                                                 hand) == NULL)
                                 goto fail;
                         }
                     }
