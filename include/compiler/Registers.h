@@ -3,6 +3,10 @@
 
 #include "compiler/common.h"
 #include "compiler/CPrep.h"
+#include "version.h"
+#if VERSION >= VERSION_GC_2_7
+#include "compiler/Coloring.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,6 +29,37 @@ struct VarInfo {
         alignmentPadding; /* 0x2b: Registers_GetInfo allocates and clears 44 bytes; unused trailing alignment byte after is_vector. */
 };
 #pragma options align = reset
+#if VERSION >= VERSION_GC_2_7
+enum VarInfoFlags { VarInfoFlag_HasRegister = 0x02, VarInfoFlag_RegisterPair = 0x04 };
+#pragma options align = mac68k
+struct VarInfoGC27 {
+    struct Object *func;
+    SInt32 usage;
+    struct BufferedToken deftoken;
+    SInt16 varnumber;
+    UInt8 noregister;
+    UInt8 used;
+    UInt8 flags;
+    UInt8 rclass;
+    SInt16 reg;
+    SInt16 regHi;
+};
+#pragma options align = reset
+#pragma pack(push, 2)
+struct GlobalRegisterVariable {
+    struct GlobalRegisterVariable *next;
+    struct Object *object;
+    struct HashNameNode *name;
+    SInt8 rclass;
+    UInt8 reg;
+    struct NameSpace *nspace;
+    UInt8 is_static;
+};
+#pragma pack(pop)
+extern VarInfoGC27 *Registers_GetInfoGC27(Object *object);
+extern int n_real_registers[RegClassMax];
+extern GlobalRegisterVariable *gGlobalRegisterVariables;
+#endif
 extern void Registers_BindVR(Object *obj, short vr);
 extern void Registers_BindFPR(Object *obj, SInt16 regnum);
 extern void Registers_BindGPR(Object *obj, SInt16 reg);

@@ -16425,7 +16425,7 @@
     "size": 493
   },
   {
-    "name": "Coloring_SetupFPRs",
+    "name": "Coloring_MarkSpecialRegisters",
     "address": "0x00508ac0",
     "size": 396,
     "source": "src/backend/Coloring.c"

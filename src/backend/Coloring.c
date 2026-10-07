@@ -509,6 +509,57 @@ InterferenceNode *Coloring_SimplifyGraph(int allocation, int register_count, int
     }
     return stack;
 }
+
+#if VERSION >= VERSION_GC_2_7
+void Coloring_MarkSpecialRegisters(char reg_class)
+{
+    unsigned int reg;
+    ObjectList *list;
+    GlobalRegisterVariable *variable;
+
+    if (copts.operandsDebug && reg_class == RegClass_FPR) {
+        CError_FATAL(58);
+    }
+    for (reg = 0; reg < n_real_registers[reg_class]; reg++) {
+        gInterferenceGraph[reg]->physical_register = reg;
+    }
+    for (list = arguments; list != NULL; list = list->next) {
+        Object *object = list->object.value;
+        VarInfoGC27 *info = Registers_GetInfoGC27(object);
+
+        if ((info->flags & VarInfoFlag_HasRegister) && info->rclass == reg_class) {
+            gInterferenceGraph[info->reg]->object = object;
+            if (info->flags & VarInfoFlag_RegisterPair) {
+                gInterferenceGraph[info->reg]->flags |= Interference_FirstOfPair;
+                gInterferenceGraph[info->regHi]->flags |= Interference_SecondOfPair;
+                gInterferenceGraph[info->regHi]->object = object;
+            }
+        }
+    }
+    for (list = locals; list != NULL; list = list->next) {
+        Object *object = list->object.value;
+        VarInfoGC27 *info = Registers_GetInfoGC27(object);
+
+        if ((info->flags & VarInfoFlag_HasRegister) && info->rclass == reg_class) {
+            gInterferenceGraph[info->reg]->object = object;
+            if (info->flags & VarInfoFlag_RegisterPair) {
+                gInterferenceGraph[info->reg]->flags |= Interference_FirstOfPair;
+                gInterferenceGraph[info->regHi]->flags |= Interference_SecondOfPair;
+                gInterferenceGraph[info->regHi]->object = object;
+            }
+        }
+    }
+    for (variable = gGlobalRegisterVariables; variable != NULL; variable = variable->next) {
+        if (reg_class == variable->rclass) {
+            VarInfoGC27 *info = Registers_GetInfoGC27(variable->object);
+
+            if (info->flags & VarInfoFlag_HasRegister) {
+                gInterferenceGraph[info->reg]->object = variable->object;
+            }
+        }
+    }
+}
+#else
 void Coloring_SetupVRs(void)
 {
     UInt32 i;
@@ -610,3 +661,4 @@ void Coloring_SetupGPRs(void)
         }
     }
 }
+#endif
