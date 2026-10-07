@@ -11,6 +11,7 @@ extern "C" {
 
 #if VERSION >= VERSION_GC_2_7
 enum RegisterClass {
+    RegClass_Invalid = -1,
     RegClass_SPR = 0,
     RegClass_CRFIELD = 1,
     RegClass_VR = 2,

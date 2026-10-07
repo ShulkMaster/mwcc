@@ -51,7 +51,7 @@ struct GlobalRegisterVariable {
     struct Object *object;
     struct HashNameNode *name;
     SInt8 rclass;
-    UInt8 reg;
+    SInt8 reg;
     struct NameSpace *nspace;
     UInt8 is_static;
 };
@@ -59,6 +59,33 @@ struct GlobalRegisterVariable {
 extern VarInfoGC27 *Registers_GetInfoGC27(Object *object);
 extern int n_real_registers[RegClassMax];
 extern GlobalRegisterVariable *gGlobalRegisterVariables;
+#define RegisterMax 32
+#define RegState_Free 0
+#define RegState_Used 1
+#define RegState_Reserved 2
+extern int used_virtual_registers[RegClassMax];
+extern int used_nonvolatile_registers[RegClassMax];
+extern int assignable_registers[RegClassMax];
+extern int n_scratch_registers[RegClassMax];
+extern int scratch_registers[RegClassMax][RegisterMax];
+extern int n_nonvolatile_registers[RegClassMax];
+extern int nonvolatile_registers[RegClassMax][RegisterMax];
+extern UInt8 reg_state[RegClassMax][RegisterMax];
+extern int first_temporary_register[RegClassMax];
+extern int last_temporary_register[RegClassMax];
+extern char *register_class_name[RegClassMax];
+extern char *register_class_format[RegClassMax];
+extern int coloring;
+extern int gGlobalRegisterVariableLimit[RegClassMax];
+extern UInt8 gGlobalRegisterVariablesAllowed;
+extern int optimizing;
+extern void assign_register_to_variable(Object *obj, enum RegisterClass rclass);
+extern int available_registers(enum RegisterClass rclass);
+extern UInt32 volatile_registers(enum RegisterClass rclass);
+extern short obtain_nonvolatile_register(enum RegisterClass rclass);
+extern void open_temp_registers(void);
+extern void check_temp_registers(void);
+extern void close_temp_registers(void);
 #endif
 extern void Registers_BindVR(Object *obj, short vr);
 extern void Registers_BindFPR(Object *obj, SInt16 regnum);

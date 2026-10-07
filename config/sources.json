@@ -481,6 +481,21 @@
     ],
     "status": "NonMatching"
   },
+  "src/backend/RegisterInfo.c": {
+    "compiler": "pro53",
+    "flags": [
+      "-O4,p",
+      "-inline",
+      "auto",
+      "-sym",
+      "on",
+      "-Cpp_exceptions",
+      "off"
+    ],
+    "include_dirs": [
+      "src/backend"
+    ]
+  },
   "src/backend/Registers.c": {
     "compiler": "pro53",
     "flags": [

@@ -6,6 +6,7 @@
   },
   "matching": [
     "src/backend/Coloring.c",
+    "src/backend/Registers.c",
     "src/driver/CLLoadAndCache.c",
     "src/driver/CLProj.c",
     "src/driver/CLStaticPlugins.c",
@@ -78,6 +79,7 @@
     "src/driver/CLDependencies.c",
     "src/frontend/CError.c",
     "src/optimizer/GlobalOptimizer.c",
-    "src/backend/CMachine.c"
+    "src/backend/CMachine.c",
+    "src/backend/RegisterInfo.c"
   ]
 }

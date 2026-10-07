@@ -40,6 +40,12 @@
 #include "compiler/StackFrameEABI.h"
 #include "compiler/Switch.h"
 #include <string.h>
+#include "version.h"
+#if VERSION >= VERSION_GC_2_7
+#include "compiler/RegisterInfo.h"
+#endif
+
+#if VERSION < VERSION_GC_2_7
 
 /* The cost of evaluating CSE's expression tree: its nodes, the divisions and multiplications twice, and the loads
    of variables that cannot live in a register. */
@@ -994,3 +1000,147 @@ void Registers_BindGPR(Object *obj, SInt16 reg)
             info->is_fpr = 1;
     }
 }
+
+#else
+
+int used_virtual_registers[RegClassMax];
+int used_nonvolatile_registers[RegClassMax];
+int assignable_registers[RegClassMax];
+int n_real_registers[RegClassMax];
+int n_scratch_registers[RegClassMax];
+int scratch_registers[RegClassMax][RegisterMax];
+int n_nonvolatile_registers[RegClassMax];
+int nonvolatile_registers[RegClassMax][RegisterMax];
+UInt8 reg_state[RegClassMax][RegisterMax];
+int first_temporary_register[RegClassMax];
+int last_temporary_register[RegClassMax];
+char *register_class_name[RegClassMax];
+char *register_class_format[RegClassMax];
+int coloring;
+int optimizing;
+
+void close_temp_registers(void)
+{
+    enum RegisterClass rclass;
+
+    for (rclass = 0; rclass < RegClassMax; rclass++) {
+        if (used_virtual_registers[rclass] < last_temporary_register[rclass])
+            used_virtual_registers[rclass] = last_temporary_register[rclass];
+        else
+            last_temporary_register[rclass] = used_virtual_registers[rclass];
+    }
+}
+
+void check_temp_registers(void)
+{
+    enum RegisterClass rclass;
+
+    for (rclass = 0; rclass < RegClassMax; rclass++) {
+        if (used_virtual_registers[rclass] > 32767)
+            PPCError_FatalError(219);
+    }
+
+    if (optimizing)
+        return;
+
+    for (rclass = 0; rclass < RegClassMax; rclass++) {
+        if (used_virtual_registers[rclass] > last_temporary_register[rclass])
+            last_temporary_register[rclass] = used_virtual_registers[rclass];
+        if (used_virtual_registers[rclass] > 256)
+            used_virtual_registers[rclass] = first_temporary_register[rclass];
+    }
+}
+
+void open_temp_registers(void)
+{
+    enum RegisterClass rclass;
+
+    for (rclass = 0; rclass < RegClassMax; rclass++)
+        first_temporary_register[rclass] = last_temporary_register[rclass] = used_virtual_registers[rclass];
+}
+
+short obtain_nonvolatile_register(enum RegisterClass rclass)
+{
+    int best = -1;
+    int reg;
+
+    while (used_nonvolatile_registers[rclass] < n_nonvolatile_registers[rclass]) {
+        reg = nonvolatile_registers[rclass][used_nonvolatile_registers[rclass]++];
+        if (reg_state[rclass][reg] == RegState_Free) {
+            best = reg;
+            break;
+        }
+    }
+
+    return best;
+}
+
+UInt32 volatile_registers(enum RegisterClass rclass)
+{
+    UInt32 mask = 0;
+    int i;
+    int reg;
+
+    for (i = 0; i < n_scratch_registers[rclass]; i++) {
+        reg = scratch_registers[rclass][i];
+        if (reg_state[rclass][reg] == RegState_Free)
+            mask |= 1 << reg;
+    }
+
+    return mask;
+}
+
+int available_registers(enum RegisterClass rclass)
+{
+    int i;
+    int count = 0;
+
+    for (i = 0; i < n_real_registers[rclass]; i++) {
+        if (reg_state[rclass][i] == RegState_Free)
+            count++;
+    }
+
+    return count;
+}
+
+void assign_register_to_variable(Object *obj, enum RegisterClass rclass)
+{
+    VarInfoGC27 *vi;
+    short reg;
+
+    vi = Registers_GetInfoGC27(obj);
+    if (optimizing) {
+        reg = used_virtual_registers[rclass]++;
+    } else {
+        reg = obtain_nonvolatile_register(rclass);
+        retain_register(obj, rclass, reg);
+    }
+
+    vi->flags |= VarInfoFlag_HasRegister;
+    vi->rclass = rclass;
+    vi->reg = reg;
+}
+
+void Registers_InitRegisterState(void)
+{
+    enum RegisterClass rclass;
+    int j;
+
+    for (rclass = 0; rclass < RegClassMax; rclass++) {
+        for (j = 0; j < RegisterMax; j++)
+            reg_state[rclass][j] = RegState_Free;
+    }
+
+    for (rclass = 0; rclass < RegClassMax; rclass++)
+        used_nonvolatile_registers[rclass] = 0;
+
+    optimizing = 1;
+
+    init_target_registers();
+    for (rclass = 0; rclass < RegClassMax; rclass++)
+        used_virtual_registers[rclass] = n_real_registers[rclass];
+
+    coloring = 1;
+}
+
+#endif

@@ -12886,93 +12886,106 @@
     "size": 55
   },
   {
-    "name": "fn_004cfde0",
+    "name": "update_asm_nonvolatile_registers",
     "address": "0x004cfde0",
-    "size": 109
+    "size": 109,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004cfe50",
+    "name": "init_endian",
     "address": "0x004cfe50",
-    "size": 120
+    "size": 120,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004cfed0",
+    "name": "reset_nonvolatile_registers",
     "address": "0x004cfed0",
-    "size": 46
+    "size": 46,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004cff00",
+    "name": "save_before_coloring_nonvolatile_registers",
     "address": "0x004cff00",
-    "size": 47
+    "size": 47,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004cff30",
+    "name": "colored_vrs_as_vrsave",
     "address": "0x004cff30",
-    "size": 172
+    "size": 172,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "Registers_BindGPR",
+    "name": "Registers_GetInfoGC27",
     "address": "0x004cffe0",
     "size": 150,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d0080",
+    "name": "set_last_exception_registers",
     "address": "0x004d0080",
-    "size": 40
+    "size": 40,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d00b0",
+    "name": "open_fe_temp_registers",
     "address": "0x004d00b0",
-    "size": 73
+    "size": 73,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "insert_type_node_before",
+    "name": "assign_GPR_pair",
     "address": "0x004d0100",
     "size": 294,
-    "source": "src/backend/DWARF.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "Registers_BindVR",
+    "name": "assign_register_by_type",
     "address": "0x004d0230",
     "size": 447,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d03f0",
+    "name": "init_target_registers",
     "address": "0x004d03f0",
-    "size": 741
+    "size": 741,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d06e0",
+    "name": "setup_diagnostic_reg_strings",
     "address": "0x004d06e0",
-    "size": 101
+    "size": 101,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
     "name": "fn_004d0750",
     "address": "0x004d0750",
-    "size": 51
+    "size": 51,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
     "name": "fn_004d0790",
     "address": "0x004d0790",
-    "size": 108
+    "size": 108,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "create_type_dwarf_ref",
+    "name": "first_nonvolatile_reg",
     "address": "0x004d0800",
     "size": 947,
-    "source": "src/backend/DWARF.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d0bc0",
+    "name": "GetRegisterClassName",
     "address": "0x004d0bc0",
-    "size": 52
+    "size": 52,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d0c00",
+    "name": "GetABIFirstNonVolatile",
     "address": "0x004d0c00",
-    "size": 52
+    "size": 52,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
     "name": "fn_004d0c40",
@@ -12985,26 +12998,28 @@
     "size": 38
   },
   {
-    "name": "fn_004d0cc0",
+    "name": "is_register_object",
     "address": "0x004d0cc0",
-    "size": 101
+    "size": 101,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "Registers_AllocateFPR",
+    "name": "retain_GPR_pair",
     "address": "0x004d0d30",
     "size": 314,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "Registers_BindGPRPair",
+    "name": "retain_register",
     "address": "0x004d0e70",
     "size": 259,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/RegisterInfo.c"
   },
   {
-    "name": "fn_004d0f80",
+    "name": "asm_used_register",
     "address": "0x004d0f80",
-    "size": 185
+    "size": 185,
+    "source": "src/backend/RegisterInfo.c"
   },
   {
     "name": "CBrowse_ForwardObjectFileRange",
@@ -14279,10 +14294,10 @@
     "size": 44
   },
   {
-    "name": "Registers_AllocateGPRPair",
+    "name": "fn_004e0860",
     "address": "0x004e0860",
     "size": 736,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/TOC.c"
   },
   {
     "name": "fn_004e0b40",
@@ -15930,44 +15945,52 @@
     "size": 15
   },
   {
-    "name": "fn_004fe230",
+    "name": "close_temp_registers",
     "address": "0x004fe230",
-    "size": 52
+    "size": 52,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe270",
+    "name": "check_temp_registers",
     "address": "0x004fe270",
-    "size": 120
+    "size": 120,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe2f0",
+    "name": "open_temp_registers",
     "address": "0x004fe2f0",
-    "size": 48
+    "size": 48,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe320",
+    "name": "obtain_nonvolatile_register",
     "address": "0x004fe320",
-    "size": 85
+    "size": 85,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe380",
+    "name": "volatile_registers",
     "address": "0x004fe380",
-    "size": 71
+    "size": 71,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe3d0",
+    "name": "available_registers",
     "address": "0x004fe3d0",
-    "size": 45
+    "size": 45,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe400",
+    "name": "assign_register_to_variable",
     "address": "0x004fe400",
-    "size": 182
+    "size": 182,
+    "source": "src/backend/Registers.c"
   },
   {
-    "name": "fn_004fe4c0",
+    "name": "Registers_InitRegisterState",
     "address": "0x004fe4c0",
-    "size": 245
+    "size": 245,
+    "source": "src/backend/Registers.c"
   },
   {
     "name": "COptimizer_GetFunctionObject",
@@ -19960,10 +19983,10 @@
     "source": "src/frontend/CExpr.c"
   },
   {
-    "name": "Registers_AllocateGPR",
+    "name": "fn_00545d70",
     "address": "0x00545d70",
     "size": 253,
-    "source": "src/backend/Registers.c"
+    "source": "src/frontend/CExpr.c"
   },
   {
     "name": "CExpr_MakeNameLookupResultExpr",
@@ -20157,10 +20180,10 @@
     "source": "src/backend/DWARF.c"
   },
   {
-    "name": "Registers_GetInfo",
+    "name": "insert_type_node_before",
     "address": "0x00548250",
     "size": 210,
-    "source": "src/backend/Registers.c"
+    "source": "src/backend/DWARF.c"
   },
   {
     "name": "DWARF_CreateObjectDebugEntry",
@@ -21775,10 +21798,10 @@
     "source": "src/frontend/CTemplateClass.c"
   },
   {
-    "name": "Registers_BindFPR",
+    "name": "instantiate_bases",
     "address": "0x00569e60",
     "size": 438,
-    "source": "src/backend/Registers.c"
+    "source": "src/frontend/CTemplateClass.c"
   },
   {
     "name": "CTemplateClass_0051cec0",
